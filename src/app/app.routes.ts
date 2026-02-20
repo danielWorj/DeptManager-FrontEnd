@@ -13,6 +13,14 @@ export const routes: Routes = [
         path: 'admin-time', 
         loadComponent : ()=>import('./Components/Admin/time/time').then(t => t.Time)
     },
+     {
+        path: 'admin-etudiants', 
+        loadComponent : ()=>import('./Components/Admin/etudiant-c/etudiant-c').then(e => e.EtudiantC)
+    },
+    {
+        path: 'admin-enseignants', 
+        loadComponent : ()=>import('./Components/Admin/enseignants-c/enseignants-c').then(e => e.EnseignantsC)
+    },
     {
         path: 'config', 
         loadComponent : ()=>import('./Components/Admin/Config/configuration/configuration').then(d => d.Configuration)

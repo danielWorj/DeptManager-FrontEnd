@@ -104,104 +104,285 @@
     </div>
     <div class="row">
     <!-- Order Statistics -->
-    <div class="col-xl-12 order-0 mb-4">
-        <div class="card h-100">
-        <div class="card-header d-flex align-items-center justify-content-between pb-0">
-            <div class="card-title mb-0">
-            <h5 class="m-0 me-2">Order Statistics</h5>
-            <small class="text-muted">42.82k Total Sales</small>
-            </div>
-            <div class="dropdown">
-            <button
-                class="btn p-0"
-                type="button"
-                id="orederStatistics"
-                data-bs-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-            >
-                <i class="bx bx-dots-vertical-rounded"></i>
-            </button>
-            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="orederStatistics">
-                <a class="dropdown-item" href="javascript:void(0);">Select All</a>
-                <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
-                <a class="dropdown-item" href="javascript:void(0);">Share</a>
-            </div>
+         <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 text-end mb-3">
+                        <button class="btn btn-primary m-1"  data-bs-target="#addDFiliereModal"  type="button" data-bs-toggle="modal" data-bs-target="#basicModal2" (click)="toggleToEdit()">
+                            <i class="fas fa-plus me-2"></i>Nouvel Horaire
+                        </button>
+                        <button class="btn btn-secondary m-1"  data-bs-target="#addDFiliereModal"  type="button" data-bs-toggle="modal" data-bs-target="#basicModal2" (click)="toggleToImpression()">
+                            <i class="fas fa-print me-2"></i>Imprimer
+                        </button>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                       <div class="row">
+                            <div class="col-md-4 mb-3">
+                                    <div class="input-group">
+                                    <label class="input-group-text" for="inputGroupSelect01">Filiere</label>
+                                    <select class="form-select" id="inputGroupSelect01" (change)="getIdFiliere($event)">
+                                        <option selected>Choose...</option>
+                                        @for (f of listFiliere(); track $index) {
+                                            <option value="{{f.id}}">{{f.intitule}}</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                    <div class="input-group">
+                                    <label class="input-group-text" for="inputGroupSelect01">Niveau</label>
+                                    <select class="form-select" id="inputGroupSelect01" (change)="getIdNiveau($event)">
+                                        <option selected>Choose...</option>
+                                        @for (n of listNiveau(); track $index) {
+                                            <option value="{{n.id}}">{{n.intitule}}</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <div class="input-group">
+                                    <label class="input-group-text" for="inputGroupSelect01">Enseignant</label>
+                                    <select class="form-select" id="inputGroupSelect01" (change)="findHoraireByEnseignant($event)">
+                                        <option selected>Choose...</option>
+                                        @for (e of listEnseignant(); track $index) {
+                                            <option value="{{e.id}}">{{e.nom}} {{e.prenom}} </option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                       </div>
+                    </div>  
+                </div>
+
+                <div class="table-responsive">
+                    <div class="d-flex justify-content-between">
+                        <p class="mb-3">Filiere : <span class="fw-bold">{{filiereSelected()?.intitule}}</span> </p>
+                        <p class="mb-3">Niveau : <span class="fw-bold">{{niveauSelected()?.intitule}}</span> </p>
+
+                    </div>                    
+
+                     @if (idFiliere()!=0 && idNiveau()!=0) {
+                        @if (listHoraire().length!=0) {
+                          <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>JOUR</th>
+                                    <th>HEURES </th>
+                                    <th>U. E</th>
+                                    <th>CREDIT</th>
+                                    <th>SEANCE</th>
+                                    <th>SALLE</th>
+                                    <th>ENSEIGNANTS</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                 @for (h of listHoraire(); track $index) {
+                                    <tr>
+                                        <td>{{h.jour.intitule}}</td>
+                                        <td>{{h.periode.debut}}/{{h.periode.fin}}</td>
+                                        <!-- <td><span class="badge bg-label-primary">{{d.abreviation}}</span></td> -->
+                                        <td>{{h.matiere.intitule}}</td>
+                                        <td>{{h.matiere.credit}}</td>
+                                        <td>{{h.matiere.seance}}</td>
+                                        <td>{{h.salle.intitule}}</td>
+                                        <td>{{h.enseignant.nom}} {{h.enseignant.prenom}}</td>
+
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-icon btn-outline-primary me-1">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-icon btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            
+                            </tbody>
+                          </table>
+                        }@else {
+                            <div class="alert alert-warning" role="alert">Emploi de temps vide pour cette filiere et ce niveau !!!!</div>
+                        }
+                                
+                    }@else {
+                        <div class="alert alert-primary" role="alert">Selectionner une filiere et un niveau!!!!</div>
+                    }
+                </div>
             </div>
         </div>
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="d-flex flex-column align-items-center gap-1">
-                <h2 class="mb-2">8,258</h2>
-                <span>Total Orders</span>
-            </div>
-            <div id="orderStatisticsChart"></div>
-            </div>
-            <ul class="p-0 m-0">
-            <li class="d-flex mb-4 pb-1">
-                <div class="avatar flex-shrink-0 me-3">
-                <span class="avatar-initial rounded bg-label-primary"
-                    ><i class="bx bx-mobile-alt"></i
-                ></span>
-                </div>
-                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                <div class="me-2">
-                    <h6 class="mb-0">Electronic</h6>
-                    <small class="text-muted">Mobile, Earbuds, TV</small>
-                </div>
-                <div class="user-progress">
-                    <small class="fw-semibold">82.5k</small>
-                </div>
-                </div>
-            </li>
-            <li class="d-flex mb-4 pb-1">
-                <div class="avatar flex-shrink-0 me-3">
-                <span class="avatar-initial rounded bg-label-success"><i class="bx bx-closet"></i></span>
-                </div>
-                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                <div class="me-2">
-                    <h6 class="mb-0">Fashion</h6>
-                    <small class="text-muted">T-shirt, Jeans, Shoes</small>
-                </div>
-                <div class="user-progress">
-                    <small class="fw-semibold">23.8k</small>
-                </div>
-                </div>
-            </li>
-            <li class="d-flex mb-4 pb-1">
-                <div class="avatar flex-shrink-0 me-3">
-                <span class="avatar-initial rounded bg-label-info"><i class="bx bx-home-alt"></i></span>
-                </div>
-                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                <div class="me-2">
-                    <h6 class="mb-0">Decor</h6>
-                    <small class="text-muted">Fine Art, Dining</small>
-                </div>
-                <div class="user-progress">
-                    <small class="fw-semibold">849k</small>
-                </div>
-                </div>
-            </li>
-            <li class="d-flex">
-                <div class="avatar flex-shrink-0 me-3">
-                <span class="avatar-initial rounded bg-label-secondary"
-                    ><i class="bx bx-football"></i
-                ></span>
-                </div>
-                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                <div class="me-2">
-                    <h6 class="mb-0">Sports</h6>
-                    <small class="text-muted">Football, Cricket Kit</small>
-                </div>
-                <div class="user-progress">
-                    <small class="fw-semibold">99</small>
-                </div>
-                </div>
-            </li>
-            </ul>
-        </div>
-        </div>
-    </div>
     
     </div>
 </div>
+
+
+ <div class="modal fade" id="basicModal2" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addDFiliereModal">
+                    @if (!isImpression()) {
+                        Edition d'emploi de temps
+                    }@else {
+                        Vue d'impression
+                    }
+                </h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body">
+                @if (!isImpression()) {
+                     <form action="" [formGroup]="timeForm" (ngSubmit)="createHoraire()">
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+                                <div class="input-group">
+                                    <label class="input-group-text" for="inputGroupSelect01">Filiere</label>
+                                    <select class="form-select" id="inputGroupSelect01" (change)="getFiliere($event)" >
+                                    <option selected>Choose...</option>
+                                    @for (f of listFiliere(); track $index) {
+                                        <option value="{{f.id}}">{{f.intitule}}</option>
+                                    }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="input-group">
+                                    <label class="input-group-text" for="inputGroupSelect01">Niveau</label>
+                                    <select class="form-select" id="inputGroupSelect01" (change)="getNiveau($event)" >
+                                    <option selected>Choose...</option>
+                                    @for (n of listNiveau(); track $index) {
+                                        <option value="{{n.id}}">{{n.intitule}}</option>
+                                    }
+                                    </select>
+                                </div>
+                            </div>
+                            <hr class="mb-2 text-primary">
+                            <div class="col-md-6 mb-3">
+                                <div class="input-group">
+                                    <label class="input-group-text" for="inputGroupSelect01">Matiere</label>
+                                    <select class="form-select" id="inputGroupSelect01" formControlName="matiere">
+                                    <option selected>Choose...</option>
+                                    @for (m of listMatiere(); track $index) {
+                                        <option value="{{m.id}}">{{m.intitule}}</option>
+                                    }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="input-group">
+                                    <label class="input-group-text" for="inputGroupSelect01">Enseignant</label>
+                                    <select class="form-select" id="inputGroupSelect01" formControlName="enseignant">
+                                    <option selected>Choose...</option>
+                                    @for (e of listEnseignant(); track $index) {
+                                        <option value="{{e.id}}">{{e.nom}}</option>
+                                    }
+                                    </select>
+                                </div>
+                            </div>
+                            <hr class="mb-2 text-primary" >
+
+                            <div class="col-md-6 mb-3">
+                                <div class="input-group">
+                                    <label class="input-group-text" for="inputGroupSelect01">Jour</label>
+                                    <select class="form-select" id="inputGroupSelect01" formControlName="jour">
+                                    <option selected>Choose...</option>
+                                    @for (j of listJour(); track $index) {
+                                        <option value="{{j.id}}">{{j.intitule}}</option>
+                                    }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="input-group">
+                                    <label class="input-group-text" for="inputGroupSelect01">Periode</label>
+                                    <select class="form-select" id="inputGroupSelect01" formControlName="periode">
+                                    <option selected>Choose...</option>
+                                    @for (p of listPeriode(); track $index) {
+                                        <option value="{{p.id}}">{{p.debut}} : {{p.fin}} </option>
+                                    }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <hr class="mb-2 text-primary">
+
+                            <div class="col-md-12 mb-3">
+                                <div class="input-group">
+                                    <label class="input-group-text" for="inputGroupSelect01">Salle</label>
+                                    <select class="form-select" id="inputGroupSelect01" formControlName="salle">
+                                    <option selected>Choose...</option>
+                                    @for (s of listSalle(); track $index) {
+                                        <option value="{{s.id}}">{{s.intitule}}</option>
+                                    }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 text-start mb-3">
+                                <button type="submit" class="btn btn-outline-primary" aria-label="Close" data-bs-dismiss="modal" > <i class="fas fa-save m-1"></i>Enregistrer</button>
+                            </div>
+                            <div class="col-md-6 text-end mb-3">
+                                <button class="btn btn-secondary" (click)="resetForm()"><div class="fas fa-refresh m-1"></div>Refresh</button>
+                            </div>
+                        </div>
+                    </form>
+
+                }@else {
+                      @if (listHoraire().length!=0) {
+                         <div class="d-flex justify-content-between">
+                            <p class="mb-3">Filiere : <span class="fw-bold">{{filiereSelected()?.intitule}}</span> </p>
+                            <p class="mb-3">Niveau : <span class="fw-bold">{{niveauSelected()?.intitule}}</span> </p>
+                         </div>                    
+
+                          <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>JOUR</th>
+                                    <th>HEURES </th>
+                                    <th>U. E</th>
+                                    <th>CREDIT</th>
+                                    <th>SEANCE</th>
+                                    <th>SALLE</th>
+                                    <th>ENSEIGNANTS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                 @for (h of listHoraire(); track $index) {
+                                    <tr>
+                                        <td>{{h.jour.intitule}}</td>
+                                        <td>{{h.periode.debut}}/{{h.periode.fin}}</td>
+                                        <!-- <td><span class="badge bg-label-primary">{{d.abreviation}}</span></td> -->
+                                        <td>{{h.matiere.intitule}}</td>
+                                        <td>{{h.matiere.credit}}</td>
+                                        <td>{{h.matiere.seance}}</td>
+                                        <td>{{h.salle.intitule}}</td>
+                                        <td>{{h.enseignant.nom}} {{h.enseignant.prenom}}</td>
+
+                                        
+                                    </tr>
+                                }
+                            
+                            </tbody>
+                          </table>
+                        }@else {
+                            <div class="alert alert-warning" role="alert">Emploi de temps vide pour cette filiere et ce niveau !!!!</div>
+                        }
+                }
+           
+
+        </div>
+        </div>
+        </div>
+    </div>
