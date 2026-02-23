@@ -62,7 +62,9 @@ export class FiliereC {
     this.configService.createFiliere(formData).subscribe({
       next:(data:ResponseServer)=>{
         if (data) {
-          console.log('creation Filiere ')
+          console.log('creation Filiere '); 
+          this.getAllFiliere(); 
+          this.filiereForm.reset(); 
         }
       }, 
       error:()=>{

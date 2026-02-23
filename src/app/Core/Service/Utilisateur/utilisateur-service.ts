@@ -55,4 +55,12 @@ export class UtilisateurService {
     }
 
 
+    createEtudiant(request:any):Observable<ResponseServer>{
+      return this.http.post<ResponseServer>(DeptManager.Utilisateur.Etudiant.create, request);
+    }
+
+    updateEtudiant(request:any):Observable<ResponseServer>{
+      return this.http.post<ResponseServer>(DeptManager.Utilisateur.Etudiant.update, request);
+    }
+
 }

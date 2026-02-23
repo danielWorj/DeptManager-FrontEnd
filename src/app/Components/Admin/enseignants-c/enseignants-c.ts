@@ -1,4 +1,4 @@
-// ✅ Les imports Chart.js doivent être AVANT leur utilisation
+//  Les imports Chart.js doivent être AVANT leur utilisation
 import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
 
@@ -23,7 +23,7 @@ export class EnseignantsC implements OnDestroy {
 
   enseignantForm!: FormGroup;
 
-  // ✅ Référence au chart pour éviter les duplications lors des re-renders
+  //  Référence au chart pour éviter les duplications lors des re-renders
   private chartInstance: Chart | null = null;
 
   constructor(
@@ -46,11 +46,14 @@ export class EnseignantsC implements OnDestroy {
       departement: new FormControl(),
     });
 
+    this.loadPage(); 
+  }
+
+  loadPage(){
     this.getAllEnseignant();
     this.getAllDepartement();
     this.getAllPoste();
   }
-
   //  Destruction du chart pour éviter les fuites mémoire
   ngOnDestroy(): void {
      this.chartInstance?.destroy();
@@ -68,7 +71,7 @@ export class EnseignantsC implements OnDestroy {
   labelDepartement     = signal<string[]>([]);
   numberEnseignant     = signal<number[]>([]);
 
-  // ─── Chargement des données ───────────────────────────────────────────────
+  //Chargement des données 
 
   getAllEnseignant(): void {
     this.listEnseignant.set([]);
@@ -116,13 +119,13 @@ export class EnseignantsC implements OnDestroy {
     });
   }
 
-  // ─── Filtres ──────────────────────────────────────────────────────────────
+  //  Filtres 
 
   findEnseignantByDepartement(event: Event): void {
-    // ✅ Typage correct de l'event au lieu de "any"
+    // Typage correct de l'event au lieu de "any"
     const idD = Number((event.target as HTMLSelectElement).value);
     if (!idD) {
-      // ✅ Si valeur vide, on remet la liste complète
+      // Si valeur vide, on remet la liste complète
       this.listEnseignant.set(this.listEnseignantSave());
       return;
     }
@@ -132,7 +135,7 @@ export class EnseignantsC implements OnDestroy {
   }
 
   findEnseignantByPoste(event: Event): void {
-    // ✅ Typage correct de l'event au lieu de "any"
+    //  Typage correct de l'event au lieu de "any"
     const idP = Number((event.target as HTMLSelectElement).value);
     if (!idP) {
       this.listEnseignant.set(this.listEnseignantSave());
@@ -143,14 +146,14 @@ export class EnseignantsC implements OnDestroy {
     );
   }
 
-  // ─── Formulaire ───────────────────────────────────────────────────────────
+  // Formulaire 
 
   resetForm(): void {
     this.enseignantForm.reset();
   }
 
   createEnseignant(): void {
-    if (this.enseignantForm.invalid) return; // ✅ Validation avant soumission
+    if (this.enseignantForm.invalid) return; //  Validation avant soumission
 
     const formData = new FormData();
     formData.append('enseignant', JSON.stringify(this.enseignantForm.value));
@@ -165,7 +168,7 @@ export class EnseignantsC implements OnDestroy {
     });
   }
 
-  // ─── Graph ────────────────────────────────────────────────────────────────
+  //  Graph 
 
   /**
    * Construit les données labelDepartement et numberEnseignant
@@ -199,22 +202,22 @@ export class EnseignantsC implements OnDestroy {
 
   getStats(): void {
     this.constructData();
-    this.graphEvolutionEvaluationByMatiere();
+    this.graphEvolutionEnseignantByDepartement();
 
     this.constructDataPoste();
     this.graphEnseignantParPoste();
   }
 
-  graphEvolutionEvaluationByMatiere(): void {
+  graphEvolutionEnseignantByDepartement(): void {
     const canvas = document.getElementById('myChart') as HTMLCanvasElement | null;
 
-    // ✅ Vérification que le canvas existe bien dans le DOM
+    //  Vérification que le canvas existe bien dans le DOM
     if (!canvas) {
       console.error('Canvas #myChart introuvable dans le DOM');
       return;
     }
 
-    // ✅ Destruction de l'ancien chart avant d'en créer un nouveau
+    //  Destruction de l'ancien chart avant d'en créer un nouveau
     if (this.chartInstance) {
       this.chartInstance.destroy();
       this.chartInstance = null;
@@ -230,7 +233,7 @@ export class EnseignantsC implements OnDestroy {
     gradient.addColorStop(0, 'rgba(105, 108, 255, 0.4)');
     gradient.addColorStop(1, 'rgba(105, 108, 255, 0.0)');
 
-    // ✅ Stockage de l'instance pour pouvoir la détruire plus tard
+    //  Stockage de l'instance pour pouvoir la détruire plus tard
     this.chartInstance = new Chart(canvas, {
       type: 'line',
       data: {
@@ -253,7 +256,7 @@ export class EnseignantsC implements OnDestroy {
           y: {
             beginAtZero: true,
             ticks: {
-              // ✅ Affiche uniquement des entiers sur l'axe Y
+              //  Affiche uniquement des entiers sur l'axe Y
               stepSize: 1,
               callback: (value) => Number.isInteger(value) ? value : null,
             },
@@ -338,7 +341,7 @@ graphEnseignantParPoste(): void {
     },
     options: {
       responsive: true,
-      cutout: '65%', // ✅ Épaisseur de l'anneau
+      cutout: '65%', //  Épaisseur de l'anneau
       plugins: {
         legend: {
           position: 'bottom',
@@ -349,7 +352,7 @@ graphEnseignantParPoste(): void {
         },
         tooltip: {
           callbacks: {
-            // ✅ Affiche le % dans le tooltip
+            //  Affiche le % dans le tooltip
             label: (context) => {
               const total = (context.dataset.data as number[]).reduce((a, b) => a + b, 0);
               const value = context.parsed;

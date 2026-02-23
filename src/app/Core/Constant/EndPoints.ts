@@ -82,7 +82,9 @@ export const DeptManager ={
         }, 
         Etudiant :{
             all : `${utilisateurapi}/etudiant/all`, 
-            count : `${utilisateurapi}/etudiant/count`, 
+            count : `${utilisateurapi}/etudiant/count`,
+            create : `${utilisateurapi}/etudiant/create`, 
+            update : `${utilisateurapi}/etudiant/update`,  
             allbydepartement : `${utilisateurapi}/etudiant/bydepartement/`, 
             allbyniveau : `${utilisateurapi}/etudiant/byniveau/`, 
             allbyFiliereAndNiveau : `${utilisateurapi}/etudiant/byfiliere/byniveau/`, 
