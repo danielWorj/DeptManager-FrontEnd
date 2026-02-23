@@ -1,12 +1,12 @@
 export interface Utilisateur{
     id : number; 
-    nom : number; 
-    prenom : number; 
-    dateCreation : number; 
-    email : number; 
-    password : number;
+    nom : string; 
+    prenom : string; 
+    dateCreation : string; 
+    email : string; 
+    password : string;
     telephone:string;  
-    role : number; 
-    status : number; 
-    photo : number; 
+    role : string; 
+    status : string; 
+    photo : string; 
 }

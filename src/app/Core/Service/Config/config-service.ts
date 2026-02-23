@@ -13,6 +13,8 @@ import { Niveau } from '../../Model/Structure/Niveau';
 import { Jour } from '../../Model/Horaire/Jour';
 import { Periode } from '../../Model/Horaire/Periode';
 import { Poste } from '../../Model/Utilisateur/Poste';
+import { AnneeAcademique } from '../../Model/Scolarite/anneeacademique';
+import { TypeDocument } from '../../Model/Scolarite/TypeDocument';
 
 @Injectable({
   providedIn: 'root',
@@ -139,4 +141,14 @@ export class ConfigService {
     return this.http.post<ResponseServer>(DeptManager.Config.Poste.create, request);
   }
 
+
+  //
+
+  getAllAnneeAcademique():Observable<AnneeAcademique[]>{
+    return this.http.get<AnneeAcademique[]>(DeptManager.Config.AnneeAcademique.all); 
+  }
+
+  getAllTypeDocument():Observable<TypeDocument[]>{
+    return this.http.get<TypeDocument[]>(DeptManager.Config.TypeDocument.all); 
+  }
 }

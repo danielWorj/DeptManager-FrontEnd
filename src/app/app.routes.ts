@@ -22,6 +22,10 @@ export const routes: Routes = [
         loadComponent : ()=>import('./Components/Admin/enseignants-c/enseignants-c').then(e => e.EnseignantsC)
     },
     {
+        path: 'admin-documentation', 
+        loadComponent : ()=>import('./Components/Admin/documentation/documentation').then(d => d.DocumentationC)
+    },
+    {
         path: 'config', 
         loadComponent : ()=>import('./Components/Admin/Config/configuration/configuration').then(d => d.Configuration)
     }

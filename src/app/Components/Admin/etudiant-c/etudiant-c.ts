@@ -357,7 +357,7 @@ export class EtudiantC implements OnDestroy {
         labels: this.labelNiveau(),
         datasets: [{
           //  Label corrigé : "Enseignants par poste" → "Étudiants par niveau"
-          label: 'Étudiants par niveau',
+          label: "Étudiants par niveau",
           data: this.numberEtudiantParNiveau(),
           backgroundColor: colors.slice(0, this.labelNiveau().length),
           borderColor: '#ffffff',

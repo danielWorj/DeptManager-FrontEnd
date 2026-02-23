@@ -1,0 +1,400 @@
+<div class="bkdoc-wrapper">
+
+  <!-- EN-TÊTE -->
+  <div class="bkdoc-page-header">
+    <div>
+      <h4><i class="bi bi-archive-fill me-2"></i>Banque de Documents</h4>
+      <p>Retrouvez tous les documents académiques en un seul endroit</p>
+    </div>
+    <button class="bkdoc-btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#detailModal" (click)="openModal()">
+      <i class="fas fa-plus"></i> Ajouter un document
+    </button>
+  </div>
+
+  <!-- FILTRES -->
+  <div class="bkdoc-filters-card">
+    <div class="bkdoc-filters-title"><i class="bi bi-funnel me-1"></i>Filtres</div>
+
+    <!-- Badges type -->
+    <div class="bkdoc-type-filters">
+      <!-- Badge "Tous" -->
+      <button class="bkdoc-type-badge"
+              [class.active]="activeType() === null"
+              (click)="filterByType(null)">
+        <i class="bi bi-grid"></i> Tous
+        <span class="bkdoc-count-inline">{{ listDocumentSave().length }}</span>
+      </button>
+
+      <!-- Badges dynamiques depuis l'API -->
+      @for (type of listTypeDocument(); track type.id) {
+        <button class="bkdoc-type-badge"
+                [class.active]="activeType() === type.id"
+                (click)="filterByType(type.id)">
+          <i class="bi bi-file-earmark"></i> {{ type.intitule }}
+          <span class="bkdoc-count-inline">{{ countByType(type.id) }}</span>
+        </button>
+      }
+    </div>
+
+    <!-- Selects ligne -->
+    <div class="bkdoc-filters-row">
+
+      <!-- Recherche -->
+      <div class="bkdoc-field bkdoc-search-wrap" style="grid-column: span 2">
+        <label>Recherche</label>
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="Titre, enseignant, matière…"
+               (input)="onSearchInput($event)" />
+      </div>
+
+      <!-- Département -->
+      <div class="bkdoc-field">
+        <label>Département</label>
+        <select (change)="findDocumentationByDepartement($event)">
+          <option value="">Tous</option>
+          @for (dep of listDepartement(); track dep.id) {
+            <option [value]="dep.id">{{ dep.intitule }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Filière (filtrée selon département) -->
+      <div class="bkdoc-field">
+        <label>Filière</label>
+        <select (change)="findDocumentByFiliere($event)">
+          <option value="">Toutes</option>
+          @for (fil of listFiliereFiltered(); track fil.id) {
+            <option [value]="fil.id">{{ fil.intitule }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Niveau -->
+      <div class="bkdoc-field">
+        <label>Niveau</label>
+        <select (change)="findDocumentByNiveau($event)">
+          <option value="">Tous</option>
+          @for (niv of listNiveau(); track niv.id) {
+            <option [value]="niv.id">{{ niv.intitule }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Année académique -->
+      <div class="bkdoc-field">
+        <label>Année académique</label>
+        <select (change)="findDocumentByAnnee($event)">
+          <option value="">Toutes</option>
+          @for (an of listAnneeAcademique(); track an.id) {
+            <option [value]="an.id">{{ an.intitule }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Enseignant -->
+      <div class="bkdoc-field">
+        <label>Enseignant</label>
+        <select (change)="findDocumentByEnseignant($event)">
+          <option value="">Tous</option>
+          @for (ens of listEnseignant(); track ens.id) {
+            <option [value]="ens.id">{{ ens.nom }} {{ ens.prenom }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Reset -->
+      <div class="bkdoc-field" style="align-self:end">
+        <button class="bkdoc-btn-primary" style="width:100%;justify-content:center"
+                (click)="resetFilters()">
+          <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LAYOUT LISTE + DÉTAIL-->
+  <div class="bkdoc-layout">
+
+    <!-- ── LISTE ── -->
+    <div class="bkdoc-list-card">
+      <div class="bkdoc-list-header">
+        <span>Documents</span>
+        <span class="bkdoc-count-badge">{{ listDocument().length }}</span>
+      </div>
+
+      <div class="bkdoc-list-scroll">
+
+        @if (listDocument().length === 0) {
+          <div class="bkdoc-no-result">
+            <i class="bi bi-search"></i>
+            Aucun document trouvé.
+          </div>
+        }
+
+        @for (doc of listDocument(); track doc.id) {
+          <div class="bkdoc-doc-item"
+               [class.active]="selectedDocument()?.id === doc.id"
+               (click)="selectDocument(doc)">
+
+            <div class="bkdoc-doc-icon bkdoc-icon-default">
+              <i class="bi bi-file-earmark-text"></i>
+            </div>
+
+            <div class="bkdoc-doc-info">
+              <p class="bkdoc-doc-title">{{ doc.matiere!.intitule ?? 'Sans titre' }}</p>
+              <div class="bkdoc-doc-meta">
+                <span class="bkdoc-doc-tag bkdoc-badge-primary">
+                  {{ doc.typeDocument!.intitule }}
+                </span>
+                <span><i class="bi bi-people"></i>{{ doc.filiere!.intitule }}</span>
+                <span><i class="bi bi-mortarboard"></i>{{ doc.niveau!.intitule }}</span>
+              </div>
+              <div class="bkdoc-doc-meta mt-1">
+                <span>
+                  <i class="bi bi-person"></i>
+                  {{ doc.enseignant?.nom }} {{ doc.enseignant?.prenom }}
+                </span>
+                <span>
+                  <i class="bi bi-calendar3"></i>
+                  {{ doc.anneeAcademique!.intitule }}
+                </span>
+              </div>
+            </div>
+
+          </div>
+        }
+
+      </div><!-- /scroll -->
+    </div>
+
+    <!-- ── DÉTAIL ── -->
+    <div class="bkdoc-detail-card">
+
+      @if (!selectedDocument()) {
+        <div class="bkdoc-detail-empty">
+          <i class="bi bi-file-earmark-text"></i>
+          <p>Sélectionnez un document dans la liste<br>pour afficher ses détails.</p>
+        </div>
+      }
+
+      @if (selectedDocument(); as doc) {
+        <!-- Header -->
+        <div class="bkdoc-detail-header">
+          <div class="bkdoc-detail-icon bkdoc-icon-default">
+            <i class="bi bi-file-earmark-text"></i>
+          </div>
+          <div style="flex:1;min-width:0">
+            <p class="bkdoc-detail-title">{{ doc.matiere!.intitule }}</p>
+            <div class="bkdoc-detail-badges">
+              <span class="bkdoc-badge bkdoc-badge-primary">
+                {{ doc.typeDocument!.intitule }}
+              </span>
+              <span class="bkdoc-badge bkdoc-badge-secondary">{{ doc.filiere!.intitule }}</span>
+              <span class="bkdoc-badge bkdoc-badge-secondary">{{ doc.niveau!.intitule }}</span>
+              <span class="bkdoc-badge bkdoc-badge-success">{{ doc.anneeAcademique!.intitule }}</span>
+            </div>
+          </div>
+          <div class="bkdoc-detail-actions">
+            <a [href]="doc.url" target="_blank" class="bkdoc-btn-icon" title="Ouvrir">
+              <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+            <a [href]="doc.url" download class="bkdoc-btn-icon" title="Télécharger">
+              <i class="bi bi-download"></i>
+            </a>
+            <button class="bkdoc-btn-icon" title="Fermer" (click)="closeDetail()">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Infos structurées -->
+        <div class="bkdoc-detail-infos">
+          <div class="bkdoc-info-item">
+            <label><i class="bi bi-building me-1"></i>Département</label>
+            <span>{{ doc.departement!.intitule }}</span>
+          </div>
+          <div class="bkdoc-info-item">
+            <label><i class="bi bi-people me-1"></i>Filière</label>
+            <span>{{ doc.filiere!.intitule }}</span>
+          </div>
+          <div class="bkdoc-info-item">
+            <label><i class="bi bi-mortarboard me-1"></i>Niveau</label>
+            <span>{{ doc.niveau!.intitule }}</span>
+          </div>
+          <div class="bkdoc-info-item">
+            <label><i class="bi bi-calendar3 me-1"></i>Année académique</label>
+            <span>{{ doc.anneeAcademique!.intitule }}</span>
+          </div>
+          <div class="bkdoc-info-item">
+            <label><i class="bi bi-person me-1"></i>Enseignant</label>
+            <span>{{ doc.enseignant?.nom }} {{ doc.enseignant?.prenom }}</span>
+          </div>
+          <div class="bkdoc-info-item">
+            <label><i class="bi bi-calendar-event me-1"></i>Date de dépôt</label>
+            <span>{{ doc.dateC | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+
+        <!-- Viewer -->
+        <div class="bkdoc-detail-body">
+          <h6><i class="bi bi-eye me-1"></i>Aperçu / Accès au document</h6>
+          <div class="bkdoc-viewer">
+            <div class="bkdoc-viewer-topbar">
+              <i class="bi bi-file-earmark-text" style="color:var(--bkdoc-primary)"></i>
+              <span>{{ doc.matiere!.intitule }} — {{ doc.typeDocument!.intitule }}</span>
+              <div class="bkdoc-viewer-btns">
+                <a [href]="doc.url" target="_blank" class="bkdoc-btn-icon" title="Ouvrir dans un nouvel onglet">
+                  <i class="bi bi-fullscreen"></i>
+                </a>
+                <a [href]="doc.url" download class="bkdoc-btn-icon" title="Télécharger">
+                  <i class="bi bi-download"></i>
+                </a>
+              </div>
+            </div>
+            <div class="bkdoc-viewer-body">
+              <!-- Iframe si l'URL est un PDF/image accessible, sinon fallback -->
+              @if (doc.url) {
+                <iframe [src]="doc.url"
+                        width="100%" height="400"
+                        style="border:none;border-radius:.25rem"
+                        title="Aperçu document">
+                </iframe>
+              } @else {
+                <div class="bkdoc-detail-empty" style="padding:2rem">
+                  <i class="bi bi-file-earmark-x" style="font-size:2rem;opacity:.4;display:block;margin-bottom:.5rem"></i>
+                  <p style="color:var(--bkdoc-text-muted)">Aucun aperçu disponible.</p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+    </div><!-- /detail -->
+
+  </div><!-- /layout -->
+
+
+  <!--  MODAL — AJOUTER UN DOCUMENT-->
+
+</div><!-- /bkdoc-wrapper -->
+
+
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">
+                <i class="fas fa-user me-2"></i>Editer les documents 
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close" (click)="closeDetail()"></button>
+        </div>
+
+        <div class="modal-body">
+          <form  action="" [formGroup]="documentForm" (ngSubmit)="creationDocument()">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                  <div class="input-group">
+                      <label class="input-group-text" for="modalFiliere">Departement</label>
+                      <select class="form-select" id="modalFiliere" formControlName="departement">
+                          <option value="">Choose...</option>
+                          @for (f of listDepartement(); track f.id) {
+                              <option value="{{f.id}}">{{f.intitule}}</option>
+                          }
+                      </select>
+                  </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                  <div class="input-group">
+                      <label class="input-group-text" for="modalFiliere">Filiere</label>
+                      <select class="form-select"  formControlName="filiere">
+                          <option value="">Choose...</option>
+                          @for (f of listFiliere(); track f.id) {
+                              <option value="{{f.id}}">{{f.abreviation}}</option>
+                          }
+                      </select>
+                  </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                  <div class="input-group">
+                      <label class="input-group-text" >Niveau</label>
+                      <select class="form-select" formControlName="niveau">
+                          <option value="">Choose...</option>
+                          @for (f of listNiveau(); track f.id) {
+                              <option value="{{f.id}}">{{f.intitule}}</option>
+                          }
+                      </select>
+                  </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                  <div class="input-group">
+                      <label class="input-group-text" >Matiere</label>
+                      <select class="form-select" formControlName="matiere">
+                          <option value="">Choose...</option>
+                          @for (f of listMatiere(); track f.id) {
+                              <option value="{{f.id}}">{{f.intitule}}</option>
+                          }
+                      </select>
+                  </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                  <div class="input-group">
+                      <label class="input-group-text" >Enseignant</label>
+                      <select class="form-select" formControlName="enseignant">
+                          <option value="">Choose...</option>
+                          @for (e of listEnseignant(); track e.id) {
+                              <option value="{{e.id}}">{{e.nom}} {{e.prenom}}</option>
+                          }
+                      </select>
+                  </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                  <div class="input-group">
+                      <label class="input-group-text" >Annee Academique</label>
+                      <select class="form-select" formControlName="anneeAcademique">
+                          <option value="">Choose...</option>
+                          @for (a of listAnneeAcademique(); track a.id) {
+                              <option value="{{a.id}}">{{a.intitule}}</option>
+                          }
+                      </select>
+                  </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                  <div class="input-group">
+                      <label class="input-group-text" >Type Document</label>
+                      <select class="form-select" formControlName="typeDocument">
+                          <option value="">Choose...</option>
+                          @for (a of listTypeDocument(); track a.id) {
+                              <option value="{{a.id}}">{{a.intitule}}</option>
+                          }
+                      </select>
+                  </div>
+              </div>
+               <div class="col-12 mb-3">
+                   <div class="input-group">
+                        <label class="input-group-text" for="inputGroupFile01">Upload</label>
+                        <input type="file" class="form-control" id="inputGroupFile01" (change)="selectFile($event)" />
+                      </div>
+                </div>
+              
+
+            </div>
+            <button type="submit" class="btn btn-primary" >
+                <i class="fas fa-plus me-1"></i>Ajouter
+            </button>
+
+          </form>
+             
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal" (click)="closeDetail()">
+                <i class="fas fa-times me-1"></i>Fermer
+            </button>
+        </div>
+    </div>
+    </div>
+</div>

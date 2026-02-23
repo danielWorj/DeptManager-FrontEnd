@@ -212,9 +212,10 @@
                                                 (click)="selectEtudiant(e)"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#detailModal">
-                                            <i class="fas fa-eye"></i>
+                                            <i class="bx bx-user-pin"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-icon btn-outline-primary me-1">
+                                        <button class="btn btn-sm btn-icon btn-outline-primary me-1"
+                                            (click)="etudiantForm.patchValue(e)" data-bs-toggle="modal" data-bs-target="#basicModal2">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <button class="btn btn-sm btn-icon btn-outline-danger">
@@ -338,7 +339,7 @@
                         <!-- Photo de profil -->
                         <div class="col-md-4 d-flex align-items-center justify-content-center p-3">
                             @if (etudiant.photo) {
-                                <!-- ✅ Si l'étudiant a une photo, on l'affiche -->
+                                <!--  Si l'étudiant a une photo, on l'affiche -->
                                 <img
                                     [src]="etudiant.photo"
                                     class="img-fluid rounded-start"
@@ -346,7 +347,7 @@
                                     alt="Photo de {{ etudiant.nom }} {{ etudiant.prenom }}"
                                 />
                             } @else {
-                                <!-- ✅ Sinon, icône utilisateur par défaut -->
+                                <!--  Sinon, icône utilisateur par défaut -->
                                 <div class="d-flex align-items-center justify-content-center bg-label-secondary rounded"
                                      style="width: 140px; height: 140px;">
                                     <i class="fas fa-user-circle" style="font-size: 100px; color: #696cff; opacity: 0.7;"></i>
@@ -387,6 +388,7 @@
                                     </p>
                                 </div>
 
+                                <hr/>
                                 <!-- Bloc : Scolarité -->
                                 <div class="mb-3">
                                     <p class="mb-1">
@@ -411,6 +413,7 @@
                                     </p>
                                 </div>
 
+                                <hr/>
                                 <p class="card-text">
                                     <small class="text-body-secondary">
                                         <i class="fas fa-calendar me-1"></i>

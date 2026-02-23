@@ -40,6 +40,12 @@ export const DeptManager ={
             update : `${structureapi}/poste/update`,
             delete : `${structureapi}/poste/delete`,
         },
+        AnneeAcademique :{
+            all : `${structureapi}/anneeacademique/all`, 
+        },
+        TypeDocument :{
+            all : `${structureapi}/typedocument/all`, 
+        }
         
     }, 
     Scolarite :{
@@ -51,6 +57,20 @@ export const DeptManager ={
             update : `${scolariteapi}/matiere/update`,
             delete : `${scolariteapi}/matiere/delete`,
         }, 
+        
+        Document :{
+            all : `${scolariteapi}/document/all`, 
+            count : `${scolariteapi}/document/count`, 
+            create : `${scolariteapi}/document/create`, 
+            update : `${scolariteapi}/document/update`, 
+            delete : `${scolariteapi}/document/delete/`, 
+            allbydepartement : `${scolariteapi}/document/bydepartement/`, 
+            allbyniveau : `${scolariteapi}/document/byniveau/`, 
+            allbyfiliere : `${scolariteapi}/document/byfiliere/`, 
+            allbyanneeacademique : `${scolariteapi}/document/byanneeacademique/`, 
+            allbyenseignant : `${scolariteapi}/document/byenseignant/`, 
+            allbytypedocument : `${scolariteapi}/document/bytypedocument/`, 
+        }
     }, 
     Horaire:{
         create : `${horaireapi}/create`, 
