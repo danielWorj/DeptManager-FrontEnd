@@ -28,5 +28,13 @@ export const routes: Routes = [
     {
         path: 'config', 
         loadComponent : ()=>import('./Components/Admin/Config/configuration/configuration').then(d => d.Configuration)
+    },
+    {
+        path: 'admin-requete', 
+        loadComponent : ()=>import('./Components/Admin/requete/requete').then(r => r.RequeteC)
+    },
+    {
+        path: 'admin-note', 
+        loadComponent : ()=>import('./Components/Admin/notes/notes').then(n => n.Notes)
     }
 ];

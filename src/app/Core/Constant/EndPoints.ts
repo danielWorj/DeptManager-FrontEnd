@@ -56,8 +56,7 @@ export const DeptManager ={
             create : `${scolariteapi}/matiere/create`,
             update : `${scolariteapi}/matiere/update`,
             delete : `${scolariteapi}/matiere/delete`,
-        }, 
-        
+        },        
         Document :{
             all : `${scolariteapi}/document/all`, 
             count : `${scolariteapi}/document/count`, 
@@ -70,6 +69,34 @@ export const DeptManager ={
             allbyanneeacademique : `${scolariteapi}/document/byanneeacademique/`, 
             allbyenseignant : `${scolariteapi}/document/byenseignant/`, 
             allbytypedocument : `${scolariteapi}/document/bytypedocument/`, 
+        }, 
+        Revendication :{
+            Requete :{
+                all : `${structureapi}/requete/all`, 
+                create : `${structureapi}/requete/creation`, 
+                update : `${structureapi}/requete/update`, 
+                change : `${structureapi}/requete/change/`, 
+                delete : `${structureapi}/requete/delete/`, 
+            }, 
+            MotifRequete:{
+                all : `${structureapi}/requete/motif/all`, 
+            }, 
+            PieceJointe:{
+                all : `${structureapi}/requete/all/piecejointe/`, 
+                create : `${structureapi}/requete/piecejointe/create`, 
+                update : `${structureapi}/requete/piecejointe/update`, 
+            }, 
+            
+
+        }, 
+        Repartition:{
+            allByEnseignant : `${scolariteapi}/repartition/all/byenseignant/`, 
+            allByFiliere : `${scolariteapi}/repartition/all/byfiliere/`, 
+            allByMatiere : `${scolariteapi}/repartition/all/bymatiere/`, 
+            allBySemestre : `${scolariteapi}/repartition/all/bysemestre/`, 
+            allByFiliereNiveau : `${scolariteapi}/repartition/all/by/filiere/niveau/`, 
+            allByFiliereNiveauAndSemestre : `${scolariteapi}/repartition/all/by/filiere/niveau/semestre/`, 
+
         }
     }, 
     Horaire:{

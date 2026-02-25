@@ -5,6 +5,10 @@ import { ResponseServer } from '../../Model/Server/ResponseServer';
 import { DeptManager } from '../../Constant/EndPoints';
 import { Observable } from 'rxjs';
 import { Documentation } from '../../Model/Scolarite/Document';
+import { MotifRequete } from '../../Model/Requete/MotifRequete';
+import { Requete } from '../../Model/Requete/Requete';
+import { PieceJointeRequete } from '../../Model/Requete/PieceJointeRequete';
+import { Repartition } from '../../Model/Scolarite/Repartition';
 
 @Injectable({
   providedIn: 'root',
@@ -92,5 +96,64 @@ export class ScolariteService {
       return this.http.get<Documentation[]>(DeptManager.Scolarite.Document.allbydepartement+id);
     }
 
+
+    //Requete 
+    getAllRequete():Observable<Requete[]>{  
+      return this.http.get<Requete[]>(DeptManager.Scolarite.Revendication.Requete.all);
+    } 
+
+    createRequete(request:any):Observable<ResponseServer>{
+      return this.http.post<ResponseServer>(DeptManager.Scolarite.Revendication.Requete.create,request);
+    } 
+
+    changeRequeteStatut(idR:number , idS:number):Observable<ResponseServer>{
+      return this.http.get<ResponseServer>(DeptManager.Scolarite.Revendication.Requete.change+idR+'/'+idS);
+    } 
+
+    updateRequete(request:any):Observable<ResponseServer>{
+      return this.http.post<ResponseServer>(DeptManager.Scolarite.Revendication.Requete.update,request);
+    }
+
+    deleteRequete(id:number):Observable<ResponseServer>{
+      return this.http.get<ResponseServer>(DeptManager.Scolarite.Revendication.Requete.delete+id);
+    } 
+
+    //Motif
+    getAllMotifRequete():Observable<MotifRequete[]>{  
+      return this.http.get<MotifRequete[]>(DeptManager.Scolarite.Revendication.MotifRequete.all);
+    } 
+
+    //Pieces jointes 
+    getAllPieceJointeByRequete(id:number):Observable<PieceJointeRequete[]>{  
+      return this.http.get<PieceJointeRequete[]>(DeptManager.Scolarite.Revendication.Requete.change+id);
+    } 
+
+
+
+
+    //Repartition 
+
+    getAllRepartitionByEnseignant(id:number):Observable<Repartition[]>{   
+      return this.http.get<Repartition[]>(DeptManager.Scolarite.Repartition.allByEnseignant+id);
+    }
     
+    getAllRepartitionByFiliere(id:number):Observable<Repartition[]>{   
+      return this.http.get<Repartition[]>(DeptManager.Scolarite.Repartition.allByFiliere+id);
+    }
+
+    getAllRepartitionByMatiere(id:number):Observable<Repartition[]>{   
+      return this.http.get<Repartition[]>(DeptManager.Scolarite.Repartition.allByMatiere+id);
+    }
+
+    getAllRepartitionBySemestre(id:number):Observable<Repartition[]>{   
+      return this.http.get<Repartition[]>(DeptManager.Scolarite.Repartition.allBySemestre+id);
+    }
+
+    getAllRepartitionByFiliereAndNiveau(idF:number, idN:number):Observable<Repartition[]>{   
+      return this.http.get<Repartition[]>(DeptManager.Scolarite.Repartition.allByFiliereNiveau+idF+'/'+idN);
+    }
+
+    getAllRepartitionByFiliereAndNiveauAndSemestre(idF:number, idN:number , idS:number):Observable<Repartition[]>{   
+      return this.http.get<Repartition[]>(DeptManager.Scolarite.Repartition.allByFiliereNiveauAndSemestre+idF+'/'+idN+'/'+idS);
+    }
 }
