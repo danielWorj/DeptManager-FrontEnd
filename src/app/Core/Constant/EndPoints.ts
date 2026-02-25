@@ -3,6 +3,7 @@ const structureapi = `${api}/structure`;
 const scolariteapi = `${api}/scolarite`; 
 const horaireapi = `${api}/horaire`; 
 const utilisateurapi = `${api}/utilisateur`; 
+const evaluationapi = `${api}/note`; 
 
 
 
@@ -146,5 +147,16 @@ export const DeptManager ={
             allbyniveau : `${utilisateurapi}/etudiant/byniveau/`, 
             allbyFiliereAndNiveau : `${utilisateurapi}/etudiant/byfiliere/byniveau/`, 
         }, 
+    }, 
+    Evaluaton:{
+        TypeEvaluation:{
+            all : `${evaluationapi}/typeevaluation/all`,
+        }, 
+        Note:{
+            create : `${evaluationapi}/create`,
+            update : `${evaluationapi}/update`,
+            allByRepartition : `${evaluationapi}/find/all/byrepartition/`,
+            allByRepartitionAndTypeEval : `${evaluationapi}/tfind/all/byrepartition/typeevaluation/`,
+        }
     }
 }
