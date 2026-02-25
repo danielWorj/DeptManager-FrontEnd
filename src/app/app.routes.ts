@@ -36,5 +36,9 @@ export const routes: Routes = [
     {
         path: 'admin-note', 
         loadComponent : ()=>import('./Components/Admin/notes/notes').then(n => n.Notes)
+    },
+    {
+        path: 'admin-repartition', 
+        loadComponent : ()=>import('./Components/Admin/repartition/repartition').then(n => n.RepartitionC)
     }
 ];

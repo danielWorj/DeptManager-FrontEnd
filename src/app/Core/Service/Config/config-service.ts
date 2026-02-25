@@ -15,6 +15,7 @@ import { Periode } from '../../Model/Horaire/Periode';
 import { Poste } from '../../Model/Utilisateur/Poste';
 import { AnneeAcademique } from '../../Model/Scolarite/anneeacademique';
 import { TypeDocument } from '../../Model/Scolarite/TypeDocument';
+import { Semestre } from '../../Model/Scolarite/Semestre';
 
 @Injectable({
   providedIn: 'root',
@@ -151,4 +152,5 @@ export class ConfigService {
   getAllTypeDocument():Observable<TypeDocument[]>{
     return this.http.get<TypeDocument[]>(DeptManager.Config.TypeDocument.all); 
   }
+
 }

@@ -5,6 +5,7 @@ import { Matiere } from "./Matiere";
 import { Semestre } from "./Semestre";
 
 export interface Repartition{
+    id:number; 
     enseignant : Enseignant;
     filiere : Filiere;
     niveau : Niveau ;

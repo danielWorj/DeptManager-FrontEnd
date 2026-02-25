@@ -9,6 +9,7 @@ import { MotifRequete } from '../../Model/Requete/MotifRequete';
 import { Requete } from '../../Model/Requete/Requete';
 import { PieceJointeRequete } from '../../Model/Requete/PieceJointeRequete';
 import { Repartition } from '../../Model/Scolarite/Repartition';
+import { Semestre } from '../../Model/Scolarite/Semestre';
 
 @Injectable({
   providedIn: 'root',
@@ -156,4 +157,21 @@ export class ScolariteService {
     getAllRepartitionByFiliereAndNiveauAndSemestre(idF:number, idN:number , idS:number):Observable<Repartition[]>{   
       return this.http.get<Repartition[]>(DeptManager.Scolarite.Repartition.allByFiliereNiveauAndSemestre+idF+'/'+idN+'/'+idS);
     }
+
+    createRepartition(request:any):Observable<ResponseServer>{
+      return this.http.post<ResponseServer>(DeptManager.Scolarite.Repartition.create,request);
+    }
+
+    updateRepartition(request:any):Observable<ResponseServer>{
+      return this.http.post<ResponseServer>(DeptManager.Scolarite.Repartition.update,request);
+    }
+    deleteRepartition(id:number):Observable<ResponseServer>{
+      return this.http.get<ResponseServer>(DeptManager.Scolarite.Repartition.delete+id);
+    }
+
+    //Semeestre
+
+    getAllSemestre():Observable<Semestre[]>{  
+      return this.http.get<Semestre[]>(DeptManager.Scolarite.Semestre.all);
+    } 
 }

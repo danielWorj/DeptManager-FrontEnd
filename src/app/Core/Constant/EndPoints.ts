@@ -90,12 +90,22 @@ export const DeptManager ={
 
         }, 
         Repartition:{
+            create : `${scolariteapi}/repartition/create`, 
+            update : `${scolariteapi}/repartition/update`, 
+            delete : `${scolariteapi}/repartition/delete/`, 
             allByEnseignant : `${scolariteapi}/repartition/all/byenseignant/`, 
             allByFiliere : `${scolariteapi}/repartition/all/byfiliere/`, 
             allByMatiere : `${scolariteapi}/repartition/all/bymatiere/`, 
             allBySemestre : `${scolariteapi}/repartition/all/bysemestre/`, 
             allByFiliereNiveau : `${scolariteapi}/repartition/all/by/filiere/niveau/`, 
             allByFiliereNiveauAndSemestre : `${scolariteapi}/repartition/all/by/filiere/niveau/semestre/`, 
+
+        }, 
+        Semestre:{
+            all : `${structureapi}/salle/all`,
+            create : `${structureapi}/salle/create`,
+            update : `${structureapi}/salle/update`,
+            delete : `${structureapi}/salle/delete`,
 
         }
     }, 
