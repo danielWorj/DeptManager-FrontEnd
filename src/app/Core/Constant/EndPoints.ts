@@ -103,12 +103,14 @@ export const DeptManager ={
 
         }, 
         Semestre:{
-            all : `${structureapi}/salle/all`,
-            create : `${structureapi}/salle/create`,
-            update : `${structureapi}/salle/update`,
-            delete : `${structureapi}/salle/delete`,
+            all : `${scolariteapi}/semestre/all`,
+            allbyAnnee : `${scolariteapi}/semestre/all/byannee`,
+            create : `${scolariteapi}/semestre/create`,
+            update : `${scolariteapi}/semestre/update`,
+            delete : `${scolariteapi}/semestre/delete`,
 
-        }
+        } 
+        
     }, 
     Horaire:{
         create : `${horaireapi}/create`, 

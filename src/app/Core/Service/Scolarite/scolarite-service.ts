@@ -10,6 +10,7 @@ import { Requete } from '../../Model/Requete/Requete';
 import { PieceJointeRequete } from '../../Model/Requete/PieceJointeRequete';
 import { Repartition } from '../../Model/Scolarite/Repartition';
 import { Semestre } from '../../Model/Scolarite/Semestre';
+import { AnneeAcademique } from '../../Model/Scolarite/anneeacademique';
 
 @Injectable({
   providedIn: 'root',
@@ -174,4 +175,11 @@ export class ScolariteService {
     getAllSemestre():Observable<Semestre[]>{  
       return this.http.get<Semestre[]>(DeptManager.Scolarite.Semestre.all);
     } 
+
+
+    // //Get All Annee Academique
+
+    // getAllAnneeAcademique():Observable<AnneeAcademique[]>{  
+    //   return this.http.get<AnneeAcademique[]>(DeptManager.Scolarite.AnneeAcademique.all);
+    // }
 }

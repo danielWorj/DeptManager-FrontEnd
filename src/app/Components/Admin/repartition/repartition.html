@@ -1,396 +1,445 @@
+<div class="container-xxl flex-grow-1 container-p-y">
 
-<div class="rpart-page" id="rpart-root">
-
-  <!--  EN-TÊTE  -->
-  <div class="rpart-page-header">
+  <!-- ══ EN-TÊTE ══ -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h4 class="rpart-page-title">
-        <i class="bi bi-grid-3x3-gap-fill"></i>
+      <h4 class="fw-bold mb-1">
+        <i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>
         Gestion des Répartitions
       </h4>
-      <p class="rpart-page-subtitle">
+      <p class="text-muted mb-0">
         Affectation des enseignants aux matières par filière, niveau et semestre
       </p>
     </div>
     <button
-      class="rpart-btn rpart-btn-primary"
+      class="btn btn-primary"
+      type="button"
+      data-bs-toggle="modal"
+      data-bs-target="#createModal"
       (click)="openCreateModal()"
       [disabled]="isLoading()">
-      <i class="bi bi-plus-lg"></i> Nouvelle répartition
+      <i class="bi bi-plus-lg me-1"></i> Nouvelle répartition
     </button>
   </div>
 
-  <!--  STATISTIQUES  -->
-  <div class="rpart-stats">
-    <div class="rpart-stat-card">
-      <div class="rpart-stat-icon purple"><i class="bi bi-grid-3x3-gap"></i></div>
-      <div>
-        <div class="rpart-stat-value">{{ listRepartition().length }}</div>
-        <div class="rpart-stat-label">Répartitions chargées</div>
+  <!-- ══ STATISTIQUES ══ -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="avatar flex-shrink-0">
+            <span class="avatar-initial rounded bg-label-primary">
+              <i class="bi bi-grid-3x3-gap"></i>
+            </span>
+          </div>
+          <div>
+            <div class="fw-bold fs-5">{{ listRepartition().length }}</div>
+            <div class="text-muted small">Répartitions chargées</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="rpart-stat-card">
-      <div class="rpart-stat-icon green"><i class="bi bi-person-check"></i></div>
-      <div>
-        <div class="rpart-stat-value">{{ listEnseignant().length }}</div>
-        <div class="rpart-stat-label">Enseignants</div>
+    <div class="col-6 col-md-3">
+      <div class="card">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="avatar flex-shrink-0">
+            <span class="avatar-initial rounded bg-label-success">
+              <i class="bi bi-person-check"></i>
+            </span>
+          </div>
+          <div>
+            <div class="fw-bold fs-5">{{ listEnseignant().length }}</div>
+            <div class="text-muted small">Enseignants</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="rpart-stat-card">
-      <div class="rpart-stat-icon yellow"><i class="bi bi-book"></i></div>
-      <div>
-        <div class="rpart-stat-value">{{ listMatiere().length }}</div>
-        <div class="rpart-stat-label">Matières</div>
+    <div class="col-6 col-md-3">
+      <div class="card">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="avatar flex-shrink-0">
+            <span class="avatar-initial rounded bg-label-warning">
+              <i class="bi bi-book"></i>
+            </span>
+          </div>
+          <div>
+            <div class="fw-bold fs-5">{{ listMatiere().length }}</div>
+            <div class="text-muted small">Matières</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="rpart-stat-card">
-      <div class="rpart-stat-icon blue"><i class="bi bi-mortarboard"></i></div>
-      <div>
-        <div class="rpart-stat-value">{{ listFiliere().length }}</div>
-        <div class="rpart-stat-label">Filières</div>
+    <div class="col-6 col-md-3">
+      <div class="card">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="avatar flex-shrink-0">
+            <span class="avatar-initial rounded bg-label-info">
+              <i class="bi bi-mortarboard"></i>
+            </span>
+          </div>
+          <div>
+            <div class="fw-bold fs-5">{{ listFiliere().length }}</div>
+            <div class="text-muted small">Filières</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- BLOC FILTRES -->
-  <div class="rpart-card">
-    <div
-      class="rpart-filter-header"
-      [class.open]="filterOpen"
-      (click)="toggleFilters()">
-      <div class="rpart-filter-header-left">
-        <i class="bi bi-funnel-fill"></i>
-        Filtres de recherche
+  <!-- ══ BLOC FILTRES ══ -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center"
+         style="cursor:pointer"
+         (click)="toggleFilters()">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-funnel-fill text-primary"></i>
+        <strong>Filtres de recherche</strong>
         @if (hasActiveFilters()) {
-          <span class="rpart-count-badge">{{ activeFilterCount() }} actif(s)</span>
+          <span class="badge bg-primary rounded-pill">{{ activeFilterCount() }} actif(s)</span>
         }
       </div>
-      <i class="bi bi-chevron-down rpart-filter-toggle" [class.open]="filterOpen"></i>
+      <i class="bi" [class]="filterOpen ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
     </div>
 
-    @if (filterOpen) {
-      <div class="rpart-filter-body">
+    <div class="card-body" [style.display]="filterOpen ? 'block' : 'none'">
+      <div class="row g-3">
 
-        <!-- GROUPE 1 : Structure -->
-        <div class="rpart-filter-section-label">
-          <i class="bi bi-diagram-3"></i> Structure académique
-        </div>
-        <div class="rpart-filter-grid rpart-filter-grid-3">
-
-          <!-- Filière -->
-          <div class="rpart-field">
-            <label for="f-filiere">
-              Filière <span class="rpart-required">*</span>
-            </label>
-            <select
-              id="f-filiere"
-              class="form-select rpart-select"
-              [(ngModel)]="filterFiliere"
-              (ngModelChange)="onFiliereChange($event)">
-              <option [ngValue]="null">— Toutes les filières —</option>
-              @for (f of listFiliere(); track f.id) {
-                <option [ngValue]="f">{{ f.intitule }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Niveau -->
-          <div class="rpart-field">
-            <label for="f-niveau">
-              Niveau <span class="rpart-required">*</span>
-            </label>
-            <select
-              id="f-niveau"
-              class="form-select rpart-select"
-              [(ngModel)]="filterNiveau"
-              (ngModelChange)="onNiveauChange($event)"
-              [disabled]="!filterFiliere">
-              <option [ngValue]="null">— Tous les niveaux —</option>
-              @for (n of listNiveau(); track n.id) {
-                <option [ngValue]="n">{{ n.intitule }}</option>
-              }
-            </select>
-            @if (!filterFiliere) {
-              <small class="rpart-hint">
-                <i class="bi bi-arrow-up-left"></i> Choisir d'abord une filière
-              </small>
+        <!-- Filière -->
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">
+            Filière <span class="text-danger">*</span>
+          </label>
+          <select class="form-select"
+                  [(ngModel)]="filterFiliere"
+                  (change)="onFiliereChange($event)">
+            <option value="">— Toutes les filières —</option>
+            @for (f of listFiliere(); track f.id) {
+              <option value="{{f.id}}">{{ f.intitule }}</option>
             }
-          </div>
-
-          <!-- Semestre (optionnel, affine le filtre) -->
-          <div class="rpart-field">
-            <label for="f-semestre">Semestre <span class="rpart-optional">(optionnel)</span></label>
-            <select
-              id="f-semestre"
-              class="form-select rpart-select"
-              [(ngModel)]="filterSemestre"
-              (ngModelChange)="onSemestreChange($event)"
-              [disabled]="!filterNiveau">
-              <option [ngValue]="null">— Tous les semestres —</option>
-              @for (s of listSemestre(); track s.id) {
-                <option [ngValue]="s">{{ s.intitule }}</option>
-              }
-            </select>
-          </div>
+          </select>
         </div>
 
-        <!-- Actions filtres -->
-        <div class="rpart-filter-actions">
-          <button
-            class="rpart-btn rpart-btn-reset"
-            (click)="resetFilters()"
-            [disabled]="!hasActiveFilters()">
-            <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
-          </button>
-          <button
-            class="rpart-btn rpart-btn-apply"
-            (click)="applyFilters()"
-            [disabled]="!filterFiliere || !filterNiveau || isLoading()">
-            @if (isLoading()) {
-              <span class="rpart-spinner"></span> Chargement…
-            } @else {
-              <i class="bi bi-search"></i> Afficher les répartitions
+        <!-- Niveau -->
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">
+            Niveau <span class="text-danger">*</span>
+          </label>
+          <select class="form-select"
+                  [(ngModel)]="filterNiveau"
+                  (change)="onNiveauChange($event)"
+                  [disabled]="!filterFiliere">
+            <option value="">— Tous les niveaux —</option>
+            @for (n of listNiveau(); track n.id) {
+              <option value="{{n.id}}">{{ n.intitule }}</option>
             }
-          </button>
+          </select>
+          @if (!filterFiliere) {
+            <small class="text-muted"><i class="bi bi-arrow-up-left"></i> Choisir d'abord une filière</small>
+          }
         </div>
 
+        <!-- Année académique -->
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">
+            Année académique 
+          </label>
+          <select class="form-select"
+                  [(ngModel)]="filterAnneeAcademique"
+                  (change)="filterSemestreByAnnee($event)"
+                  [disabled]="!filterNiveau">
+            <option value="">— Toutes les années —</option>
+            @for (a of listAnneeAcademique(); track a.id) {
+              <option value="{{a.id}}">{{ a.intitule }}</option>
+            }
+          </select>
+          @if (!filterNiveau) {
+            <small class="text-muted"><i class="bi bi-arrow-up-left"></i> Choisir d'abord un niveau</small>
+          }
+        </div>
+
+        <!-- Semestre -->
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">
+            Semestre <span class="text-muted fw-normal">(Fonction de l'annee)</span>
+          </label>
+          <select class="form-select"
+                  [(ngModel)]="filterSemestre"
+                  (change)="onSemestreChange($event)"
+                  [disabled]="!filterAnneeAcademique">
+            <option value="">— Tous les semestres —</option>
+            @for (s of listSemestre(); track s.id) {
+              <option value="{{s.id}}">{{ s.intitule }}</option>
+            }
+          </select>
+          @if (!filterAnneeAcademique) {
+            <small class="text-muted"><i class="bi bi-arrow-up-left"></i> Choisir d'abord une année académique</small>
+          }
+        </div>
+
+      </div><!-- /row filtres -->
+
+      <!-- Actions filtres -->
+      <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-outline-secondary"
+                (click)="resetFilters()"
+                [disabled]="!hasActiveFilters()">
+          <i class="bi bi-arrow-counterclockwise me-1"></i> Réinitialiser
+        </button>
+        <button class="btn btn-primary"
+                (click)="applyFilters()"
+                [disabled]="!filterFiliere || !filterNiveau || isLoading()">
+          @if (isLoading()) {
+            <span class="spinner-border spinner-border-sm me-1"></span> Chargement…
+          } @else {
+            <i class="bi bi-search me-1"></i> Afficher les répartitions
+          }
+        </button>
       </div>
-    }
-  </div><!-- /filtres -->
+    </div>
+  </div><!-- /card filtres -->
 
 
-  <!-- TABLEAU  -->
-  <div class="rpart-card">
-
-    <!-- Header tableau -->
-    <div class="rpart-table-header">
-      <h5 class="rpart-table-title">
-        <i class="bi bi-table" style="color:var(--rpart-primary)"></i>
-        Liste des répartitions
+  <!-- ══ TABLEAU ══ -->
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-table text-primary"></i>
+        <strong>Liste des répartitions</strong>
         @if (listRepartition().length > 0) {
-          <span class="rpart-count-badge">{{ listRepartition().length }} résultat(s)</span>
+          <span class="badge bg-label-primary rounded-pill">{{ listRepartition().length }} résultat(s)</span>
         }
-      </h5>
-
-      <div class="rpart-table-actions">
-        <!-- Recherche rapide locale -->
-        <div class="rpart-search-box">
-          <i class="bi bi-search rpart-search-icon"></i>
-          <input
-            type="text"
-            class="form-control rpart-search-input"
-            placeholder="Rechercher…"
-            [(ngModel)]="searchQuery"
-            (ngModelChange)="onSearchChange()" />
+      </div>
+      <div class="d-flex gap-2">
+        <div class="input-group" style="max-width:260px">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input type="text" class="form-control" placeholder="Rechercher…"
+                 [(ngModel)]="searchQuery"
+                 (ngModelChange)="onSearchChange()" />
         </div>
-        <button
-          class="rpart-btn rpart-btn-primary"
-          (click)="openCreateModal()"
-          [disabled]="isLoading()">
-          <i class="bi bi-plus-lg"></i> Ajouter
+        <button class="btn btn-primary" type="button"
+                data-bs-toggle="modal" data-bs-target="#createModal"
+                (click)="openCreateModal()" [disabled]="isLoading()">
+          <i class="bi bi-plus-lg me-1"></i> Ajouter
         </button>
       </div>
     </div>
 
     <!-- Tags filtres actifs -->
     @if (hasActiveFilters()) {
-      <div class="rpart-active-filters">
+      <div class="px-3 pt-3 d-flex gap-2 flex-wrap">
         @if (filterFiliere) {
-          <span class="rpart-filter-tag">
+          <span class="badge bg-label-secondary d-flex align-items-center gap-1">
             <i class="bi bi-diagram-2"></i> {{ filterFiliere.intitule }}
-            <button type="button" (click)="clearFilter('filiere')"><i class="bi bi-x"></i></button>
+            <button type="button" class="btn-close ms-1" style="font-size:.55rem" (click)="clearFilter('filiere')"></button>
           </span>
         }
         @if (filterNiveau) {
-          <span class="rpart-filter-tag">
+          <span class="badge bg-label-secondary d-flex align-items-center gap-1">
             <i class="bi bi-layers"></i> {{ filterNiveau.intitule }}
-            <button type="button" (click)="clearFilter('niveau')"><i class="bi bi-x"></i></button>
+            <button type="button" class="btn-close ms-1" style="font-size:.55rem" (click)="clearFilter('niveau')"></button>
+          </span>
+        }
+        @if (filterAnneeAcademique) {
+          <span class="badge bg-label-secondary d-flex align-items-center gap-1">
+            <i class="bi bi-calendar2-range"></i> {{ filterAnneeAcademique.intitule }}
+            <button type="button" class="btn-close ms-1" style="font-size:.55rem" (click)="clearFilter('anneeAcademique')"></button>
           </span>
         }
         @if (filterSemestre) {
-          <span class="rpart-filter-tag">
+          <span class="badge bg-label-secondary d-flex align-items-center gap-1">
             <i class="bi bi-calendar3"></i> {{ filterSemestre.intitule }}
-            <button type="button" (click)="clearFilter('semestre')"><i class="bi bi-x"></i></button>
+            <button type="button" class="btn-close ms-1" style="font-size:.55rem" (click)="clearFilter('semestre')"></button>
           </span>
         }
       </div>
     }
 
-    <!-- ── Aucun filtre ── -->
-    @if (!tableVisible) {
-      <div class="rpart-filter-alert">
-        <i class="bi bi-funnel"></i>
-        <p>Sélectionnez une filière et un niveau pour afficher les répartitions</p>
-        <span>Utilisez les filtres ci-dessus puis cliquez sur « Afficher les répartitions ».</span>
-      </div>
-    }
+    <div class="card-body">
 
-    <!-- ── Chargement ── -->
-    @if (tableVisible && isLoading()) {
-      <div class="rpart-loading">
-        <div class="rpart-spinner-lg"></div>
-        <span>Chargement des répartitions…</span>
-      </div>
-    }
+      <!-- Aucun filtre appliqué -->
+      @if (!tableVisible) {
+        <div class="text-center py-5 text-muted">
+          <i class="bi bi-funnel" style="font-size:3rem;opacity:.3"></i>
+          <p class="mt-3 mb-1 fw-semibold">Sélectionnez une filière et un niveau</p>
+          <span class="small">Utilisez les filtres ci-dessus puis cliquez sur « Afficher les répartitions ».</span>
+        </div>
+      }
 
-    <!-- ── Tableau de données ── -->
-    @if (tableVisible && !isLoading()) {
-      <div class="rpart-table-wrapper">
-        <table class="rpart-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Matière</th>
-              <th>Enseignant</th>
-              <th>Filière</th>
-              <th>Niveau</th>
-              <th>Semestre</th>
-              <th style="text-align:center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+      <!-- Chargement -->
+      @if (tableVisible && isLoading()) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-3 text-muted">Chargement des répartitions…</p>
+        </div>
+      }
 
-            <!-- Résultats -->
-            @for (r of filteredRepartitions(); track r.id; let i = $index) {
-              <tr class="rpart-row" [class.rpart-row-selected]="selectedRepartition?.id === r.id">
-                <td>
-                  <span class="rpart-ref">RPT-{{ (i + 1).toString().padStart(3,'0') }}</span>
-                </td>
-                <td>
-                  <div class="rpart-matiere-cell">
-                    <div class="rpart-matiere-dot"></div>
-                    <div>
-                      <strong>{{ r.matiere?.intitule ?? '—' }}</strong>
-                      @if (r.matiere?.code) {
-                        <div class="rpart-cell-sub">{{ r.matiere!.code }}</div>
-                      }
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class="rpart-teacher-cell">
-                    <div class="rpart-avatar" [style.background]="avatarColor(r.enseignant?.nom ?? '')">
-                      {{ initials(r.enseignant?.nom, r.enseignant?.prenom) }}
-                    </div>
-                    <div>
-                      <div class="rpart-teacher-name">
-                        {{ r.enseignant?.prenom }} {{ r.enseignant?.nom }}
+      <!-- Tableau de données -->
+      @if (tableVisible && !isLoading()) {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Matière</th>
+                <th>Enseignant</th>
+                <th>Filière</th>
+                <th>Niveau</th>
+                <th>Semestre</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of filteredRepartitions(); track r.id; let i = $index) {
+                <tr>
+                  <td>
+                    <span class="badge bg-label-secondary">RPT-{{ (i + 1).toString().padStart(3,'0') }}</span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="avatar avatar-sm flex-shrink-0">
+                        <span class="avatar-initial rounded bg-label-warning">
+                          <i class="bi bi-book"></i>
+                        </span>
                       </div>
-                      @if (r.enseignant?.poste?.intitule) {
-                        <div class="rpart-cell-sub">{{ r.enseignant!.poste?.intitule }}</div>
-                      }
+                      <div>
+                        <strong>{{ r.matiere?.intitule ?? '—' }}</strong>
+                        @if (r.matiere?.code) {
+                          <div class="text-muted small">{{ r.matiere!.code }}</div>
+                        }
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td>
-                  <span class="rpart-badge rpart-badge-primary">
-                    {{ r.filiere?.abreviation ?? r.filiere?.intitule ?? '—' }}
-                  </span>
-                </td>
-                <td>
-                  <span class="rpart-badge rpart-badge-info">
-                    {{ r.niveau?.intitule ?? '—' }}
-                  </span>
-                </td>
-                <td>
-                  @if (r.semestre) {
-                    <span class="rpart-badge rpart-badge-gray">{{ r.semestre.intitule }}</span>
-                  } @else {
-                    <span class="rpart-text-muted">—</span>
-                  }
-                </td>
-                <td>
-                  <div class="rpart-action-btns">
-                    <button
-                      class="rpart-btn-icon view"
-                      title="Visualiser"
-                      (click)="openViewModal(r)">
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      
+                      <div>
+                        <div class="fw-semibold">{{ r.enseignant?.prenom }} {{ r.enseignant?.nom }}</div>
+                        @if (r.enseignant?.poste?.intitule) {
+                          <div class="text-muted small">{{ r.enseignant!.poste?.intitule }}</div>
+                        }
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-label-primary">
+                      {{ r.filiere?.abreviation ?? r.filiere?.intitule ?? '—' }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge bg-label-info">{{ r.niveau?.intitule ?? '—' }}</span>
+                  </td>
+                  <td>
+                    @if (r.semestre) {
+                      <span class="badge bg-label-secondary">{{ r.semestre.intitule }}</span>
+                      @if (r.semestre.anneeAcademique?.intitule) {
+                        <div class="text-muted small">{{ r.semestre.anneeAcademique!.intitule }}</div>
+                      }
+                    } @else {
+                      <span class="text-muted">—</span>
+                    }
+                  </td>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-icon btn-outline-info me-1"
+                            title="Visualiser"
+                            (click)="openViewModal(r)"
+                            data-bs-toggle="modal"
+                            data-bs-target="#viewModal">
                       <i class="bi bi-eye"></i>
                     </button>
-                    <button
-                      class="rpart-btn-icon edit"
-                      title="Modifier"
-                      (click)="openEditModal(r)">
+                    <button class="btn btn-sm btn-icon btn-outline-primary me-1"
+                            title="Modifier"
+                            (click)="openEditModal(r)"
+                            data-bs-toggle="modal"
+                            data-bs-target="#createModal">
                       <i class="bi bi-pencil"></i>
                     </button>
-                    <button
-                      class="rpart-btn-icon delete"
-                      title="Supprimer"
-                      (click)="openDeleteModal(r)">
+                    <button class="btn btn-sm btn-icon btn-outline-danger"
+                            title="Supprimer"
+                            (click)="openDeleteModal(r)"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal">
                       <i class="bi bi-trash"></i>
                     </button>
-                  </div>
-                </td>
-              </tr>
-            }
+                  </td>
+                </tr>
+              }
+              @empty {
+                <tr>
+                  <td colspan="7">
+                    <div class="text-center py-5 text-muted">
+                      <i class="bi bi-inbox" style="font-size:2.5rem;opacity:.3"></i>
+                      <p class="mt-3 mb-1 fw-semibold">Aucune répartition trouvée</p>
+                      <span class="small">
+                        @if (searchQuery) {
+                          Aucun résultat pour « {{ searchQuery }} »
+                        } @else {
+                          Aucune répartition pour cette combinaison filière / niveau.
+                        }
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
 
-            <!-- Vide après filtre local -->
-            @empty {
-              <tr>
-                <td colspan="7">
-                  <div class="rpart-empty">
-                    <i class="bi bi-inbox"></i>
-                    <p>Aucune répartition trouvée</p>
-                    <span>
-                      @if (searchQuery) {
-                        Aucun résultat pour « {{ searchQuery }} »
-                      } @else {
-                        Aucune répartition pour cette combinaison filière / niveau.
-                      }
-                    </span>
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div><!-- /table-wrapper -->
-    }
-
+    </div>
   </div><!-- /card tableau -->
 
-</div><!-- /rpart-page -->
+</div><!-- /container -->
 
 
-<!--══
-     MODAL : CRÉER / MODIFIER═══ -->
-@if (showCreateModal) {
-  <div class="rpart-modal-overlay" (click)="onOverlayClick($event, 'create')">
-    <div class="rpart-modal" role="dialog" aria-modal="true">
+<!-- 
+     MODAL : CRÉER / MODIFIER
+ -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
 
-      <div class="rpart-modal-header" [class]="isEditMode ? 'edit' : 'create'">
-        <h5>
-          <i class="bi" [class]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi me-2" [class]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
           {{ isEditMode ? 'Modifier la répartition' : 'Nouvelle répartition' }}
         </h5>
-        <button class="rpart-modal-close" type="button" (click)="closeCreateModal()">
-          <i class="bi bi-x-lg"></i>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="Close" (click)="closeCreateModal()"></button>
       </div>
 
-      <div class="rpart-modal-body">
-        <form [formGroup]="repartitionForm" (ngSubmit)="submitRepartition()" novalidate>
+      <div class="modal-body">
+        <form [formGroup]="repartitionForm" (ngSubmit)="submitRepartition()">
 
-          <!-- Section Affectation -->
-          <div class="rpart-filter-section-label">
-            <i class="bi bi-person-badge"></i> Affectation pédagogique
+          <div class="divider">
+            <div class="divider-text">Structure académique</div>
           </div>
 
-          <div class="rpart-form-grid">
+          <div class="row g-3">
+             <!-- Departement -->
+            <div class="col-md-4">
+              <label class="form-label" for="m-filiere">
+                Departement <span class="text-danger">*</span>
+              </label>
+              <select id="m-filiere" class="form-select" (change)="filteredDataToForm($event)">
+                <option value="">Sélectionner un departement</option>
+                @for (d of listDepartement(); track d.id) {
+                  <option value="{{d.id}}">{{ d.intitule }}</option>
+                }
+              </select>
+              
+            </div>
 
             <!-- Filière -->
-            <div class="rpart-form-group">
+            <div class="col-md-4">
               <label class="form-label" for="m-filiere">
-                Filière <span class="rpart-required">*</span>
+                Filière <span class="text-danger">*</span>
               </label>
-              <select
-                id="m-filiere"
-                class="form-select"
-                formControlName="filiere"
-                [class.is-invalid]="isFieldInvalid('filiere')">
-                <option [ngValue]="null">Sélectionner une filière…</option>
-                @for (f of listFiliere(); track f.id) {
-                  <option [ngValue]="f">{{ f.intitule }}</option>
+              <select id="m-filiere" class="form-select"
+                      formControlName="filiere"
+                      [class.is-invalid]="isFieldInvalid('filiere')">
+                <option value="">Sélectionner une filière…</option>
+                @for (f of listFiliereForm(); track f.id) {
+                  <option value="{{f.id}}">{{ f.intitule }}</option>
                 }
               </select>
               @if (isFieldInvalid('filiere')) {
@@ -399,18 +448,16 @@
             </div>
 
             <!-- Niveau -->
-            <div class="rpart-form-group">
+            <div class="col-md-4">
               <label class="form-label" for="m-niveau">
-                Niveau <span class="rpart-required">*</span>
+                Niveau <span class="text-danger">*</span>
               </label>
-              <select
-                id="m-niveau"
-                class="form-select"
-                formControlName="niveau"
-                [class.is-invalid]="isFieldInvalid('niveau')">
-                <option [ngValue]="null">Sélectionner un niveau…</option>
+              <select id="m-niveau" class="form-select"
+                      formControlName="niveau"
+                      [class.is-invalid]="isFieldInvalid('niveau')">
+                <option value="">Sélectionner un niveau…</option>
                 @for (n of listNiveau(); track n.id) {
-                  <option [ngValue]="n">{{ n.intitule }}</option>
+                  <option value="{{n.id}}">{{ n.intitule }}</option>
                 }
               </select>
               @if (isFieldInvalid('niveau')) {
@@ -418,39 +465,68 @@
               }
             </div>
 
-            <!-- Semestre -->
-            <div class="rpart-form-group">
-              <label class="form-label" for="m-semestre">
-                Semestre <span class="rpart-required">*</span>
+            <!-- Année académique (formulaire) -->
+            <div class="col-md-6">
+              <label class="form-label" for="m-annee">
+                Année académique <span class="text-danger">*</span>
               </label>
-              <select
-                id="m-semestre"
-                class="form-select"
-                formControlName="semestre"
-                [class.is-invalid]="isFieldInvalid('semestre')">
-                <option [ngValue]="null">Sélectionner un semestre…</option>
-                @for (s of listSemestre(); track s.id) {
-                  <option [ngValue]="s">{{ s.intitule }}</option>
+              <select id="m-annee" class="form-select"
+                      formControlName="anneeAcademique"
+                      [class.is-invalid]="isFieldInvalid('anneeAcademique')"
+                      (change)="filterSemestreForm($event)">
+                <option value="">Sélectionner une année…</option>
+                @for (a of listAnneeAcademique(); track a.id) {
+                  <option value="{{a.id}}">{{ a.intitule }}</option>
                 }
               </select>
+              @if (isFieldInvalid('anneeAcademique')) {
+                <div class="invalid-feedback">L'année académique est obligatoire.</div>
+              }
+            </div>
+
+            <!-- Semestre -->
+            <div class="col-md-6">
+              <label class="form-label" for="m-semestre">
+                Semestre <span class="text-danger">*</span>
+              </label>
+              <select id="m-semestre" class="form-select"
+                      formControlName="semestre"
+                      [class.is-invalid]="isFieldInvalid('semestre')"
+                      [attr.disabled]="!repartitionForm.get('anneeAcademique')?.value ? '' : null">
+                <option value="">Sélectionner un semestre…</option>
+                @for (s of listSemestreForm(); track s.id) {
+                  <option value="{{s.id}}">{{ s.intitule }}</option>
+                }
+              </select>
+              @if (!repartitionForm.get('anneeAcademique')?.value) {
+                <small class="text-muted">
+                  <i class="bi bi-arrow-up-left"></i> Choisir d'abord une année académique
+                </small>
+              }
               @if (isFieldInvalid('semestre')) {
                 <div class="invalid-feedback">Le semestre est obligatoire.</div>
               }
             </div>
 
+          </div><!-- /row structure -->
+
+          <div class="divider mt-3">
+            <div class="divider-text">Affectation</div>
+          </div>
+
+          <div class="row g-3">
+
             <!-- Matière -->
-            <div class="rpart-form-group">
+            <div class="col-md-6">
               <label class="form-label" for="m-matiere">
-                Matière <span class="rpart-required">*</span>
+                Matière <span class="text-danger">*</span>
               </label>
-              <select
-                id="m-matiere"
-                class="form-select"
-                formControlName="matiere"
-                [class.is-invalid]="isFieldInvalid('matiere')">
-                <option [ngValue]="null">Sélectionner une matière…</option>
+              <select id="m-matiere" class="form-select"
+                      formControlName="matiere"
+                      [class.is-invalid]="isFieldInvalid('matiere')">
+                <option value="">Sélectionner une matière…</option>
                 @for (m of listMatiere(); track m.id) {
-                  <option [ngValue]="m">{{ m.intitule }}</option>
+                  <option value="{{m.id}}">{{ m.intitule }}</option>
                 }
               </select>
               @if (isFieldInvalid('matiere')) {
@@ -458,21 +534,19 @@
               }
             </div>
 
-            <!-- Enseignant — pleine largeur -->
-            <div class="rpart-form-group rpart-form-full">
+            <!-- Enseignant -->
+            <div class="col-md-6">
               <label class="form-label" for="m-enseignant">
-                Enseignant responsable <span class="rpart-required">*</span>
+                Enseignant responsable <span class="text-danger">*</span>
               </label>
-              <select
-                id="m-enseignant"
-                class="form-select"
-                formControlName="enseignant"
-                [class.is-invalid]="isFieldInvalid('enseignant')">
-                <option [ngValue]="null">Sélectionner un enseignant…</option>
+              <select id="m-enseignant" class="form-select"
+                      formControlName="enseignant"
+                      [class.is-invalid]="isFieldInvalid('enseignant')">
+                <option value="">Sélectionner un enseignant…</option>
                 @for (e of listEnseignant(); track e.id) {
-                  <option [ngValue]="e">
+                  <option value="{{e.id}}">
                     {{ e.prenom }} {{ e.nom }}
-                    @if (e.poste.intitule) { — {{ e.poste.intitule }} }
+                    @if (e.poste?.intitule) { — {{ e.poste.intitule }} }
                   </option>
                 }
               </select>
@@ -481,35 +555,31 @@
               }
             </div>
 
-          </div><!-- /form-grid -->
+          </div><!-- /row affectation -->
 
-          <!-- Message d'erreur serveur -->
+          <!-- Erreur serveur -->
           @if (formError()) {
-            <div class="rpart-alert rpart-alert-danger">
+            <div class="alert alert-danger d-flex align-items-center gap-2 mt-3">
               <i class="bi bi-exclamation-triangle-fill"></i>
-              {{ formError() }}
+              <span>{{ formError() }}</span>
             </div>
           }
 
         </form>
-      </div>
+      </div><!-- /modal-body -->
 
-      <div class="rpart-modal-footer">
-        <button
-          type="button"
-          class="rpart-btn rpart-btn-secondary"
-          (click)="closeCreateModal()">
-          Annuler
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary"
+                data-bs-dismiss="modal" (click)="closeCreateModal()">
+          <i class="bi bi-x me-1"></i> Annuler
         </button>
-        <button
-          type="button"
-          class="rpart-btn rpart-btn-primary"
-          (click)="submitRepartition()"
-          [disabled]="repartitionForm.invalid || isSaving()">
+        <button type="button" class="btn btn-primary"
+                (click)="submitRepartition()"
+                [disabled]="repartitionForm.invalid || isSaving()">
           @if (isSaving()) {
-            <span class="rpart-spinner"></span> Enregistrement…
+            <span class="spinner-border spinner-border-sm me-1"></span> Enregistrement…
           } @else {
-            <i class="bi bi-check-lg"></i>
+            <i class="bi bi-check-lg me-1"></i>
             {{ isEditMode ? 'Mettre à jour' : 'Enregistrer' }}
           }
         </button>
@@ -517,159 +587,203 @@
 
     </div>
   </div>
-}
+</div>
 
 
-<!--══
-     MODAL : VISUALISER═══ -->
-@if (showViewModal && selectedRepartition) {
-  <div class="rpart-modal-overlay" (click)="onOverlayClick($event, 'view')">
-    <div class="rpart-modal" role="dialog" aria-modal="true">
+<!-- 
+     MODAL : VISUALISER
+ -->
+<div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
 
-      <div class="rpart-modal-header view">
-        <h5><i class="bi bi-eye"></i> Détail de la répartition</h5>
-        <button class="rpart-modal-close" type="button" (click)="closeViewModal()">
-          <i class="bi bi-x-lg"></i>
-        </button>
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-eye me-2"></i> Détail de la répartition
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="Close" (click)="closeViewModal()"></button>
       </div>
 
-      <div class="rpart-modal-body">
+      <div class="modal-body">
+        @if (selectedRepartition) {
 
-        <!-- Bannière enseignant -->
-        <div class="rpart-detail-banner">
-          <div
-            class="rpart-avatar-lg"
-            [style.background]="avatarColor(selectedRepartition.enseignant?.nom ?? '')">
-            {{ initials(selectedRepartition.enseignant?.nom, selectedRepartition.enseignant?.prenom) }}
+          <!-- Bannière enseignant -->
+          <div class="card mb-3">
+            <div class="row g-0">
+              <div class="col-md-3 d-flex align-items-center justify-content-center p-3">
+                <div class="d-flex align-items-center justify-content-center rounded-circle"
+                     style="width:90px;height:90px;font-size:1.8rem;font-weight:700;color:#fff;"
+                     [style.background]="avatarColor(selectedRepartition.enseignant?.nom ?? '')">
+                  {{ initials(selectedRepartition.enseignant?.nom, selectedRepartition.enseignant?.prenom) }}
+                </div>
+              </div>
+              <div class="col-md-9">
+                <div class="card-body">
+                  <h5 class="card-title text-primary mb-1">
+                    {{ selectedRepartition.enseignant?.prenom }}
+                    {{ selectedRepartition.enseignant?.nom ?? 'Enseignant non défini' }}
+                  </h5>
+                  <p class="text-muted mb-0">{{ selectedRepartition.enseignant?.poste?.intitule ?? '' }}</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="rpart-detail-banner-info">
-            <strong>
-              {{ selectedRepartition.enseignant?.prenom }}
-              {{ selectedRepartition.enseignant?.nom ?? 'Enseignant non défini' }}
-            </strong>
-            <span>{{ selectedRepartition.enseignant?.poste?.intitule ?? '' }}</span>
-          </div>
-        </div>
 
-        <!-- Grille détails -->
-        <div class="rpart-detail-grid">
-          <div class="rpart-detail-item">
-            <label>Matière</label>
-            <span>{{ selectedRepartition.matiere?.intitule ?? '—' }}</span>
+          <!-- Grille détails -->
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="card bg-light border-0">
+                <div class="card-body py-2">
+                  <p class="text-muted small mb-1"><i class="bi bi-book me-1"></i> Matière</p>
+                  <strong>{{ selectedRepartition.matiere?.intitule ?? '—' }}</strong>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card bg-light border-0">
+                <div class="card-body py-2">
+                  <p class="text-muted small mb-1"><i class="bi bi-diagram-2 me-1"></i> Filière</p>
+                  <strong>{{ selectedRepartition.filiere?.intitule ?? '—' }}</strong>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card bg-light border-0">
+                <div class="card-body py-2">
+                  <p class="text-muted small mb-1"><i class="bi bi-layers me-1"></i> Niveau</p>
+                  <span class="badge bg-label-info">{{ selectedRepartition.niveau?.intitule ?? '—' }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card bg-light border-0">
+                <div class="card-body py-2">
+                  <p class="text-muted small mb-1"><i class="bi bi-calendar2-range me-1"></i> Année académique</p>
+                  <strong>{{ selectedRepartition.semestre?.anneeAcademique?.intitule ?? '—' }}</strong>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card bg-light border-0">
+                <div class="card-body py-2">
+                  <p class="text-muted small mb-1"><i class="bi bi-calendar3 me-1"></i> Semestre</p>
+                  <span class="badge bg-label-secondary">{{ selectedRepartition.semestre?.intitule ?? 'Non défini' }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card bg-light border-0">
+                <div class="card-body py-2">
+                  <p class="text-muted small mb-1"><i class="bi bi-hash me-1"></i> Identifiant</p>
+                  <strong># {{ selectedRepartition.id }}</strong>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="rpart-detail-item">
-            <label>Code matière</label>
-            <span>101</span>
-          </div>
-          <div class="rpart-detail-item">
-            <label>Filière</label>
-            <span>{{ selectedRepartition.filiere?.intitule ?? '—' }}</span>
-          </div>
-          <div class="rpart-detail-item">
-            <label>Niveau</label>
-            <span>
-              <span class="rpart-badge rpart-badge-info">
-                {{ selectedRepartition.niveau?.intitule ?? '—' }}
-              </span>
-            </span>
-          </div>
-          <div class="rpart-detail-item">
-            <label>Semestre</label>
-            <span>
-              <span class="rpart-badge rpart-badge-gray">
-                {{ selectedRepartition.semestre?.intitule ?? 'Non défini' }}
-              </span>
-            </span>
-          </div>
-          <div class="rpart-detail-item">
-            <label>Identifiant</label>
-            <span># {{ selectedRepartition.id }}</span>
-          </div>
-        </div>
 
+        } @else {
+          <div class="text-center py-4 text-muted">
+            <i class="bi bi-slash-circle" style="font-size:3rem;opacity:.3"></i>
+            <p class="mt-3">Aucune répartition sélectionnée.</p>
+          </div>
+        }
       </div>
 
-      <div class="rpart-modal-footer">
-        <button type="button" class="rpart-btn rpart-btn-secondary" (click)="closeViewModal()">
-          Fermer
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary"
+                data-bs-dismiss="modal" (click)="closeViewModal()">
+          <i class="bi bi-x me-1"></i> Fermer
         </button>
-        <button type="button" class="rpart-btn rpart-btn-primary" (click)="switchToEdit()">
-          <i class="bi bi-pencil"></i> Modifier
+        <button type="button" class="btn btn-primary"
+                data-bs-dismiss="modal"
+                data-bs-toggle="modal"
+                data-bs-target="#createModal"
+                (click)="switchToEdit()">
+          <i class="bi bi-pencil me-1"></i> Modifier
         </button>
       </div>
 
     </div>
   </div>
-}
+</div>
 
 
-<!--══
-     MODAL : SUPPRIMER═══ -->
-@if (showDeleteModal && selectedRepartition) {
-  <div class="rpart-modal-overlay" (click)="onOverlayClick($event, 'delete')">
-    <div class="rpart-modal rpart-modal-sm" role="dialog" aria-modal="true">
+<!-- 
+     MODAL : SUPPRIMER
+ -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
 
-      <div class="rpart-modal-header delete">
-        <h5><i class="bi bi-trash"></i> Confirmer la suppression</h5>
-        <button class="rpart-modal-close" type="button" (click)="closeDeleteModal()">
-          <i class="bi bi-x-lg"></i>
-        </button>
+      <div class="modal-header">
+        <h5 class="modal-title text-danger">
+          <i class="bi bi-trash me-2"></i> Confirmer la suppression
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="Close" (click)="closeDeleteModal()"></button>
       </div>
 
-      <div class="rpart-modal-body">
-        <div class="rpart-delete-confirm-icon">
-          <i class="bi bi-exclamation-triangle-fill"></i>
-        </div>
-        <div class="rpart-delete-confirm-text">
-          <p>Vous êtes sur le point de supprimer la répartition&nbsp;:</p>
-          <p class="rpart-delete-target">
+      <div class="modal-body text-center">
+        <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size:3rem"></i>
+        @if (selectedRepartition) {
+          <p class="mt-3 mb-1">Vous êtes sur le point de supprimer&nbsp;:</p>
+          <p class="fw-bold text-danger small">
             {{ selectedRepartition.matiere?.intitule ?? '?' }}
-            &nbsp;—&nbsp;
-            {{ selectedRepartition.enseignant?.prenom }} {{ selectedRepartition.enseignant?.nom ?? '?' }}
-            &nbsp;/&nbsp;
-            {{ selectedRepartition.filiere?.intitule ?? '?' }}
-            &nbsp;/&nbsp;
-            {{ selectedRepartition.niveau?.intitule ?? '?' }}
+            — {{ selectedRepartition.enseignant?.prenom }} {{ selectedRepartition.enseignant?.nom ?? '?' }}
+            / {{ selectedRepartition.filiere?.intitule ?? '?' }}
+            / {{ selectedRepartition.niveau?.intitule ?? '?' }}
           </p>
-          <p class="rpart-delete-warning">
+          <p class="text-muted small">
             Cette action est <strong>irréversible</strong>. Les emplois du temps et les notes liés
             à cette répartition peuvent être affectés.
           </p>
-        </div>
-
+        }
         @if (formError()) {
-          <div class="rpart-alert rpart-alert-danger" style="margin-top:1rem">
-            <i class="bi bi-exclamation-triangle-fill"></i> {{ formError() }}
+          <div class="alert alert-danger d-flex align-items-center gap-2 mt-2">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>{{ formError() }}</span>
           </div>
         }
       </div>
 
-      <div class="rpart-modal-footer">
-        <button type="button" class="rpart-btn rpart-btn-secondary" (click)="closeDeleteModal()">
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary"
+                data-bs-dismiss="modal" (click)="closeDeleteModal()">
           Annuler
         </button>
-        <button
-          type="button"
-          class="rpart-btn rpart-btn-danger"
-          (click)="confirmDelete()"
-          [disabled]="isSaving()">
+        <button type="button" class="btn btn-danger"
+                (click)="confirmDelete()"
+                [disabled]="isSaving()">
           @if (isSaving()) {
-            <span class="rpart-spinner"></span> Suppression…
+            <span class="spinner-border spinner-border-sm me-1"></span> Suppression…
           } @else {
-            <i class="bi bi-trash"></i> Supprimer définitivement
+            <i class="bi bi-trash me-1"></i> Supprimer définitivement
           }
         </button>
       </div>
 
     </div>
   </div>
-}
+</div>
 
 
-<!-- TOAST -->
+<!-- 
+     TOAST
+ -->
 @if (toastVisible()) {
-  <div class="rpart-toast" [class.danger]="toastType() === 'danger'">
-    <i class="bi" [class]="toastType() === 'danger' ? 'bi-x-circle-fill' : 'bi-check-circle-fill'"></i>
-    <span>{{ toastMessage() }}</span>
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index:1100">
+    <div class="toast show align-items-center border-0 text-white"
+         [class]="toastType() === 'danger' ? 'bg-danger' : 'bg-success'">
+      <div class="d-flex">
+        <div class="toast-body d-flex align-items-center gap-2">
+          <i class="bi" [class]="toastType() === 'danger' ? 'bi-x-circle-fill' : 'bi-check-circle-fill'"></i>
+          {{ toastMessage() }}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                (click)="toastVisible.set(false)">
+        </button>
+      </div>
+    </div>
   </div>
 }
