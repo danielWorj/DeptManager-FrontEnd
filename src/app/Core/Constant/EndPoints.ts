@@ -148,6 +148,7 @@ export const DeptManager ={
             allbydepartement : `${utilisateurapi}/etudiant/bydepartement/`, 
             allbyniveau : `${utilisateurapi}/etudiant/byniveau/`, 
             allbyFiliereAndNiveau : `${utilisateurapi}/etudiant/byfiliere/byniveau/`, 
+            allbyAnneeAndFiliereAndNiveau : `${utilisateurapi}/etudiant/byannee/byfiliere/byniveau/`, 
         }, 
     }, 
     Evaluaton:{

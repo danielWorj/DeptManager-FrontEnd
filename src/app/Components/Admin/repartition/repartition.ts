@@ -44,6 +44,7 @@ export class RepartitionC implements OnInit {
   listMatiere         = signal<Matiere[]>([]);
   listDepartement         = signal<Departement[]>([]);
   listFiliere         = signal<Filiere[]>([]);
+  listMatiereForm         = signal<Matiere[]>([]);
   listNiveau          = signal<Niveau[]>([]);
   listEnseignant      = signal<Enseignant[]>([]);
   listSemestre        = signal<Semestre[]>([]);
@@ -56,6 +57,9 @@ export class RepartitionC implements OnInit {
   /** Semestres affichés dans le formulaire modal (filtrés par année académique du formulaire) */
   listSemestreForm = signal<Semestre[]>([]);
   listFiliereForm = signal<Filiere[]>([]);
+  listNiveauForm = signal<Niveau[]>([]);
+  listEnseignantForm = signal<Enseignant[]>([]);
+  listAnneeAcademiqueForm = signal<AnneeAcademique[]>([]);
 
   // ── Signals : états UI ───────
   isLoading    = signal(false);
@@ -164,12 +168,13 @@ export class RepartitionC implements OnInit {
   }
 
   getAllFiliere(): void {
-    this.configService.getAllFiliere().subscribe({
-      next:  (data: Filiere[]) => this.listFiliere.set(data),
-      error: (err) => { console.error('Erreur list Filiere', err); },
-    });
-  }
-
+  this.configService.getAllFiliere().subscribe({
+    next: (data: Filiere[]) => {
+      this.listFiliere.set(data);
+      this.listFiliereForm.set(data); // ← ajouter cette ligne
+    },
+  });
+}
   getAllDepartement(): void {
     this.configService.getAllDepartement().subscribe({
       next:  (data: Departement[]) => this.listDepartement.set(data),
@@ -606,15 +611,15 @@ export class RepartitionC implements OnInit {
 
     console.log('id du departement :'+idD);
     
-     this.listFiliere.set(
-      this.listFiliereForm().filter(f => f.departement!.id === idD)
+    this.listFiliereForm.set(
+      this.listFiliere().filter(f => f.departement!.id === idD) // ← lire depuis la source
     );
   
-    this.listMatiere.set(
+    this.listMatiereForm.set(
       this.listMatiere().filter(m => m.departement!.id === idD)
     );
 
-    this.listEnseignant.set(
+    this.listEnseignantForm.set(
       this.listEnseignant().filter(e => e.departement!.id === idD)
     );
   }

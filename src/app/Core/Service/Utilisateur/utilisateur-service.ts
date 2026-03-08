@@ -53,6 +53,10 @@ export class UtilisateurService {
     getAllEtudiantByFiliereAndNiveau(id:number):Observable<Etudiant[]>{
       return this.http.get<Etudiant[]>(DeptManager.Utilisateur.Etudiant.allbyFiliereAndNiveau+id); 
     }
+    getAllEtudiantByAnneeAndFiliereAndNiveau(idA:number,idF:number,idN:number):Observable<Etudiant[]>{
+      
+      return this.http.get<Etudiant[]>(DeptManager.Utilisateur.Etudiant.allbyAnneeAndFiliereAndNiveau+idA+'/'+idF+'/'+idN); 
+    }
 
 
     createEtudiant(request:any):Observable<ResponseServer>{

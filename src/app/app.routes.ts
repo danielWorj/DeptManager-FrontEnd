@@ -35,7 +35,7 @@ export const routes: Routes = [
     },
     {
         path: 'admin-note', 
-        loadComponent : ()=>import('./Components/Admin/notes/notes').then(n => n.Notes)
+        loadComponent : ()=>import('./Components/Admin/notes/notes').then(n => n.NotesC)
     },
     {
         path: 'admin-repartition', 

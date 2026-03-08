@@ -1,1 +1,476 @@
-<p>notes works!</p>
+<div class="container-xxl flex-grow-1 container-p-y">
+<!-- Page Header -->
+<div class="nm-page-header">
+  <div>
+      <h4 class="fw-bold mb-1">
+        <i class="bi bi-bar-chart-line-fill text-primary me-2"></i>
+        Gestion des Notes
+      </h4>
+      <p class="text-muted mb-0">
+        Affectation des enseignants aux matières par filière, niveau et semestre
+      </p>
+    </div>
+  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+    <button class="nm-btn nm-btn-outline">
+      <i class="bi bi-upload"></i> Importer CSV
+    </button>
+    <button class="btn btn-primary m-1" type="button" data-bs-toggle="modal" data-bs-target="#basicModal2"
+      [disabled]="idRepartitionSelected === 0"
+      (click)="prepareCreate()">
+      <i class="bi bi-plus-lg"></i> Nouvelle note
+    </button>
+  </div>
+</div>
+
+
+<div id="accordionIcon" class="accordion mt-3 mb-3 accordion-without-arrow">
+    <div class="accordion-item card">
+        <h2 class="accordion-header text-body d-flex justify-content-between" id="accordionIconOne">
+        <button
+            type="button"
+            class="accordion-button collapsed"
+            data-bs-toggle="collapse"
+            data-bs-target="#accordionIcon-1"
+            aria-controls="accordionIcon-1"
+        >
+            Statistiques
+        </button>
+        </h2>
+        <div id="accordionIcon-1" class="accordion-collapse collapse" data-bs-parent="#accordionIcon">
+        <div class="accordion-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <canvas id="myChart"></canvas>
+                </div>
+                <div class="col-md-4">
+                    <canvas id="doughnutChart"></canvas>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div class="nm-filter-card">
+  <div class="nm-filter-title">
+    <i class="bi bi-funnel-fill"></i> Sélectionner une répartition
+  </div>
+  <div class="nm-filter-grid">
+
+    <!-- Sélecteur principal de répartition -->
+    <div style="grid-column: span 3;">
+      <div class="nm-filter-label">
+        Répartition <span class="nm-required">*</span>
+      </div>
+      <select
+        class="form-select form-select-sm"
+        (change)="onRepartitionChange($event)">
+        <option value="0" disabled [selected]="idRepartitionSelected === 0">
+          -- Choisir une répartition --
+        </option>
+        @for (rep of listRepartition(); track rep.id) {
+          <option value="{{rep.id}}">
+            {{ rep.matiere?.intitule }}
+            — {{ rep.enseignant?.nom }} {{ rep.enseignant?.prenom }}
+            — {{ rep.filiere?.abreviation }} {{ rep.niveau?.intitule }}
+            — {{ rep.semestre?.intitule }}
+          </option>
+        }
+      </select>
+    </div>
+
+    <!-- Bouton reset -->
+    <div style="display:flex; align-items:flex-end;">
+      <button
+        class="nm-btn nm-btn-outline"
+        style="width:100%;"
+        (click)="resetSelection()">
+        <i class="bi bi-x-circle"></i> Réinitialiser
+      </button>
+    </div>
+
+  </div>
+</div>
+
+@if (repartitionSelected(); as rep) {
+  <div class="nm-repartition-banner">
+    <div class="nm-rep-icon">
+      <i class="bi bi-shuffle"></i>
+    </div>
+    <div class="nm-rep-info">
+      <h4>{{ rep.matiere?.intitule }}</h4>
+      <div class="nm-rep-tags">
+        <span class="nm-rep-tag">
+          <i class="bi bi-person-fill me-1"></i>
+          {{ rep.enseignant?.nom }} {{ rep.enseignant?.prenom }}
+        </span>
+        <span class="nm-rep-tag">
+          <i class="bi bi-diagram-3 me-1"></i>
+          {{ rep.filiere?.intitule }}
+        </span>
+        <span class="nm-rep-tag">
+          <i class="bi bi-layers me-1"></i>
+          {{ rep.niveau?.intitule }}
+        </span>
+        <span class="nm-rep-tag accent">
+          <i class="bi bi-calendar3 me-1"></i>
+          {{ rep.semestre?.intitule }}
+        </span>
+      </div>
+    </div>
+  </div>
+}
+
+
+@if (idRepartitionSelected !== 0) {
+  <div class="nm-stats-row">
+    <div class="nm-stat-card">
+      <div class="nm-stat-icon blue">
+        <i class="bi bi-clipboard2-data-fill"></i>
+      </div>
+      <div>
+        <div class="nm-stat-value">{{ listNoteByRepartition().length }}</div>
+        <div class="nm-stat-label">Notes enregistrées</div>
+      </div>
+    </div>
+    <div class="nm-stat-card">
+      <div class="nm-stat-icon green">
+        <i class="bi bi-check2-circle"></i>
+      </div>
+      <div>
+        <div class="nm-stat-value">
+          {{ getNotesByMention('ADMIS') }}
+        </div>
+        <div class="nm-stat-label">Étudiants admis (≥10)</div>
+      </div>
+    </div>
+    <div class="nm-stat-card">
+      <div class="nm-stat-icon orange">
+        <i class="bi bi-exclamation-circle"></i>
+      </div>
+      <div>
+        <div class="nm-stat-value">
+          {{ getNotesByMention('REFUSE') }}
+        </div>
+        <div class="nm-stat-label">Étudiants refusés (&lt;10)</div>
+      </div>
+    </div>
+    <div class="nm-stat-card">
+      <div class="nm-stat-icon purple">
+        <i class="bi bi-bar-chart-fill"></i>
+      </div>
+      <div>
+        <div class="nm-stat-value">{{ getMoyenneGenerale() }}</div>
+        <div class="nm-stat-label">Moyenne générale</div>
+      </div>
+    </div>
+  </div>
+}
+
+
+    <div class="nm-table-card">
+    <div class="nm-table-header">
+        <h3>
+        Liste des notes
+        <span style="font-size:.75rem; color:var(--text-muted); font-weight:400; margin-left:6px;">
+            {{ listNoteByRepartition().length }} entrée(s)
+        </span>
+        </h3>
+        <div class="nm-table-actions">
+        <div class="nm-search-box">
+            <i class="bi bi-search"></i>
+            <input
+            type="text"
+            placeholder="Rechercher étudiant..."
+            (input)="onSearch($event)" />
+        </div>
+        <button class="nm-btn nm-btn-outline nm-btn-sm">
+            <i class="bi bi-download"></i> Exporter
+        </button>
+        </div>
+    </div>
+
+    <div class="nm-table-wrapper">
+        <table class="nm-table">
+        <thead>
+            <tr>
+            <th>#</th>
+            <th>Étudiant</th>
+            <th>Matricule</th>
+            <th>Note / 20</th>
+            <th>Mention</th>
+            <th>Type d'évaluation</th>
+            <th style="text-align:center;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <!-- État vide : aucune répartition choisie -->
+            @if (idRepartitionSelected === 0) {
+            <tr>
+                <td colspan="7">
+                <div class="nm-empty-state">
+                    <i class="bi bi-funnel"></i>
+                    <p>Veuillez sélectionner une répartition pour afficher les notes.</p>
+                </div>
+                </td>
+            </tr>
+
+            <!-- État vide : répartition choisie mais aucune note -->
+            } @else if (listNoteByRepartition().length === 0) {
+            <tr>
+                <td colspan="7">
+                <div class="nm-empty-state">
+                    <i class="bi bi-clipboard2-x"></i>
+                    <p>Aucune note enregistrée pour cette répartition.</p>
+                </div>
+                </td>
+            </tr>
+
+            <!-- Lignes de notes -->
+            } @else {
+            @for (note of listNoteByRepartition(); track note.id; let i = $index) {
+                <tr>
+                <!-- Numéro -->
+                <td style="color:var(--text-muted); font-size:.75rem;">
+                    {{ i + 1  }}
+                </td>
+
+                <!-- Étudiant -->
+                <td>
+                    <div class="nm-avatar-cell">
+                    <div class="nm-avatar" [class]="getAvatarColor(i)">
+                        {{ note.etudiant?.nom?.charAt(0) }}{{ note.etudiant?.prenom?.charAt(0) }}
+                    </div>
+                    <div>
+                        <div class="nm-name">
+                        {{ note.etudiant?.nom }} {{ note.etudiant?.prenom }}
+                        </div>
+                        <div class="nm-sub">{{ note.etudiant?.email }}</div>
+                    </div>
+                    </div>
+                </td>
+
+                <!-- Matricule -->
+                <td>
+                    <code style="font-size:.78rem; background:#f0f4f8; padding:2px 7px; border-radius:4px;">
+                    {{ note.etudiant?.matricule }}
+                    </code>
+                </td>
+
+                <!-- Badge note -->
+                <td>
+                    <div
+                    class="nm-note-badge"
+                    [ngClass]="getNoteBadgeClass(note.note)">
+                    {{ note.note }}
+                    </div>
+                </td>
+
+                <!-- Mention -->
+                <td>
+                    <span
+                    style="font-weight:600; font-size:.82rem;"
+                    [style.color]="getMentionColor(note.note)">
+                    {{ getMentionLabel(note.note) }}
+                    </span>
+                </td>
+
+                <!-- Type évaluation -->
+                <td>
+                    <span
+                    class="nm-eval-pill"
+                    [ngClass]="getEvalPillClass(note.typeEvaluation?.intitule)">
+                    {{ note.typeEvaluation?.intitule }}
+                    </span>
+                </td>
+
+                <!-- Actions -->
+                <td>
+                    <div style="display:flex; gap:6px; justify-content:center;">
+                    <button
+                        class="nm-btn nm-btn-outline nm-btn-sm"
+                        title="Modifier"
+                        data-bs-toggle="modal"
+                        data-bs-target="#basicModal2"
+                        (click)="prepareEdit(note)">
+                        <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button
+                        class="nm-btn nm-btn-sm"
+                        style="background:#fee2e2; color:#991b1b;"
+                        title="Supprimer"
+                        (click)="deleteNote(note.id)">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                    </div>
+                </td>
+                </tr>
+            }
+            }
+
+        </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="nm-pagination">
+        <span>
+        Total : <b>{{ listNoteByRepartition().length }}</b> résultat(s)
+        </span>
+        <div class="nm-page-btns">
+        <div class="nm-page-btn"><i class="bi bi-chevron-left"></i></div>
+        <div class="nm-page-btn active">1</div>
+        <div class="nm-page-btn"><i class="bi bi-chevron-right"></i></div>
+        </div>
+    </div>
+    </div>
+
+
+    <!-- ══ MODAL : CRÉER / MODIFIER UNE NOTE ══ -->
+    <div class="modal fade" id="basicModal2" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">
+                @if (noteFb.get('id')?.value) {
+                    Modifier la note
+                } @else {
+                    Saisie d'une nouvelle note
+                }
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+       <div class="modal-body px-4 py-3">
+            <!-- Même pattern que etudiant-c.html : form avec (ngSubmit) + formGroup -->
+            <form [formGroup]="noteFb" (ngSubmit)="createNote()">
+
+                <div class="nm-modal-section-title">
+                    <i class="bi bi-shuffle me-1"></i>Répartition concernée
+                </div>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="nm-form-label">
+                            Répartition <span class="nm-required">*</span>
+                        </label>
+                        <!-- value="{{rep.id}}" : même pattern que etudiant-c pour stocker l'id -->
+                        <select class="form-select" formControlName="repartition" required>
+                            <option value="">-- Sélectionner une répartition --</option>
+                            @for (rep of listRepartition(); track rep.id) {
+                                <option value="{{rep.id}}">
+                                    {{ rep.matiere?.intitule }}
+                                    — {{ rep.enseignant?.nom }} {{ rep.enseignant?.prenom }}
+                                    — {{ rep.filiere?.abreviation }} {{ rep.niveau?.intitule }}
+                                    — {{ rep.semestre?.intitule }}
+                                </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Section : Étudiant -->
+                <div class="nm-modal-section-title">
+                    <i class="bi bi-person-fill me-1"></i>Étudiant
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="nm-form-label">
+                            Étudiant <span class="nm-required">*</span>
+                        </label>
+                        <!-- value="{{e.id}}" : même pattern que etudiant-c -->
+                        <select class="form-select" formControlName="etudiant">
+                            <option value="">Choose...</option>
+                            @for (e of listEtudiantByRepartition(); track e.id) {
+                                <option value="{{e.id}}">{{e.nom}} {{e.prenom}}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="nm-form-label">Matricule</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Auto-rempli"
+                            readonly
+                            style="background:#f0f4f8; color:var(--text-muted);"
+                            [value]="getSelectedMatricule()" />
+                    </div>
+                </div>
+
+                <!-- Section : Note & Type évaluation -->
+                <div class="nm-modal-section-title">
+                    <i class="bi bi-clipboard2-data me-1"></i>Note & Évaluation
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="nm-form-label">
+                            Note (sur 20) <span class="nm-required">*</span>
+                        </label>
+                        <input
+                            type="number"
+                            class="form-control"
+                            formControlName="note"
+                            placeholder="ex : 14.5"
+                            min="0"
+                            max="20"
+                            step="0.25"
+                            required />
+                        <div style="font-size:.74rem; color:var(--text-muted); margin-top:4px;">
+                            Valeur comprise entre 0 et 20
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="nm-form-label">
+                            Type d'évaluation <span class="nm-required">*</span>
+                        </label>
+                        <!-- formControlName corrigé : tyeEvaluation → typeEvaluation -->
+                        <!-- value="{{type.id}}" : même pattern que etudiant-c -->
+                        <select class="form-select" formControlName="typeEvaluation" required>
+                            <option value="">-- Choisir --</option>
+                            @for (type of listTypeEvaluation(); track type.id) {
+                                <option value="{{type.id}}">{{ type.intitule }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="nm-form-label">Mention (calculée)</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Auto-calculée"
+                            readonly
+                            style="background:#f0f4f8; font-weight:600;"
+                            [value]="getMentionLabel(noteFb.get('note')?.value)"
+                            [style.color]="getMentionColor(noteFb.get('note')?.value)" />
+                    </div>
+                </div>
+
+            </form>
+       </div>
+       <div class="modal-footer" style="border-top:1px solid var(--border-color); padding:14px 24px;">
+            <button
+                type="button"
+                class="nm-btn nm-btn-outline"
+                data-bs-dismiss="modal"
+                (click)="noteFb.reset()">
+                <i class="bi bi-x-lg"></i> Annuler
+            </button>
+            <button
+                type="button"
+                class="nm-btn nm-btn-primary"
+                [disabled]="noteFb.invalid"
+                (click)="createNote()">
+                <i class="bi bi-floppy-fill"></i>
+                @if (noteFb.get('id')?.value) {
+                    Mettre à jour
+                } @else {
+                    Enregistrer la note
+                }
+            </button>
+        </div>
+    </div>
+    </div>
+</div>
+</div>

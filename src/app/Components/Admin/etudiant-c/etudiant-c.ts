@@ -12,6 +12,7 @@ import { Filiere } from '../../../Core/Model/Structure/Filiere';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ResponseServer } from '../../../Core/Model/Server/ResponseServer';
 import { DatePipe } from '@angular/common';
+import { AnneeAcademique } from '../../../Core/Model/Scolarite/anneeacademique';
 //  Suppression de l'import inutilisé : "sign" from 'crypto'
 
 @Component({
@@ -47,6 +48,7 @@ export class EtudiantC implements OnDestroy {
       matricule:   new FormControl(),
       filiere:     new FormControl(),
       niveau:      new FormControl(),
+      anneeAcademique : new FormControl(), 
     });
 
     this.loadPage();
@@ -79,6 +81,7 @@ export class EtudiantC implements OnDestroy {
     this.getAllDepartement();
     this.getAllFiliere();
     this.getAllNiveau();
+    this.getAllAneeAcademique();
   }
 
   getAllETudiant(): void {
@@ -129,6 +132,24 @@ export class EtudiantC implements OnDestroy {
       next: (data: Niveau[]) => this.listNiveau.set(data),
       error: () => console.error('Fetch list niveau : failed'),
     });
+  }
+
+  listAnnee = signal<AnneeAcademique[]>([]); 
+  getAllAneeAcademique() : void{
+    this.configService.getAllAnneeAcademique().subscribe({
+      next: (data: AnneeAcademique[]) => {
+        this.listAnnee.set(data); 
+        this.getAnneeActive(); 
+      },
+      error: () => console.error('Fetch list niveau : failed'),
+    });
+  }
+
+  anneeActive = signal<AnneeAcademique | null >(null); 
+  getAnneeActive(){
+
+    this.anneeActive.set(this.listAnnee().find(a => a.status) ?? null);
+    
   }
 
   //  Filtres 
