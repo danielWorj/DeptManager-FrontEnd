@@ -1,0 +1,112 @@
+<nav class="enset-navbar">
+  <div class="enset-container-wide">
+    <div class="enset-navbar__inner">
+
+      <!-- Logo -->
+      <a href="https://enset-douala.cm/" class="enset-logo">
+        <img
+          src="https://enset-douala.cm/wp-content/uploads/2025/07/LOGO-ENSET-UNIVERSITE-DOUALA-400x89.png"
+          alt="Logo ENSET Douala"
+          class="enset-logo__img"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        />
+        <div class="enset-logo__fallback" style="display:none;">EN<br>SET</div>
+        <div class="enset-logo__text">
+          <span class="enset-logo__name">ENSET Douala</span>
+          <span class="enset-logo__sub">École Normale Supérieure Technique</span>
+        </div>
+      </a>
+
+      <!-- Menu -->
+      <ul class="enset-nav-menu">
+        <li class="enset-nav-item">
+          <a href="#" class="enset-nav-link">À Propos <span class="enset-nav-caret">▼</span></a>
+          <div class="enset-dropdown">
+            <a href="https://enset-douala.cm/bienvenue/">Mot de bienvenue <span>→</span></a>
+            <a href="https://enset-douala.cm/a-propos/">Présentation <span>→</span></a>
+            <a href="https://enset-douala.cm/organigramme-enset/">Organigramme <span>→</span></a>
+          </div>
+        </li>
+        <li class="enset-nav-item">
+          <a href="#" class="enset-nav-link">Départements <span class="enset-nav-caret">▼</span></a>
+          <div class="enset-dropdown">
+            <a href="https://enset-douala.cm/enseignements-scientifiques-de-base-esb-2/">Sciences de Base (ESB) <span>→</span></a>
+            <a href="https://enset-douala.cm/departement-industrie-textile-et-de-lhabillement-ith/">Industrie Textile (ITH) <span>→</span></a>
+            <a href="https://enset-douala.cm/genie-forestier-gfo-2/">Génie Forestier (GFO) <span>→</span></a>
+            <a href="https://enset-douala.cm/economie-sociale-et-familiale-esf-2/">Économie Sociale & Familiale (ESF) <span>→</span></a>
+          </div>
+        </li>
+        <li class="enset-nav-item">
+          <a routerLink="pole-formation" routerLinkActive="active" class="enset-nav-link">Pôles de Formation</a>
+        </li>
+        <li class="enset-nav-item">
+          <a routerLink="recherche" routerLinkActive="active" class="enset-nav-link">Recherche <span class="enset-nav-caret">▼</span></a>
+          <div class="enset-dropdown">
+            <a href="#">Laboratoires & Unités <span>→</span></a>
+            <a href="#">Publications scientifiques <span>→</span></a>
+            <a href="#">Projets en cours <span>→</span></a>
+          </div>
+        </li>
+        <li class="enset-nav-item">
+          <a routerLink="blog" routerLinkActive="active" class="enset-nav-link">Blog</a>
+        </li>
+        <li class="enset-nav-item">
+          <a routerLink="contact" routerLinkActive="active" class="enset-nav-link">Contacts</a>
+        </li>
+      </ul>
+
+      <!-- Actions -->
+      <div class="enset-nav-actions">
+        <a href="https://enset-douala.cm/fiches-formulaires/" class="enset-btn enset-btn--outline">Fiches & Formulaires</a>
+        <a href="https://enset-douala.cm/wp-content/uploads/2025/07/Formulaire-de-Demande-dInscription-ENSET-de-Douala-2025-2026.pdf"
+           target="_blank" class="enset-btn enset-btn--primary">
+          Pré-inscription <span class="enset-btn__arrow">→</span>
+        </a>
+      </div>
+
+      <!-- Hamburger -->
+      <button class="enset-hamburger" onclick="document.getElementById('enset-mob').classList.toggle('enset-is-open')" aria-label="Menu mobile">
+        <span></span><span></span><span></span>
+      </button>
+
+    </div>
+  </div>
+</nav>
+
+<!-- 
+     MENU MOBILE
+-->
+<div class="enset-mobile-nav" id="enset-mob">
+  <div class="enset-mobile-nav__head">
+    <a href="#" class="enset-logo">
+      <img
+        src="https://enset-douala.cm/wp-content/uploads/2025/07/LOGO-ENSET-UNIVERSITE-DOUALA-400x89.png"
+        alt="Logo ENSET" class="enset-logo__img"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+      />
+      <div class="enset-logo__fallback" style="display:none;">EN<br>SET</div>
+      <div class="enset-logo__text">
+        <span class="enset-logo__name">ENSET Douala</span>
+      </div>
+    </a>
+    <button class="enset-mobile-nav__close" onclick="document.getElementById('enset-mob').classList.remove('enset-is-open')">✕</button>
+  </div>
+  <div class="enset-mobile-nav__body">
+    <ul>
+      <li><a href="https://enset-douala.cm/a-propos/">À Propos</a></li>
+      <li><a href="https://enset-douala.cm/enseignements-scientifiques-de-base-esb-2/">Départements</a></li>
+      <li><a href="https://enset-douala.cm/poles-de-formation/">Pôles de Formation</a></li>
+      <li><a href="#">Recherche</a></li>
+      <li><a href="https://enset-douala.cm/vie-etudiant/">Vie Étudiante</a></li>
+      <li><a href="https://enset-douala.cm/actualites-blog/">Blog & Actualités</a></li>
+      <li><a href="https://enset-douala.cm/contact/">Contacts</a></li>
+    </ul>
+  </div>
+  <div class="enset-mobile-nav__footer">
+    <a href="https://enset-douala.cm/fiches-formulaires/" class="enset-btn enset-btn--outline" style="justify-content:center;">Fiches & Formulaires</a>
+    <a href="https://enset-douala.cm/wp-content/uploads/2025/07/Formulaire-de-Demande-dInscription-ENSET-de-Douala-2025-2026.pdf"
+       target="_blank" class="enset-btn enset-btn--primary" style="justify-content:center;">
+      Pré-inscription 2025–2026 →
+    </a>
+  </div>
+</div>

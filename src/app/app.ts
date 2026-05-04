@@ -3,10 +3,11 @@ import { RouterOutlet } from '@angular/router';
 import { Sidebar } from "./Layout/sidebar/sidebar";
 import { Auth } from "./Components/Auth/auth/auth";
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { StructureLayoutAdmin } from "./Components/LayoutAdmin/structure-layout-admin/structure-layout-admin";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Sidebar, Auth , ReactiveFormsModule],
+  imports: [RouterOutlet, Sidebar, Auth, ReactiveFormsModule, StructureLayoutAdmin],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

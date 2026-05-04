@@ -1,1 +1,307 @@
-<p>page-contact works!</p>
+
+
+
+<!-- ═══════════ HERO CONTACT ═══════════ -->
+<section class="enset-contact-hero">
+  <div class="enset-contact-hero__pattern"></div>
+  <div class="enset-container">
+    <div class="enset-contact-hero__inner">
+      <div class="enset-contact-hero__left">
+        <div class="enset-contact-hero__eyebrow anim-1">
+          <span class="enset-tag">Nous contacter</span>
+        </div>
+        <h1 class="enset-contact-hero__title anim-2">
+          Parlons de votre <em>avenir</em> ensemble
+        </h1>
+        <p class="enset-contact-hero__desc anim-3">
+          Notre équipe administrative est disponible pour répondre à toutes vos questions — admissions, programmes, partenariats ou vie sur le campus.
+        </p>
+      </div>
+      <div class="enset-contact-hero__cards anim-4">
+        <div class="enset-contact-quick-card">
+          <div class="enset-contact-quick-card__icon">📍</div>
+          <div class="enset-contact-quick-card__body">
+            <div class="enset-contact-quick-card__label">Adresse</div>
+            <div class="enset-contact-quick-card__value">Rue Joffre, Akwa — Douala, Cameroun</div>
+          </div>
+        </div>
+        <div class="enset-contact-quick-card">
+          <div class="enset-contact-quick-card__icon">📞</div>
+          <div class="enset-contact-quick-card__body">
+            <div class="enset-contact-quick-card__label">Téléphone</div>
+            <div class="enset-contact-quick-card__value">+237 233 42 XX XX &nbsp;·&nbsp; +237 699 XX XX XX</div>
+          </div>
+        </div>
+        <div class="enset-contact-quick-card">
+          <div class="enset-contact-quick-card__icon">✉️</div>
+          <div class="enset-contact-quick-card__body">
+            <div class="enset-contact-quick-card__label">Email</div>
+            <div class="enset-contact-quick-card__value">contact@enset-douala.cm</div>
+          </div>
+        </div>
+        <div class="enset-contact-quick-card">
+          <div class="enset-contact-quick-card__icon">🕐</div>
+          <div class="enset-contact-quick-card__body">
+            <div class="enset-contact-quick-card__label">Horaires d'accueil</div>
+            <div class="enset-contact-quick-card__value">Lun – Ven · 07h30 – 15h30</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ MAIN CONTENT ═══════════ -->
+<section class="enset-contact-main">
+  <div class="enset-container">
+    <div class="enset-contact-main__grid">
+
+      <!-- Formulaire -->
+      <div class="enset-form-wrap">
+        <div class="enset-form-wrap__head">
+          <span class="enset-tag">Formulaire de contact</span>
+          <h2>Envoyez-nous un message</h2>
+          <p>Nous vous répondrons dans un délai de 48 heures ouvrables.</p>
+        </div>
+        <div class="enset-form-body" id="contactForm">
+          <div class="enset-form-row">
+            <div class="enset-field">
+              <label>Prénom <span>*</span></label>
+              <input type="text" class="enset-input" placeholder="Votre prénom" required>
+            </div>
+            <div class="enset-field">
+              <label>Nom <span>*</span></label>
+              <input type="text" class="enset-input" placeholder="Votre nom" required>
+            </div>
+          </div>
+          <div class="enset-field">
+            <label>Adresse email <span>*</span></label>
+            <input type="email" class="enset-input" placeholder="exemple@domaine.cm" required>
+          </div>
+          <div class="enset-form-row">
+            <div class="enset-field">
+              <label>Téléphone</label>
+              <input type="tel" class="enset-input" placeholder="+237 6XX XXX XXX">
+            </div>
+            <div class="enset-field">
+              <label>Vous êtes <span>*</span></label>
+              <select class="enset-input" required>
+                <option value="" disabled selected>Choisir…</option>
+                <option>Futur étudiant(e)</option>
+                <option>Étudiant(e) actuel(le)</option>
+                <option>Parent / Tuteur</option>
+                <option>Enseignant / Personnel</option>
+                <option>Partenaire / Entreprise</option>
+                <option>Journaliste / Presse</option>
+                <option>Autre</option>
+              </select>
+            </div>
+          </div>
+          <div class="enset-field">
+            <label>Objet de votre demande <span>*</span></label>
+            <select class="enset-input" required>
+              <option value="" disabled selected>Sélectionner un sujet…</option>
+              <option>Admissions & Candidatures</option>
+              <option>Informations sur les formations</option>
+              <option>Scolarité & Inscriptions</option>
+              <option>Stages & Partenariats</option>
+              <option>Vie sur le campus</option>
+              <option>Recherche & Laboratoires</option>
+              <option>Relations internationales</option>
+              <option>Autre demande</option>
+            </select>
+          </div>
+          <div class="enset-field">
+            <label>Message <span>*</span></label>
+            <textarea class="enset-input" placeholder="Décrivez votre demande en détail…" required></textarea>
+          </div>
+          <div class="enset-field" style="margin-bottom:8px;">
+            <label style="display:flex;align-items:flex-start;gap:10px;text-transform:none;letter-spacing:0;font-size:.84rem;font-weight:400;color:var(--enset-ink-soft);cursor:pointer;">
+              <input type="checkbox" style="margin-top:3px;accent-color:var(--enset-primary);flex-shrink:0;" required>
+              J'accepte que mes données soient traitées conformément à la <a href="#" style="color:var(--enset-primary);">politique de confidentialité</a> de l'ENSET Douala.
+            </label>
+          </div>
+          <div class="enset-form-submit">
+            <button type="button" class="enset-btn enset-btn--primary" onclick="submitForm()">
+              Envoyer le message <span class="enset-btn__arrow">→</span>
+            </button>
+            <span class="enset-form-note">Réponse sous 48h</span>
+          </div>
+        </div>
+        <div class="enset-form-success" id="formSuccess">
+          <div class="enset-form-success__icon">✅</div>
+          <h3>Message envoyé avec succès !</h3>
+          <p>Merci pour votre message. Notre équipe vous contactera dans les 48 heures ouvrables.</p>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="enset-contact-sidebar">
+
+        <!-- Coordonnées -->
+        <div class="enset-info-card">
+          <div class="enset-info-card__head">
+            <div class="enset-info-card__icon">🏛️</div>
+            <div class="enset-info-card__title">Coordonnées officielles</div>
+          </div>
+          <div class="enset-info-card__body">
+            <div class="enset-info-row">
+              <div class="enset-info-row__dot"></div>
+              <div class="enset-info-row__text">
+                <div class="enset-info-row__label">Adresse postale</div>
+                <div class="enset-info-row__val">Rue Joffre, Akwa<br>B.P. 1872 — Douala, Cameroun</div>
+              </div>
+            </div>
+            <div class="enset-info-row">
+              <div class="enset-info-row__dot"></div>
+              <div class="enset-info-row__text">
+                <div class="enset-info-row__label">Téléphone Scolarité</div>
+                <div class="enset-info-row__val"><a href="tel:+237233420000">+237 233 42 XX XX</a></div>
+              </div>
+            </div>
+            <div class="enset-info-row">
+              <div class="enset-info-row__dot"></div>
+              <div class="enset-info-row__text">
+                <div class="enset-info-row__label">Téléphone Direction</div>
+                <div class="enset-info-row__val"><a href="tel:+237699000000">+237 699 XX XX XX</a></div>
+              </div>
+            </div>
+            <div class="enset-info-row">
+              <div class="enset-info-row__dot"></div>
+              <div class="enset-info-row__text">
+                <div class="enset-info-row__label">Email général</div>
+                <div class="enset-info-row__val"><a href="mailto:contact@enset-douala.cm">contact@enset-douala.cm</a></div>
+              </div>
+            </div>
+            <div class="enset-info-row">
+              <div class="enset-info-row__dot"></div>
+              <div class="enset-info-row__text">
+                <div class="enset-info-row__label">Email Scolarité</div>
+                <div class="enset-info-row__val"><a href="mailto:scolarite@enset-douala.cm">scolarite@enset-douala.cm</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Horaires -->
+        <div class="enset-info-card">
+          <div class="enset-info-card__head">
+            <div class="enset-info-card__icon">🕐</div>
+            <div class="enset-info-card__title">Horaires d'accueil</div>
+          </div>
+          <div class="enset-info-card__body">
+            <div class="enset-hours-grid">
+              <div class="enset-hours-row enset-hours-today">
+                <span class="enset-hours-row__day">Lundi</span>
+                <span class="enset-hours-row__time">07h30 – 15h30</span>
+              </div>
+              <div class="enset-hours-row">
+                <span class="enset-hours-row__day">Mardi</span>
+                <span class="enset-hours-row__time">07h30 – 15h30</span>
+              </div>
+              <div class="enset-hours-row">
+                <span class="enset-hours-row__day">Mercredi</span>
+                <span class="enset-hours-row__time">07h30 – 15h30</span>
+              </div>
+              <div class="enset-hours-row">
+                <span class="enset-hours-row__day">Jeudi</span>
+                <span class="enset-hours-row__time">07h30 – 15h30</span>
+              </div>
+              <div class="enset-hours-row">
+                <span class="enset-hours-row__day">Vendredi</span>
+                <span class="enset-hours-row__time">07h30 – 14h30</span>
+              </div>
+              <div class="enset-hours-row">
+                <span class="enset-hours-row__day">Samedi</span>
+                <span class="enset-hours-row__closed">Fermé</span>
+              </div>
+              <div class="enset-hours-row">
+                <span class="enset-hours-row__day">Dimanche</span>
+                <span class="enset-hours-row__closed">Fermé</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accès -->
+        <div class="enset-directions-card">
+          <div class="enset-directions-card__inner">
+            <div class="enset-directions-card__tag">Comment venir</div>
+            <h3>Accès au campus</h3>
+            <p>Situé en plein cœur d'Akwa, l'ENSET est accessible en taxi, bus ou à pied depuis le centre-ville de Douala.</p>
+            <a href="https://maps.google.com/?q=ENSET+Douala" target="_blank" class="enset-btn enset-btn--outline-white">
+              Ouvrir dans Google Maps <span class="enset-btn__arrow">→</span>
+            </a>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ MAP ═══════════ -->
+<section class="enset-map-section">
+  <div class="enset-map-section__inner enset-container-wide" style="max-width:100%;padding:0;">
+    <div class="enset-map-section__content" style="padding-left: clamp(24px, 5vw, 80px);">
+      <span class="enset-tag">Localisation</span>
+      <h2>Nous trouver sur le campus</h2>
+      <p>L'ENSET Douala se trouve dans le quartier Akwa, à quelques minutes du centre administratif de la ville. Plusieurs lignes de transport en commun desservent l'établissement.</p>
+      <div class="enset-map-section__addr">
+        <span class="enset-map-section__addr-icon">📍</span>
+        <p>Rue Joffre, Quartier Akwa<br>B.P. 1872 — Douala, Cameroun</p>
+      </div>
+      <a href="https://maps.google.com/?q=ENSET+Douala" target="_blank" class="enset-btn enset-btn--primary">
+        Itinéraire GPS <span class="enset-btn__arrow">→</span>
+      </a>
+    </div>
+    <div class="enset-map-embed">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.765960370742!2d9.695!3d4.054!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1061128b5e7e6fbb%3A0x89e95ee18f04f748!2sENSET%20Douala!5e0!3m2!1sfr!2scm!4v1700000000000"
+        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+        title="Carte ENSET Douala">
+      </iframe>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SERVICES / DIRECTIONS ═══════════ -->
+<section class="enset-services-band">
+  <div class="enset-container">
+    <div class="enset-services-band__head">
+      <span class="enset-tag">Services</span>
+      <h2>Qui contacter selon votre demande ?</h2>
+    </div>
+    <div class="enset-services-grid">
+      <div class="enset-service-item">
+        <div class="enset-service-item__num">01</div>
+        <div class="enset-service-item__title">Admissions & Inscriptions</div>
+        <div class="enset-service-item__body">Pour les candidatures, les dossiers d'inscription et les informations sur les concours d'entrée. Contactez la Division de la Scolarité.</div>
+      </div>
+      <div class="enset-service-item">
+        <div class="enset-service-item__num">02</div>
+        <div class="enset-service-item__title">Direction & Administration</div>
+        <div class="enset-service-item__body">Pour les partenariats institutionnels, conventions d'entreprises et questions relevant de la Direction générale de l'école.</div>
+      </div>
+      <div class="enset-service-item">
+        <div class="enset-service-item__num">03</div>
+        <div class="enset-service-item__title">Recherche & Laboratoires</div>
+        <div class="enset-service-item__body">Pour les collaborations de recherche, accès aux laboratoires spécialisés et projets académiques avec des partenaires extérieurs.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CTA FINAL ═══════════ -->
+<section class="enset-final-cta">
+  <div class="enset-final-cta__pattern"></div>
+  <div class="enset-container enset-final-cta__inner">
+    <span class="enset-tag">Rejoignez-nous</span>
+    <h2>Prêt à rejoindre <em>l'excellence</em> technique ?</h2>
+    <p>Découvrez nos formations d'ingénieurs et devenez acteur du développement technologique du Cameroun.</p>
+    <div class="enset-final-cta__actions">
+      <a href="#" class="enset-btn enset-btn--primary">Déposer une candidature <span class="enset-btn__arrow">→</span></a>
+      <a href="#" class="enset-btn enset-btn--outline-white">Nos formations</a>
+    </div>
+  </div>
+</section>

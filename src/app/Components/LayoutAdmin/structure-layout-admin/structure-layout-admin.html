@@ -1,0 +1,27 @@
+<div class="layout-wrapper layout-content-navbar">
+
+      <!-- Sidebar -->
+      <app-admin-sidebar></app-admin-sidebar>
+
+      <div class="layout-page">
+
+        <!-- ── Navbar ── -->
+        <app-admin-nvbar></app-admin-nvbar>
+        <!-- / Navbar -->
+
+        <!-- ── Content wrapper ── -->
+        <div class="content-wrapper">
+
+          <!-- Router outlet admin : dashboard, étudiants, enseignants, etc. -->
+          <router-outlet></router-outlet>
+
+          <!-- Footer -->
+         <app-admin-footer></app-admin-footer>
+          <!-- / Footer -->
+
+          <div class="content-backdrop fade"></div>
+        </div>
+        <!-- / Content wrapper -->
+
+      </div>
+    </div>
