@@ -5,4 +5,5 @@ import { Utilisateur } from "./Utilisateur";
 export interface Enseignant extends Utilisateur{
     poste :Poste;
     departement ? : Departement ; 
+
 }

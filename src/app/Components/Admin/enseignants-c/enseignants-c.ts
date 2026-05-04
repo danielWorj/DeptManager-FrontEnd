@@ -2,7 +2,7 @@
 import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
 
-import { Component, OnDestroy, signal } from '@angular/core';
+import { Component, OnDestroy, signal, computed } from '@angular/core';
 import { ConfigService } from '../../../Core/Service/Config/config-service';
 import { UtilisateurService } from '../../../Core/Service/Utilisateur/utilisateur-service';
 import { Enseignant } from '../../../Core/Model/Utilisateur/Enseignant';
@@ -12,10 +12,11 @@ import { Poste } from '../../../Core/Model/Utilisateur/Poste';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ResponseServer } from '../../../Core/Model/Server/ResponseServer';
 import { Departement } from '../../../Core/Model/Structure/Departement';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-enseignants-c',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, DecimalPipe],
   templateUrl: './enseignants-c.html',
   styleUrl: './enseignants-c.css',
 })
@@ -25,6 +26,7 @@ export class EnseignantsC implements OnDestroy {
 
   //  Référence au chart pour éviter les duplications lors des re-renders
   private chartInstance: Chart | null = null;
+  private doughnutInstance: Chart | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -46,21 +48,22 @@ export class EnseignantsC implements OnDestroy {
       departement: new FormControl(),
     });
 
-    this.loadPage(); 
+    this.loadPage();
   }
 
-  loadPage(){
+  loadPage() {
     this.getAllEnseignant();
     this.getAllDepartement();
     this.getAllPoste();
   }
+
   //  Destruction du chart pour éviter les fuites mémoire
   ngOnDestroy(): void {
-     this.chartInstance?.destroy();
+    this.chartInstance?.destroy();
     this.doughnutInstance?.destroy();
   }
 
-  
+  // ─── Signals ───────────────────────────────────────────────────────────────
 
   listEnseignant       = signal<Enseignant[]>([]);
   listEnseignantSave   = signal<Enseignant[]>([]);
@@ -70,8 +73,27 @@ export class EnseignantsC implements OnDestroy {
   listPoste            = signal<Poste[]>([]);
   labelDepartement     = signal<string[]>([]);
   numberEnseignant     = signal<number[]>([]);
+  labelPoste           = signal<string[]>([]);
+  numberEnseignantParPoste = signal<number[]>([]);
 
-  //Chargement des données 
+  // ─── Métriques calculées ───────────────────────────────────────────────────
+
+  /** Nombre total d'enseignants */
+  totalEnseignants = computed(() => this.listEnseignantSave().length);
+
+  /** Nombre d'enseignants dont le statut est actif */
+  enseignantsActifs = computed(() =>
+    this.listEnseignantSave().filter(
+      e => e.status === 'ACTIF' || (e.status as unknown) === true
+    ).length
+  );
+
+  /** Nombre d'enseignants non actifs */
+  enseignantsNonActifs = computed(() =>
+    this.totalEnseignants() - this.enseignantsActifs()
+  );
+
+  // ─── Chargement des données ────────────────────────────────────────────────
 
   getAllEnseignant(): void {
     this.listEnseignant.set([]);
@@ -79,6 +101,10 @@ export class EnseignantsC implements OnDestroy {
       next: (data: Enseignant[]) => {
         this.listEnseignant.set(data);
         this.listEnseignantSave.set(data);
+        // Mise à jour automatique des graphiques dès que les données arrivent
+        this.constructData();
+        this.constructDataPoste();
+        this.renderCharts();
       },
       error: () => console.error('Fetch list enseignant : failed'),
     });
@@ -112,20 +138,11 @@ export class EnseignantsC implements OnDestroy {
     });
   }
 
-  getAllEnseignantByDepartement(id: number): void {
-    this.utilisateurService.getAllEnseignantByDepartement(id).subscribe({
-      next: (data: Enseignant[]) => this.listEnseignant.set(data),
-      error: () => console.error('Fetch list enseignant by departement : failed'),
-    });
-  }
-
-  //  Filtres 
+  // ─── Filtres ───────────────────────────────────────────────────────────────
 
   findEnseignantByDepartement(event: Event): void {
-    // Typage correct de l'event au lieu de "any"
     const idD = Number((event.target as HTMLSelectElement).value);
     if (!idD) {
-      // Si valeur vide, on remet la liste complète
       this.listEnseignant.set(this.listEnseignantSave());
       return;
     }
@@ -135,7 +152,6 @@ export class EnseignantsC implements OnDestroy {
   }
 
   findEnseignantByPoste(event: Event): void {
-    //  Typage correct de l'event au lieu de "any"
     const idP = Number((event.target as HTMLSelectElement).value);
     if (!idP) {
       this.listEnseignant.set(this.listEnseignantSave());
@@ -146,14 +162,14 @@ export class EnseignantsC implements OnDestroy {
     );
   }
 
-  // Formulaire 
+  // ─── Formulaire ────────────────────────────────────────────────────────────
 
   resetForm(): void {
     this.enseignantForm.reset();
   }
 
   createEnseignant(): void {
-    if (this.enseignantForm.invalid) return; //  Validation avant soumission
+    if (this.enseignantForm.invalid) return;
 
     const formData = new FormData();
     formData.append('enseignant', JSON.stringify(this.enseignantForm.value));
@@ -168,16 +184,22 @@ export class EnseignantsC implements OnDestroy {
     });
   }
 
-  //  Graph 
+  // ─── Graphiques ────────────────────────────────────────────────────────────
 
   /**
-   * Construit les données labelDepartement et numberEnseignant
-   * à partir de la liste des enseignants sauvegardée.
+   * Appelé après chaque rechargement des données pour raffraîchir les deux charts.
+   * Utilise setTimeout pour s'assurer que le DOM est stable.
    */
+  private renderCharts(): void {
+    setTimeout(() => {
+      this.graphEvolutionEnseignantByDepartement();
+      this.graphEnseignantParPoste();
+    }, 0);
+  }
+
   constructData(): void {
     const enseignants = this.listEnseignantSave();
 
-    // Labels des départements (sans doublons)
     const unique = new Map<number, string>();
     enseignants.forEach(e => {
       if (e.departement && !unique.has(e.departement.id)) {
@@ -186,7 +208,6 @@ export class EnseignantsC implements OnDestroy {
     });
     this.labelDepartement.set(Array.from(unique.values()));
 
-    // Nombre d'enseignants par département
     const compteur = new Map<string, number>();
     enseignants.forEach(e => {
       if (e.departement) {
@@ -200,24 +221,37 @@ export class EnseignantsC implements OnDestroy {
     );
   }
 
-  getStats(): void {
-    this.constructData();
-    this.graphEvolutionEnseignantByDepartement();
+  constructDataPoste(): void {
+    const enseignants = this.listEnseignantSave();
 
-    this.constructDataPoste();
-    this.graphEnseignantParPoste();
+    const unique = new Map<number, string>();
+    enseignants.forEach(e => {
+      if (e.poste && !unique.has(e.poste.id)) {
+        unique.set(e.poste.id, e.poste.intitule);
+      }
+    });
+    this.labelPoste.set(Array.from(unique.values()));
+
+    const compteur = new Map<string, number>();
+    enseignants.forEach(e => {
+      if (e.poste) {
+        const intitule = e.poste.intitule;
+        compteur.set(intitule, (compteur.get(intitule) ?? 0) + 1);
+      }
+    });
+
+    this.numberEnseignantParPoste.set(
+      this.labelPoste().map(label => compteur.get(label) ?? 0)
+    );
   }
 
   graphEvolutionEnseignantByDepartement(): void {
     const canvas = document.getElementById('myChart') as HTMLCanvasElement | null;
-
-    //  Vérification que le canvas existe bien dans le DOM
     if (!canvas) {
       console.error('Canvas #myChart introuvable dans le DOM');
       return;
     }
 
-    //  Destruction de l'ancien chart avant d'en créer un nouveau
     if (this.chartInstance) {
       this.chartInstance.destroy();
       this.chartInstance = null;
@@ -233,7 +267,6 @@ export class EnseignantsC implements OnDestroy {
     gradient.addColorStop(0, 'rgba(105, 108, 255, 0.4)');
     gradient.addColorStop(1, 'rgba(105, 108, 255, 0.0)');
 
-    //  Stockage de l'instance pour pouvoir la détruire plus tard
     this.chartInstance = new Chart(canvas, {
       type: 'line',
       data: {
@@ -256,9 +289,8 @@ export class EnseignantsC implements OnDestroy {
           y: {
             beginAtZero: true,
             ticks: {
-              //  Affiche uniquement des entiers sur l'axe Y
               stepSize: 1,
-              callback: (value : any) => Number.isInteger(value) ? value : null,
+              callback: (value: any) => Number.isInteger(value) ? value : null,
             },
           },
         },
@@ -266,107 +298,66 @@ export class EnseignantsC implements OnDestroy {
     });
   }
 
-
-labelPoste = signal<string[]>([]);
-numberEnseignantParPoste = signal<number[]>([]);
-
-// 
-private doughnutInstance: Chart | null = null;
-
-constructDataPoste(): void {
-  const enseignants = this.listEnseignantSave();
-
-  // Labels des postes (sans doublons)
-  const unique = new Map<number, string>();
-  enseignants.forEach(e => {
-    if (e.poste && !unique.has(e.poste.id)) {
-      unique.set(e.poste.id, e.poste.intitule);
+  graphEnseignantParPoste(): void {
+    const canvas = document.getElementById('doughnutChart') as HTMLCanvasElement | null;
+    if (!canvas) {
+      console.error('Canvas #doughnutChart introuvable dans le DOM');
+      return;
     }
-  });
-  this.labelPoste.set(Array.from(unique.values()));
 
-  // Nombre d'enseignants par poste
-  const compteur = new Map<string, number>();
-  enseignants.forEach(e => {
-    if (e.poste) {
-      const intitule = e.poste.intitule;
-      compteur.set(intitule, (compteur.get(intitule) ?? 0) + 1);
+    if (this.doughnutInstance) {
+      this.doughnutInstance.destroy();
+      this.doughnutInstance = null;
     }
-  });
 
-  this.numberEnseignantParPoste.set(
-    this.labelPoste().map(label => compteur.get(label) ?? 0)
-  );
-}
+    const ctx2d = canvas.getContext('2d');
+    if (!ctx2d) {
+      console.error('Impossible d\'obtenir le contexte 2D du canvas');
+      return;
+    }
 
-// Génération du chart Doughnut 
+    const colors = [
+      '#696cff', '#ff6b6b', '#ffd93d',
+      '#6bcb77', '#4d96ff', '#ff922b',
+      '#cc5de8', '#20c997', '#f06595',
+    ];
 
-graphEnseignantParPoste(): void {
-  const canvas = document.getElementById('doughnutChart') as HTMLCanvasElement | null;
-
-  if (!canvas) {
-    console.error('Canvas #doughnutChart introuvable dans le DOM');
-    return;
-  }
-
-  if (this.doughnutInstance) {
-    this.doughnutInstance.destroy();
-    this.doughnutInstance = null;
-  }
-
-  const ctx2d = canvas.getContext('2d');
-  if (!ctx2d) {
-    console.error('Impossible d\'obtenir le contexte 2D du canvas');
-    return;
-  }
-
-  const colors = [
-    '#696cff', '#ff6b6b', '#ffd93d',
-    '#6bcb77', '#4d96ff', '#ff922b',
-    '#cc5de8', '#20c997', '#f06595',
-  ];
-
-  this.doughnutInstance = new Chart(canvas, {
-    type: 'doughnut',
-    data: {
-      labels: this.labelPoste(),
-      datasets: [{
-        label: 'Enseignants par poste',
-        data: this.numberEnseignantParPoste(),
-        backgroundColor: colors.slice(0, this.labelPoste().length),
-        borderColor: '#ffffff',
-        borderWidth: 2,
-        hoverOffset: 10,
-      }],
-    },
-    options: {
-      responsive: true,
-      cutout: '65%', //  Épaisseur de l'anneau
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            padding: 16,
-            font: { size: 13 },
+    this.doughnutInstance = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: this.labelPoste(),
+        datasets: [{
+          label: 'Enseignants par poste',
+          data: this.numberEnseignantParPoste(),
+          backgroundColor: colors.slice(0, this.labelPoste().length),
+          borderColor: '#ffffff',
+          borderWidth: 2,
+          hoverOffset: 10,
+        }],
+      },
+      options: {
+        responsive: true,
+        cutout: '65%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 16,
+              font: { size: 13 },
+            },
           },
-        },
-        tooltip: {
-          callbacks: {
-            //  Affiche le % dans le tooltip
-            label: (context:any) => {
-              const total = (context.dataset.data as number[]).reduce((a, b) => a + b, 0);
-              const value = context.parsed;
-              const pct = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
-              return ` ${context.label} : ${value} (${pct}%)`;
+          tooltip: {
+            callbacks: {
+              label: (context: any) => {
+                const total = (context.dataset.data as number[]).reduce((a, b) => a + b, 0);
+                const value = context.parsed;
+                const pct = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+                return ` ${context.label} : ${value} (${pct}%)`;
+              },
             },
           },
         },
       },
-    },
-  });
-}
-
-
-
-
+    });
+  }
 }
