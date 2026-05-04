@@ -12,6 +12,9 @@ import { AdminNvbar } from '../admin-nvbar/admin-nvbar';
   styleUrl: './structure-layout-admin.css',
 })
 export class StructureLayoutAdmin {
+  sidebarOpen = false;
 
- 
+  onToggleSidebar() {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
 }

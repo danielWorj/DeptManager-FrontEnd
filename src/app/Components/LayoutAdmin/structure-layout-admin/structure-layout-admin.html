@@ -1,4 +1,4 @@
-<div class="layout-wrapper layout-content-navbar">
+<div class="layout-wrapper layout-content-navbar" >
 
       <!-- Sidebar -->
       <app-admin-sidebar></app-admin-sidebar>
@@ -6,7 +6,7 @@
       <div class="layout-page">
 
         <!-- ── Navbar ── -->
-        <app-admin-nvbar></app-admin-nvbar>
+        <app-admin-nvbar (toggleSidebar)="onToggleSidebar()"></app-admin-nvbar>
         <!-- / Navbar -->
 
         <!-- ── Content wrapper ── -->
