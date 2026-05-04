@@ -1,0 +1,545 @@
+<div class="dept-page">
+
+@if (isLoading()) {
+  <div style="display:flex; align-items:center; justify-content:center; height:100vh; flex-direction:column; gap:16px;">
+    <div style="width:48px; height:48px; border:4px solid #e2e8f0; border-top-color:#1a3a6b; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+    <p style="color:#64748b; font-size:1rem;">Chargement de la filière...</p>
+  </div>
+  <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+} @else {
+
+<!-- Barre de progression lecture -->
+<div class="fil-progress" id="fil-progress"></div>
+
+<!-- 
+     NAVBAR (héritée du site principal)
+ -->
+<nav class="enset-navbar">
+  <div class="enset-container-wide">
+    <div class="enset-navbar__inner">
+      <a href="index.html" class="enset-logo">
+        <img
+          src="https://enset-douala.cm/wp-content/uploads/2025/07/LOGO-ENSET-UNIVERSITE-DOUALA-400x89.png"
+          alt="Logo ENSET Douala" class="enset-logo__img"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+        />
+        <div class="enset-logo__fallback" style="display:none;">EN<br>SET</div>
+        <div class="enset-logo__text">
+          <span class="enset-logo__name">ENSET Douala</span>
+          <span class="enset-logo__sub">École Normale Supérieure Technique</span>
+        </div>
+      </a>
+      <ul class="enset-nav-menu">
+        <li class="enset-nav-item"><a href="#" class="enset-nav-link">À Propos <span class="enset-nav-caret">▼</span></a>
+          <div class="enset-dropdown">
+            <a href="#">Mot de bienvenue <span>→</span></a>
+            <a href="#">Présentation <span>→</span></a>
+            <a href="#">Organigramme <span>→</span></a>
+          </div>
+        </li>
+        <li class="enset-nav-item"><a href="#" class="enset-nav-link" style="color:var(--enset-primary);">Départements <span class="enset-nav-caret">▼</span></a>
+          <div class="enset-dropdown">
+            <a href="departement.html" style="color:var(--enset-primary);">Sciences de Base (ESB) <span>→</span></a>
+            <a href="#">Industrie Textile (ITH) <span>→</span></a>
+            <a href="#">Génie Forestier (GFO) <span>→</span></a>
+            <a href="#">Économie Sociale (ESF) <span>→</span></a>
+          </div>
+        </li>
+        <li class="enset-nav-item"><a href="#" class="enset-nav-link">Pôles de Formation</a></li>
+        <li class="enset-nav-item"><a href="#" class="enset-nav-link">Recherche</a></li>
+        <li class="enset-nav-item"><a href="#" class="enset-nav-link">Blog</a></li>
+        <li class="enset-nav-item"><a href="#" class="enset-nav-link">Contacts</a></li>
+      </ul>
+      <div class="enset-nav-actions">
+        <a href="#" class="enset-btn enset-btn--outline">Fiches & Formulaires</a>
+        <a href="https://enset-douala.cm/wp-content/uploads/2025/07/Formulaire-de-Demande-dInscription-ENSET-de-Douala-2025-2026.pdf"
+           target="_blank" class="enset-btn enset-btn--primary">
+          Pré-inscription <span class="enset-btn__arrow">→</span>
+        </a>
+      </div>
+      <button class="enset-hamburger"
+        onclick="document.getElementById('fil-mob-nav').classList.toggle('enset-is-open')"
+        aria-label="Menu mobile">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Menu mobile -->
+<div class="enset-mobile-nav" id="fil-mob-nav">
+  <div class="enset-mobile-nav__head">
+    <a href="index.html" class="enset-logo">
+      <div class="enset-logo__text"><span class="enset-logo__name">ENSET Douala</span></div>
+    </a>
+    <button class="enset-mobile-nav__close"
+      onclick="document.getElementById('fil-mob-nav').classList.remove('enset-is-open')">✕</button>
+  </div>
+  <div class="enset-mobile-nav__body">
+    <ul>
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="#">À Propos</a></li>
+      <li><a href="departement.html" style="color:var(--enset-primary);">Département ESB</a></li>
+      <li><a href="#">Pôles de Formation</a></li>
+      <li><a href="#">Recherche</a></li>
+      <li><a href="#">Blog</a></li>
+      <li><a href="#">Contacts</a></li>
+    </ul>
+  </div>
+  <div class="enset-mobile-nav__footer">
+    <a href="https://enset-douala.cm/wp-content/uploads/2025/07/Formulaire-de-Demande-dInscription-ENSET-de-Douala-2025-2026.pdf"
+       target="_blank" class="enset-btn enset-btn--primary" style="justify-content:center;">
+      Pré-inscription 2025–2026 →
+    </a>
+  </div>
+</div>
+
+<!-- 
+     BREADCRUMB
+-->
+<div class="dept-breadcrumb">
+  <div class="dept-container-wide">
+    <div class="dept-breadcrumb__inner">
+      <div class="dept-breadcrumb__item">
+        <a href="index.html">🏠 Accueil</a>
+        <span class="dept-breadcrumb__sep">›</span>
+        <a href="#">Départements</a>
+        <span class="dept-breadcrumb__sep">›</span>
+        <a href="departement.html">{{ filiereData()?.filiere?.departement?.intitule }}</a>
+        <span class="dept-breadcrumb__sep">›</span>
+      </div>
+      <span class="dept-breadcrumb__current">{{ filiereData()?.filiere?.intitule ?? 'Filière' }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- 
+     HERO FILIÈRE
+ -->
+<section class="fil-hero" id="fil-top">
+  @if (filiereData()?.profil?.url) {
+    <img
+      [src]="'assets/file/' +filiereData()!.profil!.url"
+      [alt]="filiereData()!.filiere?.intitule + ' — ENSET Douala'"
+      class="fil-hero__bg"
+      onerror="this.style.display='none'"
+    />
+  } @else {
+    <img
+      src="https://enset-douala.cm/wp-content/uploads/2025/06/Image_fx-9-600x333.png"
+      alt="Filière — ENSET Douala"
+      class="fil-hero__bg"
+      onerror="this.style.display='none'"
+    />
+  }
+  <div class="fil-hero__pattern"></div>
+  <div class="fil-hero__overlay"></div>
+
+  <!-- Panneau stats -->
+  <div class="fil-hero__aside">
+    <div class="fil-hero__aside-label">Chiffres clés</div>
+    <div class="fil-hero__aside-stat">
+      <span class="fil-hero__aside-num">Bac+3</span>
+      <span class="fil-hero__aside-lbl">Niveau de sortie (Licence)</span>
+    </div>
+    <div class="fil-hero__aside-stat">
+      <span class="fil-hero__aside-num">6</span>
+      <span class="fil-hero__aside-lbl">Semestres de formation</span>
+    </div>
+    <div class="fil-hero__aside-stat">
+      <span class="fil-hero__aside-num">30</span>
+      <span class="fil-hero__aside-lbl">Places par promotion</span>
+    </div>
+    <div class="fil-hero__aside-stat">
+      <span class="fil-hero__aside-num">91%</span>
+      <span class="fil-hero__aside-lbl">Taux d'insertion à 12 mois</span>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="fil-hero__content">
+    <div class="fil-hero__dept-tag fil-anim fil-anim-d1">
+      <a href="departement.html">{{ filiereData()?.filiere?.departement?.intitule }}</a>
+      <span>›</span>
+      Filière
+    </div>
+    <h1 class="fil-hero__title fil-anim fil-anim-d2">
+      {{ filiereData()?.filiere?.intitule ?? 'Chargement...' }}
+    </h1>
+    <p class="fil-hero__desc fil-anim fil-anim-d3">
+      {{ filiereData()?.filiere?.description ?? '' }}
+    </p>
+    <div class="fil-hero__badges fil-anim fil-anim-d3">
+      <span class="fil-hero__badge fil-hero__badge--accent">Licence · Bac+3</span>
+      <span class="fil-hero__badge">6 semestres</span>
+      <span class="fil-hero__badge">Concours national</span>
+      <span class="fil-hero__badge">Stage professionnel inclus</span>
+    </div>
+    <div class="fil-hero__actions fil-anim fil-anim-d4">
+      <a href="#fil-debouches" class="fil-btn fil-btn--accent">
+        Voir les débouchés <span class="fil-btn__arr">→</span>
+      </a>
+      <a href="#fil-programme" class="fil-btn fil-btn--outline-white">Programme</a>
+      <a href="https://enset-douala.cm/wp-content/uploads/2025/07/Formulaire-de-Demande-dInscription-ENSET-de-Douala-2025-2026.pdf"
+         target="_blank" class="fil-btn fil-btn--outline-white">Candidater</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- 
+     PRÉSENTATION DE LA FILIÈRE (image + description)
+ -->
+<section class="fil-presentation" id="fil-presentation">
+  <div class="fil-container">
+    <div class="fil-presentation__grid">
+
+      <!-- Image illustrative -->
+      <div class="fil-presentation__image-wrap">
+        @if (filiereData()?.profil?.url) {
+          <img
+            [src]="'assets/file/' + filiereData()!.profil!.url"
+            [alt]="'Cours ' + (filiereData()?.filiere?.intitule ?? '') + ' ENSET Douala'"
+            class="fil-presentation__image"
+            onerror="this.style.background='#1a2a4a'; this.style.minHeight='380px';"
+          />
+        } @else {
+          <img
+            src="https://enset-douala.cm/wp-content/uploads/2025/06/Image_fx-9-600x333.png"
+            alt="Cours ENSET Douala"
+            class="fil-presentation__image"
+            onerror="this.style.background='#1a2a4a'; this.style.minHeight='380px';"
+          />
+        }
+        <div class="fil-presentation__image-badge">
+          <span>{{ filiereData()?.filiere?.departement?.abreviation }}</span>
+          {{ filiereData()?.filiere?.intitule ?? '' }}
+        </div>
+      </div>
+
+      <!-- Texte de présentation -->
+      <div class="fil-presentation__text">
+        <div class="fil-tag">Présentation de la filière</div>
+        <h2 class="fil-h2 fil-presentation__title">
+          {{ filiereData()?.filiere?.intitule ?? 'Filière' }}
+        </h2>
+        <p class="fil-presentation__body">
+          {{ filiereData()?.filiere?.description ?? '' }}
+        </p>
+
+
+        <div class="fil-presentation__actions">
+          <a href="#fil-programme" class="fil-btn fil-btn--primary">
+            Voir le programme <span class="fil-btn__arr">→</span>
+          </a>
+          <a href="https://enset-douala.cm/wp-content/uploads/2025/06/Nos-Departements_ENSETDOUALA.pdf"
+             target="_blank" class="fil-btn fil-btn--outline">
+            Brochure PDF
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- 
+     DÉBOUCHÉS
+ -->
+<section class="fil-debouches" id="fil-debouches">
+  <div class="fil-container">
+    <div class="fil-debouches__head">
+      <div class="fil-tag" style="margin-bottom:14px;">Après le diplôme</div>
+      <h2 class="fil-h2">Débouchés <em>professionnels</em></h2>
+    </div>
+
+    <div class="fil-debouches__layout">
+
+      <!-- Grille des débouchés dynamique -->
+      <div class="fil-debouches__grid">
+
+        @if (filiereData()?.debouches && filiereData()!.debouches.length > 0) {
+          @for (debouche of filiereData()!.debouches; track debouche.id; let i = $index) {
+            <div class="fil-debouche ">
+              <span class="fil-debouche__num">{{ (i + 1).toString().padStart(2, '0') }}</span>
+              <span class="fil-debouche__icon">🎯</span>
+              <div class="fil-debouche__title">{{ debouche.intitule }}</div>
+              <p class="fil-debouche__desc">{{ debouche.description }}</p>
+            </div>
+          }
+        } @else {
+          <!-- Débouchés statiques de fallback -->
+          <div class="fil-debouche">
+            <span class="fil-debouche__num">01</span>
+            <span class="fil-debouche__icon">🏫</span>
+            <div class="fil-debouche__title">Professeur de lycée technique</div>
+            <p class="fil-debouche__desc">Enseigner les mathématiques et les sciences appliquées dans les lycées techniques et les établissements d'enseignement professionnel du Cameroun et d'Afrique centrale.</p>
+          </div>
+          <div class="fil-debouche">
+            <span class="fil-debouche__num">02</span>
+            <span class="fil-debouche__icon">🎓</span>
+            <div class="fil-debouche__title">Chargé de cours universitaire</div>
+            <p class="fil-debouche__desc">Intégrer le corps enseignant des universités camerounaises ou africaines en tant qu'assistant ou maître-assistant après une poursuite en Master ou Doctorat.</p>
+          </div>
+        }
+
+      </div>
+
+      <!-- Panneau secteurs -->
+      <div class="fil-debouches__panel">
+        <div class="fil-debouches__panel-head">Secteurs d'emploi</div>
+        @if (filiereData()?.secteurActivite!.length>0) {
+          <ul class="fil-sector-list">
+             @for (secteur of filiereData()!.secteurActivite!; track secteur.id) {
+              <li class="fil-sector">
+                <span class="fil-sector__dot"></span>
+                {{ secteur.intitule }}
+              </li>
+            }
+          </ul>
+        }@else {
+           <ul class="fil-sector-list">
+              <li class="fil-sector"><span class="fil-sector__dot"></span>Éducation nationale & universités</li>
+              <li class="fil-sector"><span class="fil-sector__dot"></span>Technologies & IA (fintech, agritech)</li>
+              <li class="fil-sector"><span class="fil-sector__dot"></span>Banques & assurances</li>
+              <li class="fil-sector"><span class="fil-sector__dot"></span>Recherche scientifique</li>
+              <li class="fil-sector"><span class="fil-sector__dot"></span>Inspection & administration scolaire</li>
+              <li class="fil-sector"><span class="fil-sector__dot"></span>ONG & coopération internationale</li>
+              <li class="fil-sector"><span class="fil-sector__dot"></span>Industrie & bureaux d'études</li>
+            </ul>
+        }
+      
+        <div class="fil-insertion">
+          <div class="fil-insertion__num">91%</div>
+          <div class="fil-insertion__lbl">Taux d'insertion professionnelle à 12 mois<br>(Promo 2022–2023)</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 
+     GALERIE DE LA FILIÈRE
+ -->
+<section class="fil-gallery" id="fil-galerie">
+  <div class="fil-container">
+
+    <div class="fil-gallery__head">
+      <div>
+        <div class="fil-tag" style="margin-bottom:14px;">Galerie</div>
+        <h2 class="fil-h2">La vie dans la filière <em>{{ filiereData()?.filiere?.intitule ?? '' }}</em></h2>
+      </div>
+      <a href="#" class="fil-btn fil-btn--outline">
+        Voir toutes les photos <span class="fil-btn__arr">→</span>
+      </a>
+    </div>
+
+    <div class="fil-gallery__grid">
+
+      @if (filiereData()?.medias && filiereData()!.medias.length > 0) {
+        @for (media of filiereData()!.medias; track media.id) {
+          <div class="fil-gal-item"
+               [attr.data-caption]="filiereData()?.filiere?.intitule ?? 'ENSET Douala'"
+               (click)="filOpenLb($event)">
+            <img
+              [src]="'assets/file/' +media.url"
+              [alt]="filiereData()?.filiere?.intitule"
+              class="fil-gal-item__img"
+              onerror="this.outerHTML='<div class=\'fil-gal-item__placeholder\'><span class=\'fil-gal-item__placeholder-icon\'>🎓</span>ENSET Douala</div>'"
+            />
+            <div class="fil-gal-item__zoom">🔍</div>
+            <div class="fil-gal-item__caption">{{ filiereData()?.filiere?.intitule ?? 'ENSET Douala' }}</div>
+          </div>
+        }
+      } @else {
+        <!-- Photos statiques de fallback -->
+        <div class="fil-gal-item" data-caption="Atelier modélisation — IA & sciences numériques"
+             onclick="filOpenLb(this)">
+          <img
+            src="https://enset-douala.cm/wp-content/uploads/2025/06/Image_fx-9-600x333.png"
+            alt="Modélisation mathématique ENSET"
+            class="fil-gal-item__img"
+            onerror="this.outerHTML='<div class=\'fil-gal-item__placeholder\'><span class=\'fil-gal-item__placeholder-icon\'>🧮</span>Modélisation mathématique</div>'"
+          />
+          <div class="fil-gal-item__zoom">🔍</div>
+          <div class="fil-gal-item__caption">Atelier modélisation mathématique & IA</div>
+        </div>
+
+        <div class="fil-gal-item" data-caption="Séminaire pédagogique — fondamentaux de l'IA"
+             onclick="filOpenLb(this)">
+          <img
+            src="https://enset-douala.cm/wp-content/uploads/2025/07/seminaire-pedagogique-enset-600x333.jpg"
+            alt="Séminaire pédagogique ENSET"
+            class="fil-gal-item__img"
+            onerror="this.outerHTML='<div class=\'fil-gal-item__placeholder\'><span class=\'fil-gal-item__placeholder-icon\'>📚</span>Séminaire pédagogique</div>'"
+          />
+          <div class="fil-gal-item__zoom">🔍</div>
+          <div class="fil-gal-item__caption">Séminaire pédagogique — fondamentaux IA</div>
+        </div>
+
+        <div class="fil-gal-item" data-caption="Cours magistral — amphithéâtre ENSET Douala"
+             onclick="filOpenLb(this)">
+          <img
+            src="https://enset-douala.cm/wp-content/uploads/2025/06/thumb-enset-400x257.jpg"
+            alt="Cours magistral ENSET"
+            class="fil-gal-item__img"
+            onerror="this.outerHTML='<div class=\'fil-gal-item__placeholder\'><span class=\'fil-gal-item__placeholder-icon\'>🎓</span>Cours magistral</div>'"
+          />
+          <div class="fil-gal-item__zoom">🔍</div>
+          <div class="fil-gal-item__caption">Cours magistral — amphithéâtre ENSET</div>
+        </div>
+
+        <div class="fil-gal-item" data-caption="Étudiants sur le campus ENSET Douala"
+             onclick="filOpenLb(this)">
+          <img
+            src="https://enset-douala.cm/wp-content/uploads/2025/06/etudiants-enset-400x257.jpg"
+            alt="Étudiants ENSET"
+            class="fil-gal-item__img"
+            onerror="this.outerHTML='<div class=\'fil-gal-item__placeholder\'><span class=\'fil-gal-item__placeholder-icon\'>👨‍🎓</span>Étudiants campus</div>'"
+          />
+          <div class="fil-gal-item__zoom">🔍</div>
+          <div class="fil-gal-item__caption">Étudiants sur le campus ENSET Douala</div>
+        </div>
+
+        <div class="fil-gal-item" data-caption="Séminaire IA pour enseignants — juillet 2025"
+             onclick="filOpenLb(this)">
+          <img
+            src="https://enset-douala.cm/wp-content/uploads/2025/07/ENSET-IA10-600x333.jpeg"
+            alt="Séminaire IA ENSET"
+            class="fil-gal-item__img"
+            onerror="this.outerHTML='<div class=\'fil-gal-item__placeholder\'><span class=\'fil-gal-item__placeholder-icon\'>🤖</span>Séminaire IA</div>'"
+          />
+          <div class="fil-gal-item__zoom">🔍</div>
+          <div class="fil-gal-item__caption">Séminaire IA pour enseignants — juillet 2025</div>
+        </div>
+      }
+
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div class="fil-lightbox" id="fil-lightbox" onclick="filCloseLb(event)">
+  <img src="" alt="" class="fil-lightbox__img" id="fil-lb-img"/>
+  <button class="fil-lightbox__close" onclick="filCloseLb(event, true)">✕</button>
+  <div class="fil-lightbox__caption" id="fil-lb-caption"></div>
+</div>
+
+<!-- 
+     CTA CANDIDATURE
+ -->
+<section class="fil-cta" id="fil-candidater">
+  <div class="fil-cta__pattern"></div>
+  <div class="fil-container fil-cta__inner">
+    <div class="fil-tag fil-tag--light">Rejoindre la filière</div>
+    <h2 class="fil-h2 fil-h2--white" style="margin-top:16px;">
+      Prêt à rejoindre la filière<br><em>{{ filiereData()?.filiere?.intitule ?? '' }}</em> ?
+    </h2>
+    <p class="fil-lead" style="color:rgba(255,255,255,.75); margin-top:14px; max-width:580px; margin-left:auto; margin-right:auto;">
+      Candidatez pour la rentrée académique 2025–2026. Les inscriptions sont ouvertes pour la filière {{ filiereData()?.filiere?.intitule ?? '' }} (Licence Bac+3).
+    </p>
+    <div class="fil-cta__actions">
+      <a href="https://enset-douala.cm/wp-content/uploads/2025/07/Formulaire-de-Demande-dInscription-ENSET-de-Douala-2025-2026.pdf"
+         target="_blank" class="fil-btn fil-btn--accent">
+        Formulaire de pré-inscription <span class="fil-btn__arr">→</span>
+      </a>
+      <a href="https://enset-douala.cm/wp-content/uploads/2025/06/Nos-Departements_ENSETDOUALA.pdf"
+         target="_blank" class="fil-btn fil-btn--outline-white">
+        Télécharger la brochure
+      </a>
+      <a href="departement.html" class="fil-btn fil-btn--outline-white">
+        Voir toutes les filières ESB
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 
+     FOOTER
+ -->
+<footer class="fil-footer">
+  <div class="fil-container-wide">
+    <div class="fil-footer__inner">
+      <span class="fil-footer__copy">
+        © 2025 ENSET Douala · Filière {{ filiereData()?.filiere?.intitule ?? '' }} — {{ filiereData()?.filiere?.departement?.intitule ?? 'Département' }} · Université de Douala
+      </span>
+      <div class="fil-footer__links">
+        <a href="index.html">Accueil</a>
+        <a href="departement.html">Département ESB</a>
+        <a href="#">Toutes les filières</a>
+        <a href="https://enset-douala.cm/contact/">Contact</a>
+        <a href="#">Mentions légales</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- 
+     SCRIPTS
+ -->
+<script>
+/* ── Barre de progression ── */
+(function(){
+  var bar = document.getElementById('fil-progress');
+  window.addEventListener('scroll', function(){
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    var p = h > 0 ? (window.scrollY / h) * 100 : 0;
+    bar.style.width = p + '%';
+  }, { passive: true });
+})();
+
+/* ── Sous-nav : lien actif au scroll ── */
+(function(){
+  var links = document.querySelectorAll('.fil-subnav__link');
+  var sections = ['fil-presentation','fil-debouches','fil-galerie','fil-candidater'];
+  window.addEventListener('scroll', function(){
+    var y = window.scrollY + 120;
+    var active = sections[0];
+    sections.forEach(function(id){
+      var el = document.getElementById(id);
+      if(el && el.offsetTop <= y) active = id;
+    });
+    links.forEach(function(l){
+      l.classList.toggle('fil-active', l.getAttribute('href') === '#'+active);
+    });
+  }, { passive: true });
+})();
+
+/* ── Animations au scroll ── */
+(function(){
+  var els = document.querySelectorAll('.fil-anim');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('fil-visible'); });
+  }, { threshold: 0.12 });
+  els.forEach(function(el){ io.observe(el); });
+  // Hero animations au chargement
+  setTimeout(function(){
+    document.querySelectorAll('.fil-hero .fil-anim').forEach(function(el){ el.classList.add('fil-visible'); });
+  }, 100);
+})();
+
+/* ── Lightbox ── */
+function filOpenLb(item){
+  var img   = item.querySelector ? item.querySelector('.fil-gal-item__img') : item.target.closest('.fil-gal-item').querySelector('.fil-gal-item__img');
+  var cap   = (item.currentTarget || item).getAttribute ? (item.currentTarget || item).getAttribute('data-caption') || '' : '';
+  var lb    = document.getElementById('fil-lightbox');
+  var lbImg = document.getElementById('fil-lb-img');
+  var lbCap = document.getElementById('fil-lb-caption');
+  if(img){ lbImg.src = img.src; lbImg.alt = img.alt; }
+  lbCap.textContent = cap;
+  lb.classList.add('fil-lb-open');
+  document.body.style.overflow = 'hidden';
+}
+function filCloseLb(e, force){
+  if(force || e.target === document.getElementById('fil-lightbox')){
+    document.getElementById('fil-lightbox').classList.remove('fil-lb-open');
+    document.body.style.overflow = '';
+  }
+}
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') filCloseLb(e, true); });
+</script>
+
+} <!-- fin @else -->
+</div>

@@ -1,0 +1,450 @@
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row">
+        <div class="col-lg-8 mb-4 order-0">
+            <div class="card">
+            <div class="d-flex align-items-end row">
+                <div class="col-sm-7">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Congratulations John! 🎉</h5>
+                    <p class="mb-4">
+                    You have done <span class="fw-bold">72%</span> more sales today. Check your new badge in
+                    your profile.
+                    </p>
+                    <a href="javascript:;" class="btn btn-sm btn-outline-primary">View Badges</a>
+                </div>
+                </div>
+                <div class="col-sm-5 text-center text-sm-left">
+                <div class="card-body pb-0 px-0 px-md-4">
+                    <img
+                    src="../assets/img/illustrations/man-with-laptop-light.png"
+                    height="140"
+                    alt="View Badge User"
+                    data-app-dark-img="illustrations/man-with-laptop-dark.png"
+                    data-app-light-img="illustrations/man-with-laptop-light.png"
+                    />
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 order-1">
+            <div class="row">
+            <div class="col-lg-6 col-md-12 col-6 mb-4">
+                <div class="card">
+                <div class="card-body">
+                    <div class="card-title d-flex align-items-start justify-content-between">
+                    <div class="avatar flex-shrink-0">
+                        <img src="../assets/img/icons/unicons/chart-success.png" alt="chart success" class="rounded"/>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn p-0" type="button" id="cardOpt3" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="bx bx-dots-vertical-rounded"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="cardOpt3">
+                        <a class="dropdown-item" href="javascript:void(0);">View More</a>
+                        <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+                        </div>
+                    </div>
+                    </div>
+                    <span class="fw-semibold d-block mb-1">Profit</span>
+                    <h3 class="card-title mb-2">$12,628</h3>
+                    <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i> +72.80%</small>
+                </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-12 col-6 mb-4">
+                <div class="card">
+                <div class="card-body">
+                    <div class="card-title d-flex align-items-start justify-content-between">
+                    <div class="avatar flex-shrink-0">
+                        <img src="../assets/img/icons/unicons/wallet-info.png" alt="Credit Card" class="rounded"/>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn p-0" type="button" id="cardOpt6" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="bx bx-dots-vertical-rounded"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="cardOpt6">
+                        <a class="dropdown-item" href="javascript:void(0);">View More</a>
+                        <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+                        </div>
+                    </div>
+                    </div>
+                    <span>Sales</span>
+                    <h3 class="card-title text-nowrap mb-1">$4,679</h3>
+                    <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i> +28.42%</small>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!--  Correction : getStats() déplacé sur le bouton de l'accordion et non sur le div parent
+         pour éviter des appels intempestifs à chaque clic n'importe où dans le bloc -->
+    <div id="accordionIcon" class="accordion mt-3 mb-3 accordion-without-arrow">
+        <div class="accordion-item card">
+            <h2 class="accordion-header text-body d-flex justify-content-between" id="accordionIconOne">
+            <button
+                type="button"
+                class="accordion-button collapsed"
+                data-bs-toggle="collapse"
+                data-bs-target="#accordionIcon-1"
+                aria-controls="accordionIcon-1"
+                (click)="getStats()"
+            >
+                Statistiques
+            </button>
+            </h2>
+            <div id="accordionIcon-1" class="accordion-collapse collapse" data-bs-parent="#accordionIcon">
+            <div class="accordion-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <canvas id="myChart"></canvas>
+                    </div>
+                    <div class="col-md-4">
+                        <canvas id="doughnutChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 text-end mb-3">
+                        <!--  Correction : data-bs-target dupliqué supprimé sur les deux boutons -->
+                        <button class="btn btn-primary m-1" type="button" data-bs-toggle="modal" data-bs-target="#basicModal2">
+                            <i class="fas fa-plus me-2"></i>Ajouter un Etudiant
+                        </button>
+                        <button class="btn btn-secondary m-1" type="button">
+                            <i class="fas fa-print me-2"></i>Imprimer
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                       <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <div class="input-group">
+                                    <label class="input-group-text" for="selectDepartement">Departement</label>
+                                    <!--  Correction : id en double "inputGroupSelect01" corrigés avec des id uniques -->
+                                    <select class="form-select" id="selectDepartement" (change)="findEtudiantByDepartement($event)">
+                                        <option value="">Tous...</option>
+                                        @for (d of listDepartement(); track d.id) {
+                                            <option value="{{d.id}}">{{d.abreviation}}</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="input-group">
+                                    <label class="input-group-text" for="selectFiliere">Filiere</label>
+                                    <!--  Utilise listFiliereFiltered pour n'afficher que les filières du département sélectionné -->
+                                    <select class="form-select" id="selectFiliere" (change)="findEtudiantByFiliere($event)">
+                                        <option value="">Tous...</option>
+                                        @for (p of listFiliereFiltered(); track p.id) {
+                                            <option value="{{p.id}}">{{p.abreviation}}</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="input-group">
+                                    <label class="input-group-text" for="selectNiveau">Niveau</label>
+                                    <select class="form-select" id="selectNiveau" (change)="findEtudiantByNiveau($event)">
+                                        <option value="">Tous...</option>
+                                        @for (p of listNiveau(); track p.id) {
+                                            <option value="{{p.id}}">{{p.intitule}}</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-primary" (click)="refreshPage()">
+                                    <i class="bx bx-refresh"></i>
+                                </button>
+                            </div>
+                       </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <div class="d-flex justify-content-between">
+                        <p class="mb-3">Filiere : <span class="fw-bold"></span></p>
+                        <p class="mb-3">Niveau : <span class="fw-bold"></span></p>
+                    </div>
+
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Matricule</th>
+                                <th>Nom et Prenom</th>
+                                <th>Email</th>
+                                <th>Telephone</th>
+                                <th>Filiere</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!--  track $index remplacé par track e.matricule pour de meilleures performances -->
+                            @for (e of listEtudiant(); track e.matricule) {
+                                <tr>
+                                    <td>{{e.matricule}}</td>
+                                    <td>{{e.nom}} {{e.prenom}}</td>
+                                    <td>{{e.email}}</td>
+                                    <td>{{e.telephone}}</td>
+                                    <!--  Opérateur ?. pour éviter un crash si filiere est null -->
+                                    <td>{{e.filiere?.abreviation}}</td>
+                                    <td>
+                                        @if (e.status) {
+                                            <span class="badge bg-label-success">Actif</span>
+                                        } @else {
+                                            <span class="badge bg-label-danger">Non Actif</span>
+                                        }
+                                    </td>
+                                    <td class="text-start">
+                                        <button class="btn btn-sm btn-icon btn-outline-info me-1"
+                                                (click)="selectEtudiant(e)"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#detailModal">
+                                            <i class="bx bx-user-pin"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-icon btn-outline-primary me-1"
+                                            (click)="etudiantForm.patchValue(e)" data-bs-toggle="modal" data-bs-target="#basicModal2">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-icon btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="basicModal2" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="addDFiliereModal">Edition de l'étudiant</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <!--  Suppression de action="" sur le form (inutile avec Angular) -->
+            <form [formGroup]="etudiantForm" (ngSubmit)="createEtudiant()">
+                <div class="row">
+                    <div class="divider">
+                        <div class="divider-text">Identification</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="nom" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="nom" placeholder="Entrer le nom" formControlName="nom"/>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="prenom" class="form-label">Prenom</label>
+                        <input type="text" class="form-control" id="prenom" placeholder="Entrer le Prenom" formControlName="prenom"/>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="matricule" class="form-label">Matricule</label>
+                        <input type="text" class="form-control" id="matricule" placeholder="Entrer le Matricule" formControlName="matricule"/>
+                    </div>
+
+                    <div class="divider">
+                        <div class="divider-text">Adresse(s)</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="email" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="email" placeholder="name@example.com" formControlName="email"/>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="telephone" class="form-label">Telephone</label>
+                        <input type="text" class="form-control" id="telephone" placeholder="Entrer le contact téléphonique" formControlName="telephone"/>
+                    </div>
+
+                    <div class="divider">
+                        <div class="divider-text">Administration</div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                          <label for="telephone" class="form-label">Annee Academique(Active)</label>
+                          <input type="text" class="form-control text-primary" [value]="anneeActive()!.intitule" readonly/>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="input-group">
+                            <label class="input-group-text" for="modalFiliere">Filiere</label>
+                            <select class="form-select" id="modalFiliere" formControlName="filiere">
+                                <option value="">Choose...</option>
+                                @for (f of listFiliere(); track f.id) {
+                                    <option value="{{f.id}}">{{f.intitule}}</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="input-group">
+                            <label class="input-group-text" for="modalNiveau">Niveau</label>
+                            <select class="form-select" id="modalNiveau" formControlName="niveau">
+                                <option value="">Choose...</option>
+                                @for (n of listNiveau(); track n.id) {
+                                    <option value="{{n.id}}">{{n.intitule}}</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 text-start mb-3">
+                        <button type="submit" class="btn btn-outline-primary" data-bs-dismiss="modal">
+                            <i class="fas fa-save m-1"></i>Enregistrer
+                        </button>
+                    </div>
+                    <div class="col-md-6 text-end mb-3">
+                        <button type="button" class="btn btn-secondary" (click)="resetForm()">
+                            <i class="fas fa-refresh m-1"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+</div>
+
+<!-- Modal Détail Étudiant -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">
+                <i class="fas fa-user me-2"></i>Détail de l'étudiant
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close" (click)="closeDetail()"></button>
+        </div>
+
+        <div class="modal-body">
+            @if (selectedEtudiant(); as etudiant) {
+
+                <div class="card mb-3">
+                    <div class="row g-0">
+
+                        <!-- Photo de profil -->
+                        <div class="col-md-4 d-flex align-items-center justify-content-center p-3">
+                            @if (etudiant.photo) {
+                                <!--  Si l'étudiant a une photo, on l'affiche -->
+                                <img
+                                    [src]="etudiant.photo"
+                                    class="img-fluid rounded-start"
+                                    style="max-height: 220px; object-fit: cover; border-radius: 12px;"
+                                    alt="Photo de {{ etudiant.nom }} {{ etudiant.prenom }}"
+                                />
+                            } @else {
+                                <!--  Sinon, icône utilisateur par défaut -->
+                                <div class="d-flex align-items-center justify-content-center bg-label-secondary rounded"
+                                     style="width: 140px; height: 140px;">
+                                    <i class="fas fa-user-circle" style="font-size: 100px; color: #696cff; opacity: 0.7;"></i>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Informations -->
+                        <div class="col-md-8">
+                            <div class="card-body">
+
+                                <h5 class="card-title text-primary mb-1">
+                                    {{ etudiant.nom }} {{ etudiant.prenom }}
+                                </h5>
+                                <p class="text-muted mb-3">
+                                    <span class="badge bg-label-primary">
+                                        {{ etudiant.matricule }}
+                                    </span>
+                                    &nbsp;
+                                    @if (etudiant.status) {
+                                        <span class="badge bg-label-success">Actif</span>
+                                    } @else {
+                                        <span class="badge bg-label-danger">Non Actif</span>
+                                    }
+                                </p>
+
+                                <hr/>
+
+                                <!-- Bloc : Coordonnées -->
+                                <div class="mb-3">
+                                    <p class="mb-1">
+                                        <i class="fas fa-envelope me-2 text-primary"></i>
+                                        <strong>Email :</strong> {{ etudiant.email }}
+                                    </p>
+                                    <p class="mb-1">
+                                        <i class="fas fa-phone me-2 text-primary"></i>
+                                        <strong>Téléphone :</strong> {{ etudiant.telephone }}
+                                    </p>
+                                </div>
+
+                                <hr/>
+                                <!-- Bloc : Scolarité -->
+                                <div class="mb-3">
+                                    <p class="mb-1">
+                                        <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                                        <strong>Filière :</strong>
+                                        {{ etudiant.filiere?.intitule ?? '—' }}
+                                        @if (etudiant.filiere?.abreviation) {
+                                            <span class="badge bg-label-info ms-1">
+                                                {{ etudiant.filiere?.abreviation }}
+                                            </span>
+                                        }
+                                    </p>
+                                    <p class="mb-1">
+                                        <i class="fas fa-layer-group me-2 text-primary"></i>
+                                        <strong>Niveau :</strong>
+                                        {{ etudiant.niveau?.intitule ?? '—' }}
+                                    </p>
+                                    <p class="mb-1">
+                                        <i class="fas fa-building me-2 text-primary"></i>
+                                        <strong>Département :</strong>
+                                        {{ etudiant.filiere?.departement?.intitule ?? '—' }}
+                                    </p>
+                                </div>
+
+                                <hr/>
+                                <p class="card-text">
+                                    <small class="text-body-secondary">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        Inscrit le : {{ etudiant.dateCreation | date:'dd/MM/yyyy' }}
+                                    </small>
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            } @else {
+                <!-- Fallback si aucun étudiant sélectionné -->
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-user-slash" style="font-size: 48px;"></i>
+                    <p class="mt-2">Aucun étudiant sélectionné.</p>
+                </div>
+            }
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal" (click)="closeDetail()">
+                <i class="fas fa-times me-1"></i>Fermer
+            </button>
+        </div>
+    </div>
+    </div>
+</div>

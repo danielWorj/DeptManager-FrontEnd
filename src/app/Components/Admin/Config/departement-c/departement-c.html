@@ -1,0 +1,450 @@
+<div class="card">
+  <div class="card-body">
+
+    <!-- ── EN-TÊTE ── -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" class="form-control" placeholder="Rechercher un département...">
+        </div>
+      </div>
+      <div class="col-md-6 text-end">
+        <button
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#addDepartementModal"
+        >
+          <i class="fas fa-plus me-2"></i>Nouveau Département
+        </button>
+      </div>
+    </div>
+
+    <!-- ── TABLEAU ── -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Nom du Département</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of listDepartement(); track d.id) {
+            <tr>
+              <td><span class="badge bg-label-primary">{{ d.abreviation }}</span></td>
+              <td class="fw-semibold">{{ d.intitule }}</td>
+              <td class="text-end">
+                <button
+                  class="btn btn-sm btn-icon btn-outline-primary"
+                  title="Voir les détails"
+                  data-bs-toggle="modal"
+                  data-bs-target="#detailDepartementModal"
+                  (click)="selectDepartement(d)"
+                >
+                  <i class="bx bx-show"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--               MODAL : CRÉER UN DÉPARTEMENT                   -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="addDepartementModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bx bx-plus-circle me-2"></i>Nouveau Département</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="departementForm" (ngSubmit)="createDepartement()">
+          <div class="row">
+            <div class="col mb-3">
+              <label class="form-label">Intitulé</label>
+              <input type="text" class="form-control" formControlName="intitule"
+                placeholder="Ex: Génie Informatique" />
+            </div>
+            <div class="col mb-3">
+              <label class="form-label">Abréviation</label>
+              <input type="text" class="form-control" formControlName="abreviation"
+                placeholder="Ex: GI" />
+            </div>
+          </div>
+          <div class="text-end">
+            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">
+              <i class="bx bx-save me-1"></i>Enregistrer
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--               MODAL : DÉTAIL DÉPARTEMENT                     -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="detailDepartementModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bx bx-buildings me-2"></i>
+          @if (departementSelected()) {
+            {{ departementSelected()!.intitule }}
+            <span class="badge bg-label-primary ms-2">{{ departementSelected()!.abreviation }}</span>
+          }
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body p-4">
+        @if (departementSelected()) {
+
+          <!-- ─── CARTE PRINCIPALE ─── -->
+          <div class="card mb-4 border shadow-none">
+            <div class="row g-0">
+
+              <!-- Photo profil -->
+              <div class="col-md-3 d-flex align-items-stretch">
+                <div class="position-relative w-100" style="min-height: 240px;">
+                  <img
+                    [src]="urlImage()"
+                    class="img-fluid rounded-start w-100 h-100"
+                    style="object-fit: cover;"
+                    [alt]="departementSelected()!.intitule"
+                  />
+                  <button
+                    class="btn btn-sm btn-primary position-absolute bottom-0 start-0 m-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#photoProfilModal"
+                  >
+                    <i class="bx bx-camera me-1"></i> Changer
+                  </button>
+                </div>
+              </div>
+
+              <!-- Infos -->
+              <div class="col-md-9">
+                <div class="card-body h-100 d-flex flex-column">
+
+                  <!-- Description -->
+                  <div class="mb-3">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                      <h6 class="fw-semibold text-muted mb-0">
+                        <i class="bx bx-info-circle me-1"></i>Description
+                      </h6>
+                      <button
+                        class="btn btn-sm btn-icon btn-outline-primary"
+                        title="Modifier la description"
+                        data-bs-toggle="modal"
+                        data-bs-target="#descriptionModal"
+                      >
+                        <i class="bx bx-edit-alt"></i>
+                      </button>
+                    </div>
+                    <p class="card-text text-body mb-0">
+                      {{ departementSelected()!.description || 'Aucune description disponible.' }}
+                    </p>
+                  </div>
+
+                  <!-- Mot du chef -->
+                  <div class="mb-0">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                      <h6 class="fw-semibold text-muted mb-0">
+                        <i class="bx bx-message-square-detail me-1"></i>Mot du Chef de Département
+                      </h6>
+                      <button
+                        class="btn btn-sm btn-icon btn-outline-primary"
+                        title="Modifier le mot du chef"
+                        data-bs-toggle="modal"
+                        data-bs-target="#motChefModal"
+                      >
+                        <i class="bx bx-edit-alt"></i>
+                      </button>
+                    </div>
+                    <blockquote class="blockquote border-start border-primary ps-3 mb-0">
+                      <p class="mb-1 fst-italic text-body">
+                        {{ departementSelected()!.motChef || 'Aucun message du chef de département.' }}
+                      </p>
+                      <footer class="blockquote-footer mt-1">
+                        {{ departementSelected()!.nomChef || 'Chef de Département' }}
+                      </footer>
+                    </blockquote>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── FILIÈRES ─── -->
+          <div class="card mb-4 border shadow-none">
+            <div class="card-header d-flex align-items-center justify-content-between">
+              <h6 class="mb-0"><i class="bx bx-git-branch me-2"></i>Filières</h6>
+              <button
+                class="btn btn-primary btn-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#filiereModal"
+              >
+                <i class="bx bx-plus me-1"></i>Ajouter
+              </button>
+            </div>
+            <div class="card-body">
+              @if (listFiliereByDept().length > 0) {
+                <div class="row g-3">
+                  @for (f of listFiliereByDept(); track f.id) {
+                    <div class="col-md-4">
+                      <div class="card border shadow-none h-100">
+                        <div class="card-body d-flex align-items-center">
+                          <span class="badge bg-label-info me-2">{{ f.abreviation }}</span>
+                          <span class="fw-semibold">{{ f.intitule }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="text-center py-3 text-muted">
+                  <i class="bx bx-git-branch bx-lg mb-2 d-block"></i>
+                  Aucune filière enregistrée.
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- ─── GALERIE ─── -->
+          <div class="card border shadow-none mb-0">
+            <div class="card-header d-flex align-items-center justify-content-between">
+              <h6 class="mb-0"><i class="bx bx-images me-2"></i>Galerie Photos</h6>
+              <button
+                class="btn btn-primary btn-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#galerieModal"
+              >
+                <i class="bx bx-plus me-1"></i>Ajouter
+              </button>
+            </div>
+            <div class="card-body">
+              @if (listMedia().length > 0) {
+                <div class="row g-3">
+                  @for (media of listMedia(); track media.id) {
+                    @if (!media.profil) {
+                      <div class="col-6 col-md-3">
+                        <div class="position-relative rounded overflow-hidden" style="height: 140px;">
+                          <img
+                            [src]="getSafeMediaUrl(media)"
+                            class="w-100 h-100"
+                            style="object-fit: cover;"
+                            [alt]="departementSelected()!.intitule"
+                          />
+                        </div>
+                      </div>
+                    }
+                  }
+                </div>
+              } @else {
+                <div class="text-center py-3 text-muted">
+                  <i class="bx bx-image bx-lg mb-2 d-block"></i>
+                  Aucune photo dans la galerie.
+                </div>
+              }
+            </div>
+          </div>
+
+        } @else {
+          <div class="text-center py-5 text-muted">
+            <div class="spinner-border text-primary" role="status"></div>
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fermer</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--                     MODALS SECONDAIRES                       -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+
+<!-- ── Photo profil ── -->
+<div class="modal fade" id="photoProfilModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bx bx-camera me-2"></i>Photo principale</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Choisir une nouvelle photo</label>
+          <!-- context='profil' : onFileSelected alimente previewProfilUrl -->
+          <input type="file" class="form-control" accept="image/*"
+            (change)="onFileSelected($event, 'profil')" />
+          <div class="form-text">Cette photo sera affichée comme photo principale du département.</div>
+        </div>
+        <!-- Aperçu immédiat avant envoi -->
+        @if (previewProfilUrl()) {
+          <div class="mb-3 text-center">
+            <img [src]="previewProfilUrl()" class="img-thumbnail" style="max-height: 180px;" alt="Aperçu" />
+          </div>
+        }
+        <div class="text-end">
+          <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Annuler</button>
+          <!-- Pas de data-bs-dismiss : la fermeture est gérée dans changerPhotoProfil() après succès -->
+          <button type="button" class="btn btn-primary" (click)="changerPhotoProfil()">
+            <i class="bx bx-save me-1"></i>Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Description ── -->
+<div class="modal fade" id="descriptionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bx bx-edit me-2"></i>Modifier la description</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="departementForm">
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" rows="5" formControlName="description"
+              placeholder="Décrivez le département..."></textarea>
+          </div>
+          <div class="text-end">
+            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Annuler</button>
+            <!-- Pas de data-bs-dismiss : la fermeture est gérée dans updateDepartement() après succès -->
+            <button type="button" class="btn btn-primary" (click)="updateDepartement('descriptionModal')">
+              <i class="bx bx-save me-1"></i>Enregistrer
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Mot du chef ── -->
+<div class="modal fade" id="motChefModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bx bx-message-square-edit me-2"></i>Mot du Chef</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="departementForm">
+          <div class="mb-3">
+            <label class="form-label">Nom du chef</label>
+            <input type="text" class="form-control" formControlName="nomChef"
+              placeholder="Ex: Prof. Jean Dupont" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Message</label>
+            <textarea class="form-control" rows="4" formControlName="motChef"
+              placeholder="Message du chef de département..."></textarea>
+          </div>
+          <div class="text-end">
+            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Annuler</button>
+            <!-- Pas de data-bs-dismiss : la fermeture est gérée dans updateDepartement() après succès -->
+            <button type="button" class="btn btn-primary" (click)="updateDepartement('motChefModal')">
+              <i class="bx bx-save me-1"></i>Enregistrer
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+ù
+<!-- ── Filière ── -->
+<div class="modal fade" id="filiereModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bx bx-git-branch me-2"></i>Ajouter une filière</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="filiereForm">
+          <div class="row">
+            <div class="col mb-3">
+              <label class="form-label">Intitulé</label>
+              <input type="text" class="form-control" formControlName="intitule"
+                placeholder="Ex: Génie Informatique" />
+            </div>
+            <div class="col mb-3">
+              <label class="form-label">Abréviation</label>
+              <input type="text" class="form-control" formControlName="abreviation"
+                placeholder="Ex: GI" />
+            </div>
+          </div>
+          <div class="text-end">
+            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Annuler</button>
+            <!-- Pas de data-bs-dismiss : la fermeture est gérée dans createFiliere() après succès -->
+            <button type="button" class="btn btn-primary" (click)="createFiliere()">
+              <i class="bx bx-save me-1"></i>Enregistrer
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Galerie ── -->
+<div class="modal fade" id="galerieModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bx bx-image-add me-2"></i>Ajouter des photos</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Photo</label>
+          <!-- context='galerie' : onFileSelected alimente previewGalerieUrl -->
+          <input type="file" class="form-control" accept="image/*"
+            (change)="onFileSelected($event, 'galerie')" />
+          <div class="form-text">Formats acceptés : JPG, PNG, WEBP.</div>
+        </div>
+        <!-- Aperçu immédiat avant envoi -->
+        @if (previewGalerieUrl()) {
+          <div class="mb-3 text-center">
+            <img [src]="previewGalerieUrl()" class="img-thumbnail" style="max-height: 180px;" alt="Aperçu" />
+          </div>
+        }
+        <div class="text-end">
+          <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Annuler</button>
+          <!-- Pas de data-bs-dismiss : la fermeture est gérée dans createMedia() après succès -->
+          <button type="button" class="btn btn-primary" (click)="createMedia()">
+            <i class="bx bx-upload me-1"></i>Uploader
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,107 @@
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" placeholder="Rechercher une matière...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select">
+                    <option>Tous les départements</option>
+                    <option>Informatique</option>
+                    <option>Mathématiques</option>
+                    <option>Physique</option>
+                </select>
+            </div>
+            <div class="col-md-5 text-end">
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Nouvelle Matière
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Nom de la Matière</th>
+                        <th>Département</th>
+                        <th>Coefficient</th>
+                        <th>Heures/Semaine</th>
+                        <th>Statut</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge bg-label-primary">INF101</span></td>
+                        <td class="fw-semibold">Programmation Java</td>
+                        <td>Informatique</td>
+                        <td>3</td>
+                        <td>6h</td>
+                        <td><span class="badge bg-success">Actif</span></td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-icon btn-outline-primary me-1">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-icon btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-label-primary">INF102</span></td>
+                        <td class="fw-semibold">Base de Données</td>
+                        <td>Informatique</td>
+                        <td>2</td>
+                        <td>4h</td>
+                        <td><span class="badge bg-success">Actif</span></td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-icon btn-outline-primary me-1">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-icon btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-label-primary">MATH201</span></td>
+                        <td class="fw-semibold">Analyse Numérique</td>
+                        <td>Mathématiques</td>
+                        <td>2</td>
+                        <td>3h</td>
+                        <td><span class="badge bg-success">Actif</span></td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-icon btn-outline-primary me-1">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-icon btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-label-primary">PHYS301</span></td>
+                        <td class="fw-semibold">Mécanique Quantique</td>
+                        <td>Physique</td>
+                        <td>3</td>
+                        <td>5h</td>
+                        <td><span class="badge bg-warning">En pause</span></td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-icon btn-outline-primary me-1">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-icon btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

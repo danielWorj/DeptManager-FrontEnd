@@ -1,0 +1,454 @@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <!-- ══ EN-TÊTE ══ -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-1">
+        <i class="fas fa-calendar-alt text-primary me-2"></i>
+        Gestion des Emplois du Temps
+      </h4>
+      <p class="text-muted mb-0">Planifiez et visualisez les créneaux horaires par filière et niveau</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-primary"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#horaireModal"
+              (click)="toggleToEdit()">
+        <i class="fas fa-plus me-1"></i> Nouvel Horaire
+      </button>
+      <button class="btn btn-outline-secondary"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#horaireModal"
+              (click)="toggleToImpression()">
+        <i class="fas fa-table me-1"></i> Vue Emploi du Temps
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ══ CARD FILTRES ══ -->
+  <div class="card mb-4 tdt-filter-card">
+    <div class="card-header tdt-filter-header">
+      <i class="fas fa-filter text-primary me-2"></i>
+      <strong>Filtres de recherche</strong>
+    </div>
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+
+        <!-- Filière -->
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">
+            <i class="fas fa-graduation-cap me-1 text-primary"></i> Filière
+          </label>
+          <select class="form-select" (change)="getIdFiliere($event)">
+            <option value="0">— Toutes les filières —</option>
+            @for (f of listFiliere(); track f.id) {
+              <option value="{{f.id}}">{{ f.abreviation }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Niveau -->
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">
+            <i class="fas fa-layer-group me-1 text-primary"></i> Niveau
+          </label>
+          <select class="form-select" (change)="getIdNiveau($event)">
+            <option value="0">— Tous les niveaux —</option>
+            @for (n of listNiveau(); track n.id) {
+              <option value="{{n.id}}">{{ n.intitule }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Séparateur visuel -->
+        <div class="col-md-1 text-center tdt-filter-sep">
+          <span class="text-muted small">ou</span>
+        </div>
+
+        <!-- Enseignant -->
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">
+            <i class="fas fa-chalkboard-teacher me-1 text-primary"></i> Enseignant
+          </label>
+          <select class="form-select" (change)="getIdEnseignant($event)">
+            <option value="0">— Tous les enseignants —</option>
+            @for (e of listEnseignant(); track e.id) {
+              <option value="{{e.id}}">{{ e.nom }} {{ e.prenom }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Boutons action -->
+        <div class="col-md-2 d-flex gap-2">
+          <button class="btn btn-primary flex-grow-1" (click)="applyFilters()">
+            <i class="fas fa-search me-1"></i> Appliquer
+          </button>
+          <button class="btn btn-outline-secondary"
+                  title="Réinitialiser"
+                  (click)="resetFilters()">
+            <i class="fas fa-redo"></i>
+          </button>
+        </div>
+
+      </div><!-- /row filtres -->
+
+      <!-- Tags contextuels après sélection -->
+      @if (tableVisible()) {
+        <div class="d-flex gap-2 mt-3 flex-wrap tdt-active-filters">
+          @if (filiereSelected()) {
+            <span class="badge bg-label-primary">
+              <i class="fas fa-graduation-cap me-1"></i>{{ filiereSelected()!.intitule }}
+            </span>
+          }
+          @if (niveauSelected()) {
+            <span class="badge bg-label-info">
+              <i class="fas fa-layer-group me-1"></i>{{ niveauSelected()!.intitule }}
+            </span>
+          }
+          @if (enseignantSelected()) {
+            <span class="badge bg-label-success">
+              <i class="fas fa-user me-1"></i>
+              {{ enseignantSelected()!.nom }} {{ enseignantSelected()!.prenom }}
+            </span>
+          }
+          <span class="badge bg-label-secondary ms-auto">
+            {{ listHoraire().length }} créneau(x) trouvé(s)
+          </span>
+        </div>
+      }
+
+    </div>
+  </div><!-- /card filtres -->
+
+
+  <!-- ══ TABLEAU DES HORAIRES ══ -->
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <div>
+        <i class="fas fa-clock text-primary me-2"></i>
+        <strong>Liste des créneaux</strong>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <!-- État initial : aucun filtre appliqué -->
+      @if (!tableVisible()) {
+        <div class="tdt-empty-state">
+          <i class="fas fa-filter"></i>
+          <p class="fw-semibold mt-3 mb-1">Sélectionnez vos critères</p>
+          <span class="small text-muted">
+            Choisissez une filière + un niveau, ou un enseignant, puis cliquez sur « Appliquer ».
+          </span>
+        </div>
+      }
+
+      <!-- Aucun horaire trouvé -->
+      @if (tableVisible() && listHoraire().length === 0) {
+        <div class="alert alert-warning d-flex align-items-center gap-2" role="alert">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>Aucun horaire trouvé pour cette combinaison. Créez des créneaux avec le bouton « Nouvel Horaire ».</span>
+        </div>
+      }
+
+      <!-- Tableau des créneaux -->
+      @if (tableVisible() && listHoraire().length > 0) {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="tdt-thead">
+              <tr>
+                <th>#</th>
+                <th>Jour</th>
+                <th>Horaire</th>
+                <th>Matière</th>
+                <th>Crédit</th>
+                <th>Séance</th>
+                <th>Salle</th>
+                <th>Enseignant</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (h of listHoraire(); track h.id; let i = $index) {
+                <tr>
+                  <td>
+                    <span class="badge bg-label-secondary">{{ i + 1 }}</span>
+                  </td>
+                  <td>
+                    <span class="badge bg-label-primary">{{ h.jour.intitule }}</span>
+                  </td>
+                  <td>
+                    <span class="tdt-time-slot">
+                      <i class="fas fa-clock me-1 text-muted"></i>
+                      {{ h.periode.debut }} – {{ h.periode.fin }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="fw-semibold">{{ h.repartition.matiere.intitule }}</div>
+                    <div class="text-muted small">{{ h.repartition.filiere?.abreviation }} · {{ h.repartition.niveau?.intitule }}</div>
+                  </td>
+                  <td>
+                    <span class="badge bg-label-warning">{{ h.repartition.matiere.credit }} cr.</span>
+                  </td>
+                  <td>{{ h.repartition.matiere.seance }}</td>
+                  <td>
+                    <span class="badge bg-label-info">{{ h.salle.intitule }}</span>
+                  </td>
+                  <td>
+                    <div class="tdt-enseignant-cell">
+                      <div class="tdt-avatar">
+                        {{ h.repartition.enseignant.nom.charAt(0) }}{{ h.repartition.enseignant.prenom.charAt(0) }}
+                      </div>
+                      <div>
+                        <div class="fw-semibold">{{ h.repartition.enseignant.nom }} {{ h.repartition.enseignant.prenom }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-icon btn-outline-primary me-1" title="Modifier">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-icon btn-outline-danger"
+                            title="Supprimer"
+                            (click)="deleteHoraire(h.id)">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+    </div>
+  </div><!-- /card tableau -->
+
+</div><!-- /container -->
+
+
+<!-- 
+     MODAL : CRÉER UN HORAIRE  /  VISUALISER L'EMPLOI DU TEMPS
+      -->
+<div class="modal fade" id="horaireModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">
+          @if (!isImpression()) {
+            <i class="fas fa-plus-circle me-2 text-primary"></i> Nouvel Horaire
+          } @else {
+            <i class="fas fa-table me-2 text-primary"></i> Emploi du Temps
+            @if (filiereSelected()) {
+              — <span class="text-primary">{{ filiereSelected()!.intitule }}</span>
+            }
+            @if (niveauSelected()) {
+              · <span class="text-info">{{ niveauSelected()!.intitule }}</span>
+            }
+            @if (enseignantSelected()) {
+              — <span class="text-success">{{ enseignantSelected()!.nom }} {{ enseignantSelected()!.prenom }}</span>
+            }
+          }
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- ── VUE CRÉATION ── -->
+        @if (!isImpression()) {
+          <form [formGroup]="timeForm" (ngSubmit)="createHoraire()">
+
+            <div class="divider">
+              <div class="divider-text">Affectation concernée</div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <!-- Répartition -->
+              <div class="col-md-12">
+                <label class="form-label fw-semibold">
+                  Répartition <span class="text-danger">*</span>
+                </label>
+                <select class="form-select" formControlName="repartition" (change)="getIdRepartitionr($event)">
+                  <option value="">— Sélectionner une répartition —</option>
+                  @for (r of listRepartition(); track r.id) {
+                    <option value="{{r.id}}">
+                      {{ r.matiere.intitule }}
+                      — {{ r.enseignant.nom }} {{ r.enseignant.prenom }}
+                      — {{ r.filiere?.abreviation }} {{ r.niveau?.intitule }}
+                    </option>
+                  }
+                </select>
+                @if (listRepartition().length === 0) {
+                  <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Appliquez d'abord un filtre filière + niveau pour charger les répartitions.
+                  </small>
+                }
+                @if (horaireForRepartitionExist()) {
+                   <div class="alert alert-warning d-flex align-items-center gap-2" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span> Ce cours a deja ete programme : {{horaireProgrammeByR()?.jour?.intitule}} : {{horaireProgrammeByR()?.periode?.debut}} --
+                    {{horaireProgrammeByR()?.periode?.fin}} en {{horaireProgrammeByR()?.salle?.intitule}}</span>
+                   </div>
+                }
+              </div>
+            </div>
+
+            <div class="divider">
+              <div class="divider-text">Créneau horaire</div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <!-- Jour -->
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  Jour <span class="text-danger">*</span>
+                </label>
+                <select class="form-select" formControlName="jour" (change)="getIdJour($event)">
+                  <option value="">— Choisir un jour —</option>
+                  @for (j of listJour(); track j.id) {
+                    <option value="{{j.id}}">{{ j.intitule }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Période -->
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  Période / Heure <span class="text-danger">*</span>
+                </label>
+                <select class="form-select" formControlName="periode" (change)="getIdPeriode($event)">
+                  <option value="">— Choisir une période —</option>
+                  @for (p of listPeriode(); track p.id) {
+                    <option value="{{p.id}}">{{ p.debut }} – {{ p.fin }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="divider">
+              <div class="divider-text">Salle</div>
+            </div>
+
+            <div class="row g-3">
+              <!-- Salle -->
+              <div class="col-md-12">
+                <label class="form-label fw-semibold">
+                  Salle <span class="text-danger">*</span>
+                </label>
+                <select class="form-select" formControlName="salle" (change)="getIdSalle($event)">
+                  <option value="">— Choisir une salle —</option>
+                  @for (s of listSalle(); track s.id) {
+                    <option value="{{s.id}}">{{ s.intitule }}</option>
+                  }
+                </select>
+                 @if (horaireForSalleJourAndPeriodeExist()) {
+                   <div class="alert alert-warning d-flex align-items-center gap-2" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span class="text text-black"> Cette heure est deja occupe par : {{horaireProgrammeByS()?.repartition?.matiere?.intitule}} : Mr/Mme {{horaireProgrammeByS()?.repartition?.enseignant?.nom}}</span>
+                   </div>
+                }
+              </div>
+            </div>
+
+          </form>
+        }
+
+
+        <!-- ── VUE EMPLOI DU TEMPS (grille jours × périodes) ── -->
+        @if (isImpression()) {
+
+          @if (listHoraire().length === 0) {
+            <div class="alert alert-warning d-flex align-items-center gap-2" role="alert">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>Aucun horaire chargé. Appliquez d'abord un filtre.</span>
+            </div>
+          } @else {
+
+            <!-- Grille emploi du temps : lignes = périodes, colonnes = jours -->
+            <div class="table-responsive">
+              <table class="table table-bordered tdt-edt-table">
+                <thead>
+                  <tr>
+                    <!-- Cellule coin -->
+                    <th class="tdt-edt-corner">
+                      <span class="text-muted small">Horaire \ Jour</span>
+                    </th>
+                    <!-- Une colonne par jour -->
+                    @for (jour of listJour(); track jour.id) {
+                      <th class="tdt-edt-day-header text-center">
+                        {{ jour.intitule }}
+                      </th>
+                    }
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Une ligne par période -->
+                  @for (row of getEmploiDuTempsGrid(); track row.periode.id) {
+                    <tr>
+                      <!-- Colonne horaire -->
+                      <td class="tdt-edt-time-col">
+                        <div class="fw-semibold text-primary">{{ row.periode.debut }}</div>
+                        <div class="text-muted small">{{ row.periode.fin }}</div>
+                      </td>
+                      <!-- Cellules jours -->
+                      @for (cell of row.cells; track cell.jour.id) {
+                        <td class="tdt-edt-cell"
+                            [class.tdt-edt-cell-filled]="cell.horaire !== null">
+                          @if (cell.horaire) {
+                            <div class="tdt-edt-slot">
+                              <div class="tdt-edt-slot-matiere">
+                                {{ cell.horaire.repartition.matiere.intitule }}
+                              </div>
+                              <div class="tdt-edt-slot-enseignant">
+                                <i class="fas fa-user me-1"></i>
+                                {{ cell.horaire.repartition.enseignant.nom }}
+                                {{ cell.horaire.repartition.enseignant.prenom }}
+                              </div>
+                              <div class="tdt-edt-slot-salle">
+                                <i class="fas fa-door-open me-1"></i>
+                                {{ cell.horaire.salle.intitule }}
+                              </div>
+                            </div>
+                          } @else {
+                            <span class="tdt-edt-empty">—</span>
+                          }
+                        </td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div><!-- /table-responsive -->
+
+          }
+        }<!-- /isImpression -->
+
+      </div><!-- /modal-body -->
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetForm()">
+          <i class="fas fa-times me-1"></i> Fermer
+        </button>
+        <button type="button" class="btn btn-info"  (click)="resetForm()">
+          <i class="fas fa-refresh me-1"></i> Rafraichir
+        </button>
+        @if (!isImpression() && !horaireForRepartitionExist() && !horaireForSalleJourAndPeriodeExist()) {
+          <button type="button" class="btn btn-primary" (click)="createHoraire()">
+            <i class="fas fa-save me-1"></i> Enregistrer
+          </button>
+        }
+        @if (isImpression()) {
+          <button type="button" class="btn btn-primary" (click)="telecharger()">
+            <i class="fas fa-print me-1"></i> Imprimer
+          </button>
+        }
+      </div>
+
+    </div>
+  </div>
+</div>

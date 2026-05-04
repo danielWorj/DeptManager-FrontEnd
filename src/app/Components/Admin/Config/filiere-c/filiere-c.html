@@ -1,0 +1,98 @@
+ <div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" placeholder="Rechercher un département...">
+                </div>
+            </div>
+            <div class="col-md-6 text-end">
+                <button class="btn btn-primary"  data-bs-target="#addDFiliereModal"  type="button" data-bs-toggle="modal" data-bs-target="#basicModal2">
+                    <i class="fas fa-plus me-2"></i>Nouvelle Filiere
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Filiere</th>
+                        <th>Département</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (d of listFiliere(); track $index) {
+                        <tr>
+                            <td><span class="badge bg-label-primary">{{d.abreviation}}</span></td>
+                            <td class="fw-semibold">{{d.intitule}}</td>
+                            <td class="fw-semibold">{{d.departement.intitule}}</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-icon btn-outline-primary me-1">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-icon btn-outline-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+ <div class="card-body">
+
+        <!-- Modal -->
+    <div class="modal fade" id="basicModal2" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addDFiliereModal">Creation </h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body">
+            <form action="" [formGroup]="filiereForm" (ngSubmit)="createFiliere()">
+                 <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="nameBasic" class="form-label">Intitule</label>
+                        <input type="text" id="nameBasic" class="form-control" formControlName="intitule" placeholder="Entrer l'intitule" />
+                    </div>
+                    <div class="col mb-6">
+                        <label for="nameBasic" class="form-label">Abreviation</label>
+                        <input type="text" id="nameBasic" class="form-control" formControlName="abreviation" placeholder="Entrer l'abreviation" />
+                    </div>
+                    <div class="col-12 mb-3">
+                        <div class="input-group">
+                            <label class="input-group-text" for="inputGroupSelect01">Departement</label>
+                            <select class="form-select" id="inputGroupSelect01" formControlName="departement">
+                              <option selected>Choose...</option>
+                              @for (d of listDepartement(); track $index) {
+                                <option value="{{d.id}}">{{d.intitule}}</option>
+                              }
+                            </select>
+                          </div>
+                    </div>
+                    
+                </div>
+                <button type="submit" class="btn btn-primary" aria-label="Close" data-bs-dismiss="modal" >Save changes</button>
+
+            </form>
+
+        </div>
+        </div>
+        </div>
+    </div>
+ 
+</div>

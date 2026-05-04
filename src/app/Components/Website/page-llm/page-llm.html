@@ -1,0 +1,328 @@
+
+<div class="llm-page">
+
+  <!-- Topbar : statut serveur + indexation -->
+  <header class="llm-topbar">
+    <div class="llm-topbar__brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+      <span>BibliothèqueIA</span>
+    </div>
+
+    @let status = serverStatus();
+    <div class="llm-topbar__status">
+
+      @if (!status) {
+        <div class="llm-status llm-status--loading">
+          <span class="llm-spinner llm-spinner--xs"></span>
+          Connexion au serveur…
+        </div>
+      }
+
+      @if (status && !isServerReady()) {
+        <div class="llm-status llm-status--error">
+          <span class="llm-status__dot"></span>
+          Serveur non disponible
+          <button class="llm-status__action" (click)="checkServerStatus()" type="button">↺ Réessayer</button>
+        </div>
+      }
+
+      @if (status && isServerReady() && chunksIndexed() === 0) {
+        <div class="llm-index-alert">
+          <span class="llm-index-alert__icon">📂</span>
+          <span>
+            @if (status.docs_found.length > 0) {
+              {{ status.docs_found.length }} PDF(s) prêts à indexer
+            } @else {
+              Aucun PDF dans <code>docs/</code>
+            }
+          </span>
+          <button
+            class="llm-btn-index"
+            type="button"
+            (click)="indexDocuments()"
+            [disabled]="isIndexing()">
+            @if (isIndexing()) {
+              <span class="llm-spinner llm-spinner--xs llm-spinner--white"></span> Indexation…
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Indexer
+            }
+          </button>
+        </div>
+      }
+
+      @if (status && isServerReady() && chunksIndexed() > 0) {
+        <div class="llm-status llm-status--ok">
+          <span class="llm-status__dot"></span>
+          <strong>{{ chunksIndexed() }}</strong> chunks · <strong>{{ status.docs_found.length }}</strong> PDF(s)
+          <button class="llm-status__action" (click)="indexDocuments()" type="button" [disabled]="isIndexing()">
+            @if (isIndexing()) { <span class="llm-spinner llm-spinner--xs"></span> } @else { ↺ }
+            Ré-indexer
+          </button>
+        </div>
+      }
+
+    </div>
+  </header>
+  <!-- /topbar -->
+
+  <!-- ── Corps principal : chat layout ────────────────────────────────────── -->
+  <div class="llm-layout">
+
+    <!-- Panneau gauche : filtres + suggestions -->
+    <aside class="llm-sidebar">
+
+      <!-- Filtre départements -->
+      <div class="llm-sidebar__section">
+        <p class="llm-sidebar__label">Département</p>
+        <div class="llm-dept-list">
+          @for (dept of departments; track dept) {
+            <button
+              class="llm-dept-btn"
+              [class.llm-dept-btn--active]="selectedDept() === dept"
+              (click)="selectDept(dept)"
+              type="button">
+              {{ dept }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Suggestions rapides -->
+      <div class="llm-sidebar__section">
+        <p class="llm-sidebar__label">Questions suggérées</p>
+        <div class="llm-suggestions">
+          @for (card of suggestions; track card.question) {
+            <button
+              class="llm-suggestion-item"
+              type="button"
+              (click)="applySuggestion(card)">
+              <span class="llm-suggestion-item__icon">{{ card.icon }}</span>
+              <span class="llm-suggestion-item__text">{{ card.question }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+    </aside>
+    <!-- /sidebar -->
+
+    <!-- Zone principale chat -->
+    <main class="llm-chat">
+
+      <!-- Zone d'affichage des réponses -->
+      <div class="llm-chat__viewport" #chatViewport>
+
+        <!-- État vide -->
+        @if (!isLoading() && !hasResults() && !errorMessage()) {
+          <div class="llm-empty">
+            <div class="llm-empty__orb">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" width="36" height="36">
+                <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </div>
+            <h3 class="llm-empty__title">Posez votre question</h3>
+            <p class="llm-empty__sub">
+              Notre base documentaire contient des mémoires, thèses et rapports.<br>
+              @if (chunksIndexed() === 0 && isServerReady()) {
+                <strong>Indexez d'abord vos documents via la barre du haut.</strong>
+              }
+            </p>
+            <div class="llm-quick-chips">
+              <button class="llm-chip" type="button" (click)="searchQuery.set('Quels sont les projets de fin d\'études en génie électrique ?')">Projets GEI</button>
+              <button class="llm-chip" type="button" (click)="searchQuery.set('Quelles méthodes de deep learning ont été appliquées ?')">Deep learning</button>
+              <button class="llm-chip" type="button" (click)="searchQuery.set('Recherches sur les réseaux de télécommunication')">Télécommunications</button>
+              <button class="llm-chip" type="button" (click)="searchQuery.set('Études sur l\'enseignement technique et la pédagogie')">Pédagogie</button>
+            </div>
+          </div>
+        }
+
+        <!-- État chargement -->
+        @if (isLoading()) {
+          <div class="llm-loading">
+            <!-- Bulle utilisateur fantôme -->
+            <div class="llm-bubble llm-bubble--user llm-bubble--ghost">
+              <div class="llm-bubble__avatar llm-bubble__avatar--user">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+              </div>
+              <div class="llm-bubble__content">{{ searchQuery() }}</div>
+            </div>
+
+            <!-- Bulle IA en attente -->
+            <div class="llm-bubble llm-bubble--ai">
+              <div class="llm-bubble__avatar llm-bubble__avatar--ai">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                  <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <div class="llm-bubble__content llm-bubble__content--typing">
+                <div class="llm-thinking">
+                  <span class="llm-thinking__msg">{{ loadingMessage() }}</span>
+                  <span class="llm-thinking__dots">
+                    <span></span><span></span><span></span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Erreur -->
+        @if (errorMessage()) {
+          <div class="llm-error-bubble">
+            <div class="llm-bubble llm-bubble--user">
+              <div class="llm-bubble__avatar llm-bubble__avatar--user">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+              </div>
+              <div class="llm-bubble__content">{{ searchQuery() }}</div>
+            </div>
+            <div class="llm-bubble llm-bubble--ai">
+              <div class="llm-bubble__avatar llm-bubble__avatar--ai">⚠️</div>
+              <div class="llm-bubble__content llm-bubble__content--error">
+                <strong>Erreur</strong>
+                <p>{{ errorMessage() }}</p>
+                <button class="llm-retry-btn" (click)="doSearch()" type="button">
+                  ↺ Réessayer
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Résultats -->
+        @if (showResults()) {
+          @let result = searchResult()!;
+
+          <!-- Bulle utilisateur -->
+          <div class="llm-bubble llm-bubble--user">
+            <div class="llm-bubble__avatar llm-bubble__avatar--user">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+            </div>
+            <div class="llm-bubble__content">{{ searchQuery() }}</div>
+          </div>
+
+          <!-- Bulle IA : réponse -->
+          <div class="llm-bubble llm-bubble--ai">
+            <div class="llm-bubble__avatar llm-bubble__avatar--ai">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <div class="llm-bubble__content llm-bubble__content--ai">
+
+              <!-- Méta réponse -->
+              <div class="llm-bubble__meta">
+                <span class="llm-bubble__model-tag">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                  </svg>
+                  Synthèse IA
+                </span>
+                <span class="llm-bubble__dept-tag">{{ selectedDept() === 'Tous' ? 'Tous dép.' : selectedDept() }}</span>
+                <span class="llm-bubble__sources-tag">{{ sourcesWithScore().length }} sources</span>
+              </div>
+
+              <!-- Texte réponse -->
+              <p class="llm-bubble__answer">{{ result.answer }}</p>
+
+              <!-- Sources -->
+              <div class="llm-sources">
+                <p class="llm-sources__label">Sources identifiées</p>
+                <div class="llm-sources__grid">
+                  @for (source of sourcesWithScore(); track trackBySource($index, source)) {
+                    <div class="llm-source-chip" [style.animation-delay.ms]="$index * 60">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="11" height="11">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                      </svg>
+                      <span class="llm-source-chip__name">{{ source.source }}</span>
+                      <span class="llm-source-chip__page">p.{{ source.page }}</span>
+                      <span class="llm-source-chip__score"
+                        [class.llm-score--high]="source.score >= 0.7"
+                        [class.llm-score--mid]="source.score >= 0.4 && source.score < 0.7"
+                        [class.llm-score--low]="source.score < 0.4">
+                        {{ formatScore(source.score) }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              </div>
+
+            </div>
+          </div>
+        }
+        <!-- /showResults -->
+
+      </div>
+      <!-- /viewport -->
+
+      <!-- Zone de saisie (fixée en bas) -->
+      <div class="llm-input-area">
+
+        <!-- Avertissement indexation -->
+        @if (chunksIndexed() === 0 && isServerReady()) {
+          <div class="llm-input-area__warn">
+            ⚠️ Indexez vos documents pour activer la recherche
+          </div>
+        }
+
+        <div class="llm-input-bar">
+          <div class="llm-input-wrap">
+            <textarea
+              class="llm-textarea"
+              placeholder="Posez votre question sur les travaux académiques…"
+              rows="1"
+              [value]="searchQuery()"
+              (input)="onQueryInput($event)"
+             
+              autocomplete="off"></textarea>
+            @if (searchQuery()) {
+              <button class="llm-clear-btn" (click)="searchQuery.set('')" type="button" title="Effacer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            }
+          </div>
+          <button
+            class="llm-send-btn"
+            type="button"
+            (click)="doSearch()"
+            [disabled]="isLoading() || !searchQuery().trim()"
+            [class.llm-send-btn--disabled-index]="chunksIndexed() === 0 && !isLoading()"
+            [title]="chunksIndexed() === 0 ? 'Indexez d\'abord les documents' : 'Lancer la recherche (Entrée)'">
+            @if (isLoading()) {
+              <span class="llm-spinner llm-spinner--white"></span>
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            }
+          </button>
+        </div>
+
+        <p class="llm-input-area__hint">
+          Entrée pour envoyer · Shift+Entrée pour nouvelle ligne
+        </p>
+
+      </div>
+      <!-- /input-area -->
+
+    </main>
+    <!-- /chat -->
+
+  </div>
+  <!-- /layout -->
+
+</div>
+<!-- /llm-page -->

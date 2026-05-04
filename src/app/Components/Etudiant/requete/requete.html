@@ -1,0 +1,456 @@
+<div class="rq-admin">
+
+  <!-- EN-TÊTE DE PAGE -->
+  <div class="rq-page-header">
+    <div>
+      <h1 class="rq-page-title">
+        <i class="bi bi-inbox-fill me-2" style="color:#696cff"></i>Gestion des Requêtes
+      </h1>
+      <p class="rq-page-subtitle">Visualisez, créez et gérez toutes les requêtes des étudiants</p>
+    </div>
+    <button class="rq-btn-primary" (click)="openCreateModal()">
+      <i class="bi bi-plus-lg"></i> Nouvelle Requête
+    </button>
+  </div>
+
+  <!-- CARTES STATISTIQUES -->
+  <div class="rq-stats-row">
+    <div class="rq-stat-card">
+      <div class="rq-stat-icon purple"><i class="bi bi-inbox"></i></div>
+      <div>
+        <div class="rq-stat-value">{{ listRequeteSave().length }}</div>
+        <div class="rq-stat-label">Total requêtes</div>
+      </div>
+    </div>
+    <div class="rq-stat-card">
+      <div class="rq-stat-icon yellow"><i class="bi bi-hourglass-split"></i></div>
+      <div>
+        <div class="rq-stat-value">{{ numberRequeteEnAttente() }}</div>
+        <div class="rq-stat-label">En attente</div>
+      </div>
+    </div>
+    <div class="rq-stat-card">
+      <div class="rq-stat-icon green"><i class="bi bi-check-circle"></i></div>
+      <div>
+        <div class="rq-stat-value">{{ numberRequeteEnTraite() }}</div>
+        <div class="rq-stat-label">Traitées</div>
+      </div>
+    </div>
+    <div class="rq-stat-card">
+      <div class="rq-stat-icon red"><i class="bi bi-x-circle"></i></div>
+      <div>
+        <div class="rq-stat-value">{{ numberRequeteEnRejete() }}</div>
+        <div class="rq-stat-label">Rejetées</div>
+      </div>
+    </div>
+  </div>
+
+ 
+
+  <!-- TABLEAU DES REQUÊTES-->
+  <div class="rq-card">
+    <div class="rq-card-header">
+      <span class="rq-card-title">
+        Liste des requêtes
+        <span class="rq-result-count">{{ listRequete().length }} résultat(s)</span>
+      </span>
+      <div class="rq-search-box">
+        <i class="bi bi-search"></i>
+        <input
+          type="text"
+          class="rq-search-input"
+          placeholder="Rechercher…"
+        />
+      </div>
+    </div>
+
+    <div class="rq-table-wrapper">
+      <table class="rq-table">
+        <thead>
+          <tr>
+            <th>Étudiant</th>
+            <th>Filière</th>
+            <th>Motif</th>
+            <th>Statut</th>
+            <th>Date</th>
+            <th style="text-align:center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- État vide -->
+          @if (listRequete().length === 0) {
+            <tr>
+              <td colspan="8" class="rq-empty-state">
+                <i class="bi bi-inbox" style="font-size:2rem;color:#c3c4ff;display:block;margin-bottom:.5rem"></i>
+                Aucune requête trouvée.
+              </td>
+            </tr>
+          }
+
+          @for (r of listRequete(); track r.id) {
+            <tr>
+              <!-- ID -->
+
+
+              <!-- Étudiant -->
+              <td>
+                <div class="rq-etu-cell">
+                  <div>
+                    <div class="rq-etu-nom">{{ r.etudiant?.prenom }} {{ r.etudiant?.nom }}</div>
+                    <div class="rq-etu-meta fw-bold">{{ r.etudiant?.matricule }}</div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Filière -->
+              <td>
+                <span class="rq-dept-label">
+                  {{ r.etudiant?.filiere?.intitule ?? '—' }}
+                </span>
+              </td>
+
+              <!-- Motif -->
+              <td>
+                <span class="rq-badge rq-badge-primary">
+                  {{ r.motifRequete?.intitule ?? '—' }}
+                </span>
+              </td>
+
+              <!-- Statut -->
+              <td>
+                 @if (r.statutRequete.id==1) {
+                  <span class="rq-badge rq-badge-warning">
+                      En attente 
+                  </span>
+
+                }
+                @if (r.statutRequete.id==2) {
+                 <span class="rq-badge rq-badge-success">
+                      Traite
+                 </span>
+
+                }
+                @if (r.statutRequete.id==3) {
+                 <span class="rq-badge rq-badge-danger">
+                      Rejete
+                 </span>
+
+                }
+              </td>
+             
+             
+
+              <!-- Date -->
+              <td class="rq-date-cell">{{ formatDate(r.dateCreation) }}</td>
+
+              <!-- Actions -->
+              <td style="text-align:center;white-space:nowrap">
+                <button
+                  class="rq-btn-icon view"
+                  title="Visualiser"
+                  (click)="openViewModal(r)"
+                  data-bs-toggle="modal"
+                  data-bs-target="#viewRequeteModal"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button
+                  class="rq-btn-icon delete"
+                  title="Supprimer"
+                  (click)="openDeleteModal(r.id)"
+                  data-bs-toggle="modal"
+                  data-bs-target="#deleteRequeteModal"
+                >
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </td>
+            </tr>
+          }
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pied de tableau -->
+    <div class="rq-pagination">
+      <span>{{ listRequete().length }} résultat(s) sur {{ listRequeteSave().length }} au total</span>
+    </div>
+
+  </div>
+
+</div><!-- /.rq-admin -->
+
+
+<!-- MODAL : CRÉER UNE REQUÊTE -->
+<div class="modal fade rq-admin-modal" id="createRequeteModal" tabindex="-1" aria-labelledby="createRequeteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="createRequeteLabel">
+          <i class="bi bi-pencil-square me-2"></i>Nouvelle Requête
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="requeteFb" (ngSubmit)="createRequete()" novalidate>
+
+          <!-- Étudiant -->
+          <div class="mb-3">
+            <label class="form-label" for="cEtudiant">
+              Étudiant <span class="text-danger">*</span>
+            </label>
+            <select class="form-select" id="cEtudiant" formControlName="etudiant"
+              [class.is-invalid]="isFieldInvalid('etudiant')">
+              <option [ngValue]="null" disabled>Sélectionner un étudiant…</option>
+              @for (etu of listEtudiant(); track etu.id) {
+                <option [value]="etu.id">{{ etu.prenom }} {{ etu.nom }}</option>
+              }
+            </select>
+            @if (isFieldInvalid('etudiant')) {
+              <div class="invalid-feedback">Veuillez sélectionner un étudiant.</div>
+            }
+          </div>
+
+          <!-- Motif -->
+          <div class="mb-3">
+            <label class="form-label" for="cMotif">
+              Motif de la requête <span class="text-danger">*</span>
+            </label>
+            <select class="form-select" id="cMotif" formControlName="motifRequete"
+              [class.is-invalid]="isFieldInvalid('motifRequete')">
+              <option [ngValue]="null" disabled>Sélectionner un motif…</option>
+              @for (motif of listMotifRequete(); track motif.id) {
+                <option [value]="motif.id">{{ motif.intitule }}</option>
+              }
+            </select>
+            @if (isFieldInvalid('motifRequete')) {
+              <div class="invalid-feedback">Veuillez sélectionner un motif.</div>
+            }
+          </div>
+
+          <!-- Description -->
+          <div class="mb-3">
+            <label class="form-label" for="cDescription">
+              Description <span class="text-danger">*</span>
+            </label>
+            <textarea
+              class="form-control"
+              id="cDescription"
+              rows="4"
+              formControlName="description"
+              [class.is-invalid]="isFieldInvalid('description')"
+              placeholder="Décrivez précisément la requête…"
+            ></textarea>
+            @if (isFieldInvalid('description')) {
+              <div class="invalid-feedback">
+                La description est obligatoire (minimum 10 caractères).
+              </div>
+            }
+          </div>
+
+          <!-- Pièces jointes -->
+          <div class="mb-2">
+            <label class="form-label">
+              Pièces jointes
+              <small class="text-muted fw-normal">(optionnel)</small>
+            </label>
+
+            <!-- Zone de dépôt -->
+            <div
+              class="rq-dropzone"
+              (click)="fileInput.click()"
+              (dragover)="onDragOver($event)"
+              (drop)="onDrop($event)"
+            >
+              <div class="rq-dz-icon"><i class="bi bi-cloud-arrow-up-fill"></i></div>
+              <p><strong>Cliquez pour parcourir</strong> ou déposez vos fichiers ici</p>
+              <p class="mt-1">PDF, JPG, PNG, DOCX — max 10 Mo par fichier</p>
+            </div>
+
+            <input
+              #fileInput
+              type="file"
+              multiple
+              accept=".pdf,.jpg,.jpeg,.png,.docx"
+              style="display:none"
+              (change)="onFileSelect($event)"
+            />
+
+            <!-- Liste des fichiers sélectionnés -->
+            @if (selectedFiles().length > 0) {
+              <div class="rq-file-list">
+                @for (file of selectedFiles(); track file.name) {
+                  <div class="rq-file-item">
+                    <i class="bi bi-paperclip"></i>
+                    <span>{{ file.name }}</span>
+                    <button class="rq-file-remove" type="button" (click)="removeFile(file.name)">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+        </form>
+      </div>
+
+      <div class="modal-footer gap-2">
+        <button type="button" class="btn-rq-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn-rq-primary" (click)="createRequete()">
+          <i class="bi bi-send-fill me-1"></i> Enregistrer la requête
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL : VISUALISER UNE REQUÊTE -->
+<div class="modal fade rq-admin-modal" id="viewRequeteModal" tabindex="-1" aria-labelledby="viewRequeteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewRequeteLabel">
+          <i class="bi bi-eye-fill me-2"></i>Détail de la Requête
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+
+      @if (requeteSelected(); as r) {
+        <div class="modal-body">
+
+          <!-- ID -->
+          <h4 class="rq-view-title">Requête #{{ r.id }}</h4>
+
+          <!-- Étudiant -->
+          <div class="rq-detail-section">
+            <div class="rq-detail-label">Étudiant</div>
+            <div class="rq-student-card">
+              <div class="rq-student-avatar">
+                {{ getInitials(r.etudiant?.nom, r.etudiant?.prenom) }}
+              </div>
+              <div>
+                <div class="rq-student-name">{{ r.etudiant?.prenom }} {{ r.etudiant?.nom }}</div>
+                <div class="rq-student-meta">
+                  {{ r.etudiant?.matricule }} — {{ r.etudiant?.filiere?.intitule }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="rq-divider" />
+
+          <!-- Département + Filière + Date -->
+          <div class="rq-detail-row">
+            <div class="rq-detail-section">
+              <div class="rq-detail-label">Département</div>
+              <div class="rq-detail-value">
+                {{ r.etudiant?.filiere?.departement?.intitule ?? '—' }}
+              </div>
+            </div>
+            <div class="rq-detail-section">
+              <div class="rq-detail-label">Filière</div>
+              <div class="rq-detail-value">{{ r.etudiant?.filiere?.intitule ?? '—' }}</div>
+            </div>
+            <div class="rq-detail-section">
+              <div class="rq-detail-label">Date de soumission</div>
+              <div class="rq-detail-value">{{ formatDate(r.dateCreation) }}</div>
+            </div>
+          </div>
+
+          <hr class="rq-divider" />
+
+          <!-- Motif -->
+          <div class="rq-detail-section">
+            <div class="rq-detail-label">Motif de la requête</div>
+            <div class="rq-detail-value">
+              <span class="rq-badge rq-badge-primary">{{ r.motifRequete?.intitule ?? '—' }}</span>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="rq-detail-section">
+            <div class="rq-detail-label">Description</div>
+            <div class="rq-detail-value description">{{ r.description }}</div>
+          </div>
+
+          <!-- Pièces jointes -->
+          @if (listPieceJointe().length > 0) {
+            <div class="rq-detail-section">
+              <div class="rq-detail-label">Pièces jointes</div>
+              <div class="rq-attachments-grid">
+                @for (pj of listPieceJointe(); track pj) {
+                  <span class="rq-attachment-chip">
+                    <i class="bi bi-paperclip"></i>{{ pj }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+      }
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success"  data-bs-dismiss="modal" (click)="changeStatutRequete(this.requeteSelected()!.id, 2)"> <i class="fas fa-check"></i> Traitee</button>
+        <button type="button" class="btn-rq-danger" data-bs-dismiss="modal" (click)="changeStatutRequete(this.requeteSelected()!.id, 3)"> <i class="fas fa-close"></i> Rejete</button>
+        <button type="button" class="btn-rq-secondary" data-bs-dismiss="modal">Fermer</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL : CONFIRMER LA SUPPRESSION -->
+
+<div class="modal fade rq-admin-modal rq-delete-modal" id="deleteRequeteModal" tabindex="-1" aria-labelledby="deleteRequeteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteRequeteLabel">
+          <i class="bi bi-trash3-fill me-2"></i>Supprimer la Requête
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+
+      <div class="modal-body text-center py-4">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size:3rem;color:#ff3e1d"></i>
+        <h5 class="mt-3 mb-1" style="color:#2d3748;font-weight:700">Êtes-vous sûr ?</h5>
+        <p class="mb-0" style="color:#8a92a1;font-size:0.875rem">
+          Vous êtes sur le point de supprimer la requête
+          <strong>#{{ deleteTargetId() }}</strong>.<br />
+          Cette action est irréversible.
+        </p>
+      </div>
+
+      <div class="modal-footer justify-content-center gap-3">
+        <button type="button" class="btn-rq-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn-rq-danger" (click)="deleteRequete()">
+          <i class="bi bi-trash3 me-1"></i> Oui, supprimer
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- TOAST -->
+@if (toast(); as t) {
+  <div class="rq-toast" [class]="'rq-toast--' + t.type">
+    <i class="bi"
+      [class.bi-check-circle-fill]="t.type === 'success'"
+      [class.bi-trash3-fill]="t.type === 'danger'"
+      [class.bi-info-circle-fill]="t.type === 'info'"
+    ></i>
+    {{ t.message }}
+  </div>
+}

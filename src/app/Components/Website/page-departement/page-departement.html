@@ -1,0 +1,561 @@
+<div class="dept-page">
+
+@if (isLoading()) {
+  <div style="display:flex; align-items:center; justify-content:center; height:100vh; flex-direction:column; gap:16px;">
+    <div style="width:48px; height:48px; border:4px solid #e2e8f0; border-top-color:#1a3a6b; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+    <p style="color:#64748b; font-size:1rem;">Chargement du département...</p>
+  </div>
+  <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+} @else {
+  <!-- ── Barre de progression de lecture ── -->
+  <div class="dept-progress" id="dept-progress"></div>
+
+  <nav class="enset-navbar">
+    <div class="enset-container-wide">
+      <div class="enset-navbar__inner">
+
+        <a href="index.html" class="enset-logo">
+          <img
+            src="https://enset-douala.cm/wp-content/uploads/2025/07/LOGO-ENSET-UNIVERSITE-DOUALA-400x89.png"
+            alt="Logo ENSET Douala"
+            class="enset-logo__img"
+            (error)="onImgError($event)"
+          />
+          <div class="enset-logo__fallback" style="display:none;">EN<br>SET</div>
+          <div class="enset-logo__text">
+            <span class="enset-logo__name">ENSET Douala</span>
+            <span class="enset-logo__sub">École Normale Supérieure Technique</span>
+          </div>
+        </a>
+
+        <ul class="enset-nav-menu">
+          <li class="enset-nav-item">
+            <a href="index.html#" class="enset-nav-link">À Propos <span class="enset-nav-caret">▼</span></a>
+            <div class="enset-dropdown">
+              <a href="#">Mot de bienvenue <span>→</span></a>
+              <a href="#">Présentation <span>→</span></a>
+              <a href="#">Organigramme <span>→</span></a>
+            </div>
+          </li>
+          <li class="enset-nav-item">
+            <a href="#" class="enset-nav-link" style="color:var(--enset-primary);">
+              Départements <span class="enset-nav-caret">▼</span>
+            </a>
+            <div class="enset-dropdown">
+              @if (departementForWebsite(); as dept) {
+                <a href="departement.html" style="color:var(--enset-primary);">
+                  {{ dept.departement.intitule }} ({{ dept.departement.abreviation }}) <span>→</span>
+                </a>
+              }
+            </div>
+          </li>
+          <li class="enset-nav-item"><a href="#" class="enset-nav-link">Pôles de Formation</a></li>
+          <li class="enset-nav-item"><a href="#" class="enset-nav-link">Recherche</a></li>
+          <li class="enset-nav-item"><a href="#" class="enset-nav-link">Blog</a></li>
+          <li class="enset-nav-item"><a href="#" class="enset-nav-link">Contacts</a></li>
+        </ul>
+
+        <div class="enset-nav-actions">
+          <a href="#" class="enset-btn enset-btn--outline">Fiches &amp; Formulaires</a>
+          <a
+            href="https://enset-douala.cm/wp-content/uploads/2025/07/Formulaire-de-Demande-dInscription-ENSET-de-Douala-2025-2026.pdf"
+            target="_blank"
+            class="enset-btn enset-btn--primary"
+          >
+            Pré-inscription <span class="enset-btn__arrow">→</span>
+          </a>
+        </div>
+
+        <button
+          class="enset-hamburger"
+          (click)="mobileNavOpen.set(!mobileNavOpen())"
+          aria-label="Menu mobile"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Menu mobile -->
+  <div class="enset-mobile-nav" [class.enset-is-open]="mobileNavOpen()">
+    <div class="enset-mobile-nav__head">
+      <a href="index.html" class="enset-logo">
+        <div class="enset-logo__text"><span class="enset-logo__name">ENSET Douala</span></div>
+      </a>
+      <button class="enset-mobile-nav__close" (click)="mobileNavOpen.set(false)">✕</button>
+    </div>
+    <div class="enset-mobile-nav__body">
+      <ul>
+        <li><a href="index.html">Accueil</a></li>
+        <li><a href="#">À Propos</a></li>
+        <li><a href="#" style="color:var(--enset-primary);">Départements</a></li>
+        <li><a href="#">Pôles de Formation</a></li>
+        <li><a href="#">Recherche</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Contacts</a></li>
+      </ul>
+    </div>
+    <div class="enset-mobile-nav__footer">
+      <a
+        href="https://enset-douala.cm/wp-content/uploads/2025/07/Formulaire-de-Demande-dInscription-ENSET-de-Douala-2025-2026.pdf"
+        target="_blank"
+        class="enset-btn enset-btn--primary"
+        style="justify-content:center;"
+      >
+        Pré-inscription 2025–2026 →
+      </a>
+    </div>
+  </div>
+
+  @if (departementForWebsite(); as dept) {
+
+    <!-- BREADCRUMB -->
+    <div class="dept-breadcrumb">
+      <div class="dept-container-wide">
+        <div class="dept-breadcrumb__inner">
+          <div class="dept-breadcrumb__item">
+            <a href="index.html">🏠 Accueil</a>
+            <span class="dept-breadcrumb__sep">›</span>
+            <a href="#">Départements</a>
+            <span class="dept-breadcrumb__sep">›</span>
+          </div>
+          <span class="dept-breadcrumb__current">{{ dept.departement.intitule }}</span>
+        </div>
+      </div>
+    </div>
+
+    <section class="dept-hero" id="dept-top">
+
+      <!-- ── CORRECTIF : on utilise le computed heroImgUrl() défini dans le .ts
+           au lieu d'appeler getSafeUrl() directement dans le template.
+           getSafeUrl() dans un binding [src] crée un nouvel objet SafeUrl
+           à chaque cycle de détection → boucle infinie de re-renders. ── -->
+      @if (dept.medias && dept.medias.length > 0) {
+        <img
+          [src]="heroImgUrl()"
+          [alt]="'Département ' + dept.departement.abreviation + ' — ENSET Douala'"
+          class="dept-hero__bg"
+          (error)="onImgError($event)"
+        />
+      }
+      <div class="dept-hero__pattern"></div>
+      <div class="dept-hero__overlay"></div>
+
+      <!-- Stats -->
+      <div class="dept-hero__aside">
+        <div class="dept-hero__aside-label">Chiffres du département</div>
+        <div class="dept-hero__aside-stat">
+          <span class="dept-hero__aside-num">{{ dept.filieres.length }}</span>
+          <span class="dept-hero__aside-lbl">Filières proposées</span>
+        </div>
+        <div class="dept-hero__aside-stat">
+          <span class="dept-hero__aside-num">{{ dept.debouches.length }}</span>
+          <span class="dept-hero__aside-lbl">Débouchés professionnels</span>
+        </div>
+        <div class="dept-hero__aside-stat">
+          <span class="dept-hero__aside-num">{{ dept.secteurActivites.length }}</span>
+          <span class="dept-hero__aside-lbl">Secteurs d'activité</span>
+        </div>
+        <div class="dept-hero__aside-stat">
+          <span class="dept-hero__aside-num">{{ dept.medias.length }}</span>
+          <span class="dept-hero__aside-lbl">Ressources médias</span>
+        </div>
+      </div>
+
+      <!-- Texte héro -->
+      <div class="dept-hero__content">
+        <div class="dept-hero__code dept-anim dept-anim-d1">
+          {{ dept.departement.abreviation }} · Département
+        </div>
+        <h1 class="dept-hero__title dept-anim dept-anim-d2">
+          {{ dept.departement.intitule }}
+        </h1>
+        <p class="dept-hero__subtitle dept-anim dept-anim-d3">
+          {{ dept.departement.description }}
+        </p>
+        <div class="dept-hero__actions dept-anim dept-anim-d4">
+          <a href="#dept-filieres" class="dept-btn dept-btn--primary">
+            Voir les filières <span class="dept-btn__arr">→</span>
+          </a>
+          <a href="#dept-chef" class="dept-btn dept-btn--outline-white">Mot du Chef</a>
+          <a
+            href="https://enset-douala.cm/wp-content/uploads/2025/07/Formulaire-de-Demande-dInscription-ENSET-de-Douala-2025-2026.pdf"
+            target="_blank"
+            class="dept-btn dept-btn--outline-white"
+          >Candidater</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOUS-NAVIGATION -->
+    <nav class="dept-subnav" aria-label="Navigation de la page">
+      <div class="dept-container-wide">
+        <div class="dept-subnav__inner">
+          <a href="#dept-chef"       class="dept-subnav__link" [class.dept-active]="activeSection() === 'dept-chef'">Mot du Chef</a>
+          <a href="#dept-filieres"   class="dept-subnav__link" [class.dept-active]="activeSection() === 'dept-filieres'">Filières</a>
+          <a href="#dept-debouches"  class="dept-subnav__link" [class.dept-active]="activeSection() === 'dept-debouches'">Débouchés</a>
+          <a href="#dept-galerie"    class="dept-subnav__link" [class.dept-active]="activeSection() === 'dept-galerie'">Galerie</a>
+          <a href="#dept-candidater" class="dept-subnav__link" [class.dept-active]="activeSection() === 'dept-candidater'">Candidater</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ════════════════════════════════════════
+         MOT DU CHEF
+    ════════════════════════════════════════ -->
+    <section class="dept-chef-section" id="dept-chef">
+      <div class="dept-container">
+        <div class="dept-chef-grid">
+
+          <!-- Carte profil chef -->
+          <div class="dept-chef-card">
+            @if (dept.chefDepartement; as chef) {
+              <div class="dept-chef-card__photo-wrap">
+                <!-- ── CORRECTIF : on utilise le computed chefPhotoUrl() défini dans le .ts
+                     au lieu de 'assets/file/'+getSafeUrl(...) dans le template.
+                     La concaténation de string + SafeUrl est incorrecte,
+                     et getSafeUrl() dans un binding crée une boucle infinie. ── -->
+                @if (chef.photo) {
+                  <img
+                    [src]="chefPhotoUrl()"
+                    [alt]="chef.prenom + ' ' + chef.nom"
+                    class="dept-chef-card__photo"
+                    (error)="onImgError($event)"
+                  />
+                } @else {
+                  <div class="dept-chef-card__photo-placeholder">👤</div>
+                }
+                <div class="dept-chef-card__overlay"></div>
+                <span class="dept-chef-card__photo-badge">Chef de Département</span>
+              </div>
+                
+              <div class="dept-chef-card__body">
+                <div class="dept-chef-card__name">
+                  {{ chef.enseignant.prenom }}
+                  {{ chef.enseignant.nom }}
+                </div>
+                <div class="dept-chef-card__role">
+                  Chef du Département {{ dept.departement.abreviation }}
+                  @if (chef.enseignant.poste) {
+                    · {{ chef.enseignant.poste.intitule }}
+                  }
+                </div>
+                
+                @if (chef.enseignant.email) {
+                  <div class="dept-chef-card__info">
+                    <span class="dept-chef-card__info-ic">✉</span>
+                    {{ chef.enseignant.email }}
+                  </div>
+                }
+                @if (chef.enseignant.telephone) {
+                  <div class="dept-chef-card__info">
+                    <span class="dept-chef-card__info-ic">📞</span>
+                    {{ chef.enseignant.telephone }}
+                  </div>
+                }
+
+                <div class="dept-chef-card__contact">
+                  @if (chef.enseignant.email) {
+                    <a
+                      [href]="'mailto:' + chef.enseignant.email"
+                      class="dept-btn dept-btn--primary"
+                      style="font-size:.8rem;padding:9px 18px;"
+                    >✉ Envoyer un message</a>
+                  }
+                  @if (chef.enseignant.telephone) {
+                    <a
+                      [href]="'tel:' + chef.enseignant.telephone"
+                      class="dept-btn dept-btn--outline"
+                      style="font-size:.8rem;padding:9px 18px;"
+                    >📞 {{ chef.enseignant.telephone }}</a>
+                  }
+                </div>
+              </div>
+            } @else {
+              <div class="dept-chef-card__photo-wrap">
+                <div class="dept-chef-card__photo-placeholder">👤</div>
+                <span class="dept-chef-card__photo-badge">Chef de Département</span>
+              </div>
+              <div class="dept-chef-card__body">
+                <div class="dept-chef-card__name">Information non disponible</div>
+              </div>
+            }
+          </div>
+
+          <!-- Mot du chef -->
+          <div class="dept-chef-word">
+            <div class="dept-tag dept-chef-word__tag">Mot du Chef de Département</div>
+
+            @if (dept.motChef?.enonce) {
+              <div class="dept-chef-word__quote">
+                <span class="dept-chef-word__quote-mark">"</span>
+                <p class="dept-chef-word__quote-text">{{ dept.motChef?.enonce }}</p>
+              </div>
+            }
+
+            <div class="dept-chef-word__sig">
+              <div class="dept-chef-word__sig-av">
+                <span class="dept-chef-word__sig-initials">
+                  {{ dept.chefDepartement?.enseignant?.prenom?.charAt(0) }}{{ dept.chefDepartement?.enseignant?.nom?.charAt(0) }}
+                </span>
+              </div>
+              <div>
+                <div class="dept-chef-word__sig-name">
+                  {{ dept.chefDepartement?.enseignant?.poste?.intitule }}
+                  {{ dept.chefDepartement?.enseignant?.prenom }}
+                  {{ dept.chefDepartement?.enseignant?.nom }}
+                </div>
+                <div class="dept-chef-word__sig-role">
+                  Chef du Département {{ dept.departement.abreviation }} · ENSET Douala
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════
+         FILIÈRES
+         - Filiere[] : { id, intitule, description, abreviation?,
+                         duree?, capacite? }
+         - Departement.admission  → condition commune
+    ════════════════════════════════════════ -->
+    <section class="dept-filieres" id="dept-filieres">
+      <div class="dept-container">
+
+        <div class="dept-filieres__head">
+          <div>
+            <div class="dept-tag dept-tag--light" style="margin-bottom:14px;">Formations proposées</div>
+            <h2 class="dept-h2 dept-h2--white">Nos filières d'<em>excellence</em></h2>
+          </div>
+          <a href="#" class="dept-btn dept-btn--outline-white">
+            Tous les pôles <span class="dept-btn__arr">→</span>
+          </a>
+        </div>
+
+        <div class="dept-filieres__grid">
+          @for (filiere of dept.filieres; track filiere.id) {
+            <div class="dept-filiere">
+              <div class="dept-filiere__top-bar"></div>
+
+              @if (filiere.abreviation) {
+                <div class="dept-filiere__level">{{ filiere.abreviation }}</div>
+              }
+              <div class="dept-filiere__title">{{ filiere.intitule }}</div>
+              <p class="dept-filiere__desc">{{ filiere.description }}</p>
+
+              <div class="dept-filiere__meta">
+                @if (dept.departement.admission) {
+                  <div class="dept-filiere__meta-row">
+                    <span>📋</span> {{ dept.departement.admission }}
+                  </div>
+                }
+              </div>
+
+              <a href="#" class="dept-filiere__link">
+                Programme détaillé <span class="dept-btn__arr">→</span>
+              </a>
+            </div>
+          } @empty {
+            <p class="dept-empty">Aucune filière disponible pour ce département.</p>
+          }
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════
+         DÉBOUCHÉS
+         - Debouche[]      : { id, intitule, description, icone? }
+         - SecteurActivite[]: { id, intitule }
+    ════════════════════════════════════════ -->
+    <section class="dept-debouches" id="dept-debouches">
+      <div class="dept-container">
+
+        <div class="dept-debouches__head">
+          <div class="dept-tag" style="margin-bottom:14px;">Après le diplôme</div>
+          <h2 class="dept-h2">Débouchés <em>professionnels</em></h2>
+        </div>
+
+        <div class="dept-debouches__layout">
+
+          <!-- Grille débouchés -->
+          <div class="dept-debouches__grid">
+            @for (debouche of dept.debouches; track debouche.id; let i = $index) {
+              <div class="fil-debouche">
+                <span class="fil-debouche__num">{{ (i + 1).toString().padStart(2, '0') }}</span>
+                <span class="fil-debouche__icon">🎯</span>
+                <div class="fil-debouche__title">{{ debouche.intitule }}</div>
+                <p class="fil-debouche__desc">{{ debouche.description }}</p>
+              </div>
+            } @empty {
+              <p class="dept-empty">Aucun débouché renseigné pour ce département.</p>
+            }
+          </div>
+
+          <!-- Panneau secteurs -->
+          <div class="dept-debouches__panel">
+            <div class="dept-debouches__panel-head">
+              <span class="dept-debouches__panel-title">Secteurs d'emploi</span>
+            </div>
+            <ul class="dept-sector-list">
+              @for (secteur of dept.secteurActivites; track secteur.id) {
+                <li class="dept-sector">
+                  <span class="dept-sector__dot"></span>{{ secteur.intitule }}
+                </li>
+              } @empty {
+                <li class="dept-empty">Aucun secteur renseigné.</li>
+              }
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════
+         GALERIE
+         - Media[] : { id, url, titre?, legende? }
+         SafeUrl appliqué via getSafeUrl() mis en cache (pas de boucle infinie)
+    ════════════════════════════════════════ -->
+    <section class="dept-gallery" id="dept-galerie">
+      <div class="dept-container">
+
+        <div class="dept-gallery__head">
+          <div>
+            <div class="dept-tag" style="margin-bottom:14px;">Galerie</div>
+            <h2 class="dept-h2">
+              La vie au département <em>{{ dept.departement.abreviation }}</em>
+            </h2>
+          </div>
+          <a href="#" class="dept-btn dept-btn--outline">
+            Voir toutes les photos <span class="dept-btn__arr">→</span>
+          </a>
+        </div>
+
+        <div class="dept-gallery__grid">
+          @for (media of dept.medias; track media.id) {
+            <div
+              class="dept-gal-item"
+              (click)="openLightbox(media)"
+            >
+              <!-- ── CORRECTIF : getSafeUrl() est maintenant mis en cache dans le .ts
+                   via un Map<string, SafeUrl>. Le même objet SafeUrl est retourné
+                   pour la même URL, ce qui évite la boucle infinie de re-renders. ── -->
+              <img
+                [src]="getSafeUrl('assets/file/' + media.url)"
+                [alt]="media.departement.intitule  || (media.url.split('/').pop() || 'image')"
+                class="dept-gal-item__img"
+                (error)="onGalleryImgError($event)"
+              />
+              <div class="dept-gal-item__zoom">🔍</div>
+              <div class="dept-gal-item__caption">{{ media.departement.intitule  || (media.url.split('/').pop() || 'image') }}</div>
+            </div>
+          } @empty {
+            <p class="dept-empty">Aucune photo disponible pour ce département.</p>
+          }
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Lightbox -->
+    <div
+      class="dept-lightbox"
+      [class.dept-lb-open]="lightboxOpen()"
+      (click)="closeLightboxOnBackdrop($event)"
+    >
+      <img
+        [src]="lightboxSrc()"
+        [alt]="lightboxCaption()"
+        class="dept-lightbox__img"
+      />
+      <!-- ── CORRECTIF : closeLightbox() n'a plus de paramètre inutile ── -->
+      <button class="dept-lightbox__close" (click)="closeLightbox()">✕</button>
+      <div class="dept-lightbox__caption">{{ lightboxCaption() }}</div>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         CTA CANDIDATURE
+    ════════════════════════════════════════ -->
+    <section class="dept-cta" id="dept-candidater">
+      <div class="dept-cta__pattern"></div>
+      <div class="dept-container dept-cta__inner">
+
+        <div class="dept-tag dept-tag--light">
+          Rejoindre le département {{ dept.departement.abreviation }}
+        </div>
+
+        <h2 class="dept-h2 dept-h2--white" style="margin-top:16px;">
+          Prêt à devenir un pilier<br>des <em>sciences en Afrique</em> ?
+        </h2>
+
+        <p class="dept-lead dept-lead--light" style="margin-top:14px;">
+          Candidatez pour la prochaine rentrée académique. Les inscriptions sont ouvertes pour toutes nos filières.
+        </p>
+
+        @if (dept.departement.admission) {
+          <p class="dept-lead dept-lead--light" style="margin-top:8px;opacity:.85;">
+            <strong>Conditions d'admission :</strong> {{ dept.departement.admission }}
+          </p>
+        }
+
+        <div class="dept-cta__actions">
+          <a
+            href="https://enset-douala.cm/wp-content/uploads/2025/07/Formulaire-de-Demande-dInscription-ENSET-de-Douala-2025-2026.pdf"
+            target="_blank"
+            class="dept-btn dept-btn--primary"
+          >
+            Formulaire de pré-inscription <span class="dept-btn__arr">→</span>
+          </a>
+          <a
+            href="https://enset-douala.cm/wp-content/uploads/2025/06/Nos-Departements_ENSETDOUALA.pdf"
+            target="_blank"
+            class="dept-btn dept-btn--outline-white"
+          >
+            Télécharger la brochure
+          </a>
+          @if (dept.chefDepartement?.email) {
+            <a
+              [href]="'mailto:' + dept.chefDepartement!.email"
+              class="dept-btn dept-btn--outline-white"
+            >
+              Contacter le département
+            </a>
+          }
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="dept-footer">
+      <div class="dept-container-wide">
+        <div class="dept-footer__inner">
+          <span class="dept-footer__copy">
+            © {{ currentYear }} ENSET Douala · Département {{ dept.departement.abreviation }} — Université de Douala
+          </span>
+          <div class="dept-footer__links">
+            <a href="index.html">Accueil</a>
+            <a href="#">Tous les départements</a>
+            <a href="https://enset-douala.cm/contact/">Contact</a>
+            <a href="#">Mentions légales</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  } @else {
+
+    <!-- ÉTAT D'ERREUR (données non chargées après tentative) -->
+    <div class="dept-loading">
+      <div class="dept-loading__spinner"></div>
+      <p class="dept-loading__text">Impossible de charger le département.</p>
+    </div>
+
+  }
+}
+</div>
