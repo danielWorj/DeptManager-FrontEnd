@@ -1,3 +1,4 @@
+// AuthGuard.ts
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../Service/Auth/auth-service';
@@ -7,9 +8,11 @@ export const AuthGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   if (authService.isAuthenticated()) {
-    return true; // Accès autorisé
+    return true;
   } else {
-    // Redirection vers la page login si non connecté
-    return router.parseUrl('/login'); 
+    // On mémorise l'URL demandée dans le queryParam
+    return router.createUrlTree(['/login'], {
+      queryParams: { returnUrl: state.url }
+    });
   }
 };

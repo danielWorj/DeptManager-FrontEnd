@@ -9,9 +9,9 @@ import { BasicAuthData } from '../../Model/Utilisateur/BasicAuthData';
 })
 export class AuthService {
   constructor(private http:HttpClient){}
-  isAuthenticated(): boolean {
-    const id = localStorage.getItem('id');
-    return !!id; // Returns true if id exists, false otherwise
+    isAuthenticated(): boolean {
+    if (typeof window === 'undefined') return false; // SSR guard
+    return !!localStorage.getItem('id');
   }
 
   

@@ -76,7 +76,10 @@ export const routes: Routes = [
         path : '',
         loadComponent: ()=>import('./Components/Website/layout/structure/structure').then(a=>a.Structure),
         children : [
-            
+                {
+                    path : '', 
+                    loadComponent: ()=>import('./Components/Website/landing-page/landing-page').then(l=>l.LandingPage)
+                },
                 {
                     path : 'landing-page', 
                     loadComponent: ()=>import('./Components/Website/landing-page/landing-page').then(l=>l.LandingPage)
