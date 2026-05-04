@@ -2,7 +2,7 @@
 import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
 
-import { Component, OnDestroy, signal } from '@angular/core';
+import { Component, OnDestroy, AfterViewInit, signal } from '@angular/core';
 import { ConfigService } from '../../../Core/Service/Config/config-service';
 import { UtilisateurService } from '../../../Core/Service/Utilisateur/utilisateur-service';
 import { Etudiant } from '../../../Core/Model/Utilisateur/Etudiant';
@@ -21,7 +21,7 @@ import { AnneeAcademique } from '../../../Core/Model/Scolarite/anneeacademique';
   templateUrl: './etudiant-c.html',
   styleUrl: './etudiant-c.css',
 })
-export class EtudiantC implements OnDestroy {
+export class EtudiantC implements OnDestroy, AfterViewInit {
 
   etudiantForm!: FormGroup;
 
@@ -60,6 +60,12 @@ export class EtudiantC implements OnDestroy {
     this.doughnutInstance?.destroy();
   }
 
+  //  Les charts sont dessinés dès que la vue est prête
+  ngAfterViewInit(): void {
+    // Petit délai pour laisser les données arriver avant de tracer les charts
+    setTimeout(() => this.getStats(), 300);
+  }
+
   //  Signals 
   listEtudiant          = signal<Etudiant[]>([]);
   listEtudiantSave      = signal<Etudiant[]>([]);
@@ -73,6 +79,17 @@ export class EtudiantC implements OnDestroy {
   numberEtudiant            = signal<number[]>([]);
   labelNiveau               = signal<string[]>([]);
   numberEtudiantParNiveau   = signal<number[]>([]);
+
+  // ── Métriques pour les cards (status est un string côté API) ──
+  get totalEtudiants(): number {
+    return this.listEtudiantSave().length;
+  }
+  get totalActifs(): number {
+    return this.listEtudiantSave().filter(e => e.status === 'true' || (e.status as unknown) === true).length;
+  }
+  get totalInactifs(): number {
+    return this.listEtudiantSave().filter(e => e.status !== 'true' && (e.status as unknown) !== true).length;
+  }
 
   //  Chargement 
 
@@ -90,6 +107,8 @@ export class EtudiantC implements OnDestroy {
         this.listEtudiant.set(data);
         //  On alimente listEtudiantSave qui était vide — les filtres ne fonctionnaient pas sans ça
         this.listEtudiantSave.set(data);
+        //  Mise à jour des charts à chaque rechargement de la liste
+        setTimeout(() => this.getStats(), 0);
       },
       error: () => console.error('Fetch list etudiant : failed'),
     });
