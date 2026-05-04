@@ -205,6 +205,11 @@ export class ConfigService {
     return this.http.post<ResponseServer>(DeptManager.Actualite.update, request); 
   }
 
+  changeActualiteStatus(id:number):Observable<ResponseServer>{
+    return this.http.get<ResponseServer>(DeptManager.Actualite.vedette+id); 
+  }
+
+
   deleteActualite(id:number):Observable<ResponseServer>{
     return this.http.get<ResponseServer>(DeptManager.Actualite.delete+id); 
   }

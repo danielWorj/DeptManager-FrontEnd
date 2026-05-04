@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NgClass } from '@angular/common';
 import { ConfigService } from '../../../Core/Service/Config/config-service';
 import { Actualite } from '../../../Core/Model/Actualite/Actualite';
 import { ResponseServer } from '../../../Core/Model/Server/ResponseServer';
@@ -7,7 +8,7 @@ import { CategorieActualite } from '../../../Core/Model/Actualite/CategorieActua
 
 @Component({
   selector: 'app-actualite',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, NgClass],
   templateUrl: './actualite.html',
   styleUrl: './actualite.css',
 })
@@ -26,11 +27,11 @@ export class ActualiteE {
     this.getAllCategorieActualite();
   }
 
-  // ─── Données
+  // ─── Données ────────────────────────────────────────────────────────────────
   listActualite          = signal<Actualite[]>([]);
   listCategorieActualite = signal<CategorieActualite[]>([]);
 
-  // ─── Filtres
+  // ─── Filtres ─────────────────────────────────────────────────────────────────
   filterCategorieId = signal<number | null>(null);
   filterDate        = signal<string | null>(null);
   filterSearch      = signal<string>('');
@@ -39,37 +40,38 @@ export class ActualiteE {
     let list = this.listActualite();
     const catId  = this.filterCategorieId();
     const date   = this.filterDate();
-    const search = this.filterSearch().toLowerCase();
+    const search = this.filterSearch().toLowerCase().trim();
 
-    if (catId)   list = list.filter(a => a.categorieActualite?.id === catId);
-    if (date)    list = list.filter(a => a.datePublication === date);
-    if (search)  list = list.filter(a => a.titre?.toLowerCase().includes(search));
+    if (catId)  list = list.filter(a => a.categorieActualite?.id === catId);
+    if (date)   list = list.filter(a => a.datePublication === date);
+    if (search) list = list.filter(a => a.titre?.toLowerCase().includes(search));
     return list;
   });
 
-  // ─── Sélection / état UI
+  // ─── Sélection / état UI ─────────────────────────────────────────────────────
+  selectedActualite    = signal<Actualite | null>(null);
   deleteTargetId       = signal<number | null>(null);
   deleteCategorieId    = signal<number | null>(null);
-  toast                = signal<{ message: string; type: string } | null>(null);
+  toast                = signal<{ message: string; type: 'success' | 'danger' | 'info' } | null>(null);
 
-  // ─── Fichiers image
-  fileActualiteCreate !: File;
-  fileActualiteEdit   !: File;
-  previewUrlCreate     = signal<string | null>(null);
-  previewUrlEdit       = signal<string | null>(null);
+  // ─── Fichiers image ──────────────────────────────────────────────────────────
+  fileActualiteCreate!: File;
+  fileActualiteEdit  !: File;
+  previewUrlCreate    = signal<string | null>(null);
+  previewUrlEdit      = signal<string | null>(null);
 
-  // ─── Formulaires
-  actualiteFb!: FormGroup;
+  // ─── Formulaires ────────────────────────────────────────────────────────────
+  actualiteFb    !: FormGroup;
   editActualiteFb!: FormGroup;
-  categorieFb!: FormGroup;
+  categorieFb    !: FormGroup;
   editCategorieFb!: FormGroup;
 
   private buildForms(): void {
     this.actualiteFb = this.fb.group({
-      titre:              new FormControl('', [Validators.required]),
-      description:        new FormControl('', [Validators.required, Validators.minLength(10)]),
+      titre:              new FormControl('',   [Validators.required]),
+      description:        new FormControl('',   [Validators.required, Validators.minLength(10)]),
       url:                new FormControl(''),
-      datePublication:    new FormControl('', [Validators.required]),
+      datePublication:    new FormControl('',   [Validators.required]),
       categorieActualite: new FormControl(null, [Validators.required]),
     });
 
@@ -92,10 +94,11 @@ export class ActualiteE {
     });
   }
 
-  // ─── API : Actualités
+  // ─── API : Actualités ────────────────────────────────────────────────────────
+
   getAllActualite(): void {
     this.configService.getAllActualite().subscribe({
-      next: (data: Actualite[]) => this.listActualite.set(data),
+      next:  (data: Actualite[]) => this.listActualite.set(data),
       error: (err) => console.error('Fetch actualités :', err),
     });
   }
@@ -118,7 +121,7 @@ export class ActualiteE {
           this.showToast(data.message ?? 'Erreur lors de la création.', 'danger');
         }
       },
-      error: (err) => { console.error('Erreur création :', err); this.showToast('Erreur serveur.', 'danger'); },
+      error: () => this.showToast('Erreur serveur.', 'danger'),
     });
   }
 
@@ -139,7 +142,7 @@ export class ActualiteE {
           this.showToast(data.message ?? 'Erreur lors de la mise à jour.', 'danger');
         }
       },
-      error: (err) => { console.error('Erreur update :', err); this.showToast('Erreur serveur.', 'danger'); },
+      error: () => this.showToast('Erreur serveur.', 'danger'),
     });
   }
 
@@ -158,14 +161,48 @@ export class ActualiteE {
           this.showToast(data.message ?? 'Erreur lors de la suppression.', 'danger');
         }
       },
-      error: (err) => { console.error('Erreur suppression :', err); this.showToast('Erreur serveur.', 'danger'); },
+      error: () => this.showToast('Erreur serveur.', 'danger'),
     });
   }
 
-  // ─── API : Catégories
+  // ─── API : Vedette ───────────────────────────────────────────────────────────
+
+  toggleVedette(a: Actualite): void {
+    const updated: Actualite = { ...a, vedette: !a.vedette };
+
+    this.configService.changeActualiteStatus(a.id).subscribe({
+      next: (data: ResponseServer) => {
+        if (data.status) {
+          // Mise à jour locale de la liste
+          this.listActualite.update(list =>
+            list.map(item => item.id === updated.id ? updated : item)
+          );
+          // Mise à jour de l'actualité sélectionnée dans le modal détail
+          this.selectedActualite.set(updated);
+
+          const msg = updated.vedette
+            ? 'Article mis en vedette !'
+            : 'Article retiré de la vedette.';
+          this.showToast(msg, 'success');
+        } else {
+          this.showToast(data.message ?? 'Erreur lors de la mise à jour.', 'danger');
+        }
+      },
+      error: () => this.showToast('Erreur serveur.', 'danger'),
+    });
+  }
+
+  private toFormData(a: Actualite): FormData {
+    const fd = new FormData();
+    fd.append('actualite', JSON.stringify(a));
+    return fd;
+  }
+
+  // ─── API : Catégories ────────────────────────────────────────────────────────
+
   getAllCategorieActualite(): void {
     this.configService.getAllCategorieActualite().subscribe({
-      next: (data: CategorieActualite[]) => this.listCategorieActualite.set(data),
+      next:  (data: CategorieActualite[]) => this.listCategorieActualite.set(data),
       error: (err) => console.error('Fetch catégories :', err),
     });
   }
@@ -187,7 +224,7 @@ export class ActualiteE {
           this.showToast(data.message ?? 'Erreur lors de la création.', 'danger');
         }
       },
-      error: (err) => { console.error('Erreur création catégorie :', err); this.showToast('Erreur serveur.', 'danger'); },
+      error: () => this.showToast('Erreur serveur.', 'danger'),
     });
   }
 
@@ -207,7 +244,7 @@ export class ActualiteE {
           this.showToast(data.message ?? 'Erreur lors de la mise à jour.', 'danger');
         }
       },
-      error: (err) => { console.error('Erreur update catégorie :', err); this.showToast('Erreur serveur.', 'danger'); },
+      error: () => this.showToast('Erreur serveur.', 'danger'),
     });
   }
 
@@ -226,11 +263,19 @@ export class ActualiteE {
           this.showToast(data.message ?? 'Erreur lors de la suppression.', 'danger');
         }
       },
-      error: (err) => { console.error('Erreur suppression catégorie :', err); this.showToast('Erreur serveur.', 'danger'); },
+      error: () => this.showToast('Erreur serveur.', 'danger'),
     });
   }
 
-  // ─── Actions UI
+  // ─── Actions UI ──────────────────────────────────────────────────────────────
+
+  /** Ouvre le modal de détail et sélectionne l'actualité */
+  openDetailModal(a: Actualite): void {
+    this.selectedActualite.set(a);
+    this.openModal('detailActualiteModal');
+  }
+
+  /** Pré-remplit le formulaire d'édition et ouvre le modal */
   openEditModal(a: Actualite): void {
     this.previewUrlEdit.set(a.url ?? null);
     this.editActualiteFb.patchValue({
@@ -243,7 +288,7 @@ export class ActualiteE {
     });
   }
 
-  openDeleteModal(id: number): void  { this.deleteTargetId.set(id); }
+  openDeleteModal(id: number): void { this.deleteTargetId.set(id); }
 
   openEditCategorieModal(cat: CategorieActualite): void {
     this.editCategorieFb.patchValue({ id: cat.id, intitule: cat.intitule });
@@ -251,7 +296,8 @@ export class ActualiteE {
 
   openDeleteCategorieModal(id: number): void { this.deleteCategorieId.set(id); }
 
-  // ─── Filtres
+  // ─── Filtres ──────────────────────────────────────────────────────────────────
+
   onFilterCategorie(event: Event): void {
     const val = (event.target as HTMLSelectElement).value;
     this.filterCategorieId.set(val ? +val : null);
@@ -265,7 +311,8 @@ export class ActualiteE {
     this.filterSearch.set((event.target as HTMLInputElement).value);
   }
 
-  // ─── Upload image (création)
+  // ─── Upload image (création) ──────────────────────────────────────────────────
+
   selectFileCreate(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
@@ -284,7 +331,8 @@ export class ActualiteE {
     this.previewUrlCreate.set(null);
   }
 
-  // ─── Upload image (édition)
+  // ─── Upload image (édition) ───────────────────────────────────────────────────
+
   selectFileEdit(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
@@ -309,13 +357,19 @@ export class ActualiteE {
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
       const url = e.target?.result as string;
-      if (target === 'create') { this.fileActualiteCreate = file; this.previewUrlCreate.set(url); }
-      else                     { this.fileActualiteEdit   = file; this.previewUrlEdit.set(url); }
+      if (target === 'create') {
+        this.fileActualiteCreate = file;
+        this.previewUrlCreate.set(url);
+      } else {
+        this.fileActualiteEdit = file;
+        this.previewUrlEdit.set(url);
+      }
     };
     reader.readAsDataURL(file);
   }
 
-  // ─── Helpers
+  // ─── Helpers ─────────────────────────────────────────────────────────────────
+
   countArticlesByCategorie(catId: number): number {
     return this.listActualite().filter(a => a.categorieActualite?.id === catId).length;
   }
@@ -326,23 +380,39 @@ export class ActualiteE {
     return `${day}/${m}/${y}`;
   }
 
-  isInvalid(formName: 'actualiteFb' | 'editActualiteFb' | 'categorieFb' | 'editCategorieFb', field: string): boolean {
+  /** Classe CSS Bootstrap du toast selon le type */
+  toastClass(type: string): string {
+    const map: Record<string, string> = {
+      success: 'bg-success text-white',
+      danger:  'bg-danger text-white',
+      info:    'bg-info text-white',
+    };
+    return map[type] ?? 'bg-secondary text-white';
+  }
+
+  isInvalid(
+    formName: 'actualiteFb' | 'editActualiteFb' | 'categorieFb' | 'editCategorieFb',
+    field: string
+  ): boolean {
     const ctrl = this[formName].get(field);
-    return !!(ctrl && ctrl.invalid && ctrl.touched);
+    return !!(ctrl?.invalid && ctrl.touched);
   }
 
   private resetCreateForm(): void {
     this.actualiteFb.reset();
     this.previewUrlCreate.set(null);
+    this.fileActualiteCreate = undefined!;
   }
 
-  // ─── Toast
+  // ─── Toast ───────────────────────────────────────────────────────────────────
+
   showToast(message: string, type: 'success' | 'danger' | 'info' = 'info'): void {
     this.toast.set({ message, type });
-    setTimeout(() => this.toast.set(null), 3000);
+    setTimeout(() => this.toast.set(null), 3500);
   }
 
-  // ─── Bootstrap Modal
+  // ─── Bootstrap Modal helpers ──────────────────────────────────────────────────
+
   openModal(id: string): void {
     const el = document.getElementById(id);
     if (el) (window as any).bootstrap?.Modal?.getOrCreateInstance(el).show();

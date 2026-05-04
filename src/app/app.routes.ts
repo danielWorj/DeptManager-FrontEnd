@@ -93,6 +93,10 @@ export const routes: Routes = [
                     loadComponent: ()=>import('./Components/Website/blog/blog').then(l=>l.Blog)
                 },  
                 {
+                    path : 'brochure', 
+                    loadComponent: ()=>import('./Components/Website/page-brochure/page-brochure').then(l=>l.PageBrochure)
+                },
+                {
                     path : 'dept-page', 
                     loadComponent: ()=>import('./Components/Website/page-departement/page-departement').then(d=>d.PageDepartement)
                 },

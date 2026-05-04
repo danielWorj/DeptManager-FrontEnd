@@ -215,6 +215,7 @@ export const DeptManager ={
         create : `${actualiteapi}/create`, 
         update : `${actualiteapi}/update`, 
         delete : `${actualiteapi}/delete/`, 
+        vedette : `${actualiteapi}/vedette/`, 
         
         CategorieActualite:{
             all : `${actualiteapi}/categorie/all`, 

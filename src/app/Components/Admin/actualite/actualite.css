@@ -1,0 +1,178 @@
+  /* ─── Cards Actualités ──────────────────────────────────────────────────── */
+  .act-card {
+    border-radius: 12px;
+    transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease;
+    overflow: hidden;
+  }
+  .act-card:hover {
+    box-shadow: 0 8px 28px rgba(105, 108, 255, .16);
+    transform: translateY(-3px);
+    border-color: rgba(105, 108, 255, .3) !important;
+  }
+
+  .act-card-thumb {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    background: #f3f4f6;
+    flex-shrink: 0;
+  }
+  .act-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .4s ease;
+  }
+  .act-card:hover .act-card-img { transform: scale(1.05); }
+
+  .act-card-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+  }
+
+  /* Badges flottants sur la miniature */
+  .act-vedette-badge {
+    top: 10px; left: 10px;
+    font-size: .72rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+  }
+  .act-cat-badge {
+    bottom: 10px; right: 10px;
+    font-size: .72rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+  }
+
+  /* Texte tronqué */
+  .act-title-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: .95rem;
+    line-height: 1.4;
+  }
+  .act-desc-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.55;
+  }
+
+  /* ─── Cards Catégories ──────────────────────────────────────────────────── */
+  .act-cat-card {
+    border-radius: 12px;
+    transition: box-shadow .2s ease, transform .2s ease, border-color .2s ease;
+  }
+  .act-cat-card:hover {
+    box-shadow: 0 4px 18px rgba(105, 108, 255, .12);
+    transform: translateY(-2px);
+    border-color: rgba(105, 108, 255, .25) !important;
+  }
+  .act-cat-icon {
+    width: 44px; height: 44px;
+    background: rgba(105, 108, 255, .1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ─── Zone d'upload ─────────────────────────────────────────────────────── */
+  .act-upload-zone {
+    position: relative;
+    border: 2px dashed #d0d3db;
+    border-radius: 12px;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    background: #fafafa;
+    transition: border-color .2s, background .2s;
+  }
+  .act-upload-zone:hover {
+    border-color: #696cff;
+    background: rgba(105, 108, 255, .03);
+  }
+  .act-upload-placeholder {
+    text-align: center;
+    padding: 24px;
+    pointer-events: none;
+    color: #8090a0;
+  }
+  .act-upload-placeholder p { margin: 0; font-size: .88rem; }
+  .act-upload-hint { font-size: .76rem; color: #a0aab4; margin-top: 4px; }
+
+  .act-upload-preview {
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+    display: block;
+    border-radius: 10px;
+  }
+  .act-upload-remove {
+    position: absolute; top: 10px; right: 10px;
+    background: rgba(0, 0, 0, .55);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 30px; height: 30px;
+    font-size: .78rem;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .act-upload-remove:hover { background: rgba(220, 38, 38, .85); }
+
+  /* ─── Modal détail ──────────────────────────────────────────────────────── */
+  .act-detail-img-wrap {
+    width: 100%;
+    max-height: 340px;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  .act-detail-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .act-detail-img-placeholder {
+    width: 100%;
+    height: 180px;
+    background: #f3f4f6;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .act-detail-desc {
+    background: rgba(105, 108, 255, .04);
+    border-left: 3px solid #696cff;
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    font-size: .94rem;
+    color: #435971;
+    line-height: 1.8;
+  }
+
+  /* ─── Icône de confirmation (modals supprimer) ──────────────────────────── */
+  .act-confirm-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px; height: 72px;
+    border-radius: 50%;
+  }
+  .act-confirm-icon--danger { background: rgba(255, 62, 62, .1); }

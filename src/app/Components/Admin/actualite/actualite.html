@@ -1,23 +1,39 @@
 <div class="container-xxl flex-grow-1 container-p-y">
 
-  <!-- En-tête -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  <!-- ══════════════════════════════════════ EN-TÊTE ══════════════════════════════════════ -->
+  <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
     <div>
-      <h4 class="fw-bold mb-1"><i class="bi bi-newspaper me-2" style="color:#696cff"></i>Gestion des Actualités</h4>
-      <p class="text-muted mb-0">Gérez les articles et les catégories publiés sur le portail</p>
+      <h4 class="fw-bold mb-1">
+        <i class="bi bi-newspaper me-2" style="color:#696cff"></i>
+        Gestion des Actualités
+      </h4>
+      <p class="text-muted mb-0 small">
+        Gérez les articles et les catégories publiés sur le portail
+      </p>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <span class="badge rounded-pill bg-label-primary px-3 py-2" style="font-size:.84rem">
+        {{ listActualite().length }} article(s)
+      </span>
+      <button class="btn btn-primary" (click)="openModal('createActualiteModal')">
+        <i class="bi bi-plus-lg me-1"></i> Nouvelle actualité
+      </button>
     </div>
   </div>
 
-  <!-- Onglets -->
+
+  <!-- ══════════════════════════════════════ ONGLETS ══════════════════════════════════════ -->
   <ul class="nav nav-pills mb-4" id="actTab" role="tablist">
     <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="tab-actu" data-bs-toggle="pill" data-bs-target="#pane-actu" type="button">
+      <button class="nav-link active" id="tab-actu"
+        data-bs-toggle="pill" data-bs-target="#pane-actu" type="button">
         <i class="bi bi-file-earmark-text me-1"></i> Actualités
         <span class="badge bg-label-primary ms-1">{{ listActualite().length }}</span>
       </button>
     </li>
     <li class="nav-item" role="presentation">
-      <button class="nav-link" id="tab-cat" data-bs-toggle="pill" data-bs-target="#pane-cat" type="button">
+      <button class="nav-link" id="tab-cat"
+        data-bs-toggle="pill" data-bs-target="#pane-cat" type="button">
         <i class="bi bi-tags me-1"></i> Catégories
         <span class="badge bg-label-secondary ms-1">{{ listCategorieActualite().length }}</span>
       </button>
@@ -26,15 +42,18 @@
 
   <div class="tab-content">
 
-    <!-- ═══════════════════════════════════════ ONGLET ACTUALITÉS -->
+    <!-- ═══════════════════════════════ ONGLET ACTUALITÉS ═══════════════════════════════ -->
     <div class="tab-pane fade show active" id="pane-actu" role="tabpanel">
 
-      <!-- Filtres + bouton créer -->
-      <div class="card mb-4">
-        <div class="card-body">
+      <!-- ── Barre de filtres ── -->
+      <div class="card mb-4 shadow-none border">
+        <div class="card-body py-3">
           <div class="row g-3 align-items-end">
+
             <div class="col-md-4">
-              <label class="form-label">Catégorie</label>
+              <label class="form-label fw-semibold mb-1 small text-uppercase text-muted ls-1">
+                Catégorie
+              </label>
               <select class="form-select" (change)="onFilterCategorie($event)">
                 <option [ngValue]="null">Toutes les catégories</option>
                 @for (cat of listCategorieActualite(); track cat.id) {
@@ -42,165 +61,327 @@
                 }
               </select>
             </div>
+
             <div class="col-md-3">
-              <label class="form-label">Date de publication</label>
+              <label class="form-label fw-semibold mb-1 small text-uppercase text-muted ls-1">
+                Date
+              </label>
               <input type="date" class="form-control" (change)="onFilterDate($event)" />
             </div>
-            <div class="col-md-3">
-              <label class="form-label">Recherche</label>
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold mb-1 small text-uppercase text-muted ls-1">
+                Recherche
+              </label>
               <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control" placeholder="Titre…" (input)="onSearch($event)" />
+                <span class="input-group-text bg-transparent border-end-0">
+                  <i class="bi bi-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0 ps-0"
+                  placeholder="Rechercher par titre…" (input)="onSearch($event)" />
               </div>
             </div>
-            <div class="col-md-2 text-end">
-              <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#createActualiteModal">
-                <i class="bi bi-plus-lg me-1"></i> Nouvelle
-              </button>
+
+            <div class="col-md-1">
+              <p class="mb-0 text-muted small text-end">
+                <strong class="text-dark">{{ filteredActualite().length }}</strong>
+                / {{ listActualite().length }}
+              </p>
             </div>
+
           </div>
         </div>
       </div>
 
-      <!-- Tableau actualités -->
-      <div class="card">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th style="width:60px">Image</th>
-                <th>Titre</th>
-                <th>Catégorie</th>
-                <th>Date de publication</th>
-                <th style="text-align:center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @if (filteredActualite().length === 0) {
-                <tr>
-                  <td colspan="5" class="text-center py-5 text-muted">
-                    <i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:.5rem"></i>
-                    Aucune actualité trouvée.
-                  </td>
-                </tr>
-              }
-              @for (a of filteredActualite(); track a.id) {
-                <tr>
-                  <td>
-                    <div class="act-thumb">
-                      @if (a.url) {
-                        <img [src]="a.url" [alt]="a.titre" />
-                      } @else {
-                        <i class="bi bi-image text-muted"></i>
-                      }
-                    </div>
-                  </td>
-                  <td>
-                    <div class="fw-semibold text-dark">{{ a.titre }}</div>
-                    <div class="text-muted small act-desc-preview">{{ a.description }}</div>
-                  </td>
-                  <td>
-                    <span class="badge bg-label-primary">{{ a.categorieActualite?.intitule ?? '—' }}</span>
-                  </td>
-                  <td class="text-muted small">{{ formatDate(a.datePublication) }}</td>
-                  <td style="text-align:center;white-space:nowrap">
-                    <button class="btn btn-sm btn-icon btn-outline-primary me-1" title="Modifier"
-                      (click)="openEditModal(a)" data-bs-toggle="modal" data-bs-target="#editActualiteModal">
-                      <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-sm btn-icon btn-outline-danger" title="Supprimer"
-                      (click)="openDeleteModal(a.id)" data-bs-toggle="modal" data-bs-target="#deleteActualiteModal">
-                      <i class="bi bi-trash3"></i>
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
+      <!-- ── État vide ── -->
+      @if (filteredActualite().length === 0) {
+        <div class="card shadow-none border">
+          <div class="card-body text-center py-5">
+            <i class="bi bi-inbox d-block mb-3 text-muted" style="font-size:3rem;opacity:.3"></i>
+            <p class="fw-semibold mb-1">Aucune actualité trouvée</p>
+            <p class="text-muted small mb-3">
+              Modifiez vos filtres ou publiez un premier article.
+            </p>
+            <button class="btn btn-sm btn-outline-primary"
+              (click)="openModal('createActualiteModal')">
+              <i class="bi bi-plus me-1"></i> Publier un article
+            </button>
+          </div>
         </div>
-        <div class="card-footer text-muted small">
-          {{ filteredActualite().length }} résultat(s) sur {{ listActualite().length }} au total
-        </div>
-      </div>
-    </div>
+      }
 
-    <!-- ═══════════════════════════════════════ ONGLET CATÉGORIES -->
+      <!-- ── Grille de cards ── -->
+      <div class="row g-4">
+        @for (a of filteredActualite(); track a.id) {
+          <div class="col-sm-6 col-xl-4">
+
+            <div class="card h-100 shadow-none border act-card"
+              (click)="openDetailModal(a)" style="cursor:pointer">
+
+              <!-- Miniature -->
+              <div class="act-card-thumb position-relative">
+                @if (a.url) {
+                  <img [src]="a.url" [alt]="a.titre" class="act-card-img" />
+                } @else {
+                  <div class="act-card-img-placeholder">
+                    <i class="bi bi-image text-muted" style="font-size:2.5rem;opacity:.25"></i>
+                  </div>
+                }
+
+                <!-- Badge vedette -->
+                @if (a.vedette) {
+                  <span class="badge bg-warning text-dark position-absolute act-vedette-badge">
+                    <i class="bi bi-star-fill me-1"></i> Vedette
+                  </span>
+                }
+
+                <!-- Badge catégorie -->
+                <span class="badge bg-label-primary position-absolute act-cat-badge">
+                  {{ a.categorieActualite?.intitule ?? '—' }}
+                </span>
+              </div>
+
+              <!-- Corps -->
+              <div class="card-body d-flex flex-column gap-2 p-3">
+                <h6 class="fw-bold mb-0 act-title-clamp">{{ a.titre }}</h6>
+                <p class="text-muted small mb-0 act-desc-clamp">{{ a.description }}</p>
+              </div>
+
+              <!-- Footer card -->
+              <div class="card-footer bg-transparent border-top py-2 px-3
+                          d-flex align-items-center justify-content-between">
+                <span class="text-muted small">
+                  <i class="bi bi-calendar3 me-1"></i>{{ formatDate(a.datePublication) }}
+                </span>
+                <!-- stopPropagation pour ne pas déclencher le modal détail -->
+                <div class="d-flex gap-1" (click)="$event.stopPropagation()">
+                  <button class="btn btn-sm btn-icon btn-outline-primary" title="Modifier"
+                    (click)="openEditModal(a); openModal('editActualiteModal')">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-sm btn-icon btn-outline-danger" title="Supprimer"
+                    (click)="openDeleteModal(a.id); openModal('deleteActualiteModal')">
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        }
+      </div>
+
+    </div>
+    <!-- /pane-actu -->
+
+
+    <!-- ═══════════════════════════════ ONGLET CATÉGORIES ═══════════════════════════════ -->
     <div class="tab-pane fade" id="pane-cat" role="tabpanel">
 
-      <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCategorieModal">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <p class="text-muted small mb-0">
+          {{ listCategorieActualite().length }} catégorie(s) enregistrée(s)
+        </p>
+        <button class="btn btn-primary btn-sm" (click)="openModal('createCategorieModal')">
           <i class="bi bi-plus-lg me-1"></i> Nouvelle catégorie
         </button>
       </div>
 
-      <div class="card">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>#</th>
-                <th>Intitulé</th>
-                <th>Nb. articles</th>
-                <th style="text-align:center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @if (listCategorieActualite().length === 0) {
-                <tr>
-                  <td colspan="4" class="text-center py-5 text-muted">
-                    <i class="bi bi-tags" style="font-size:2rem;display:block;margin-bottom:.5rem"></i>
-                    Aucune catégorie enregistrée.
-                  </td>
-                </tr>
-              }
-              @for (cat of listCategorieActualite(); track cat.id) {
-                <tr>
-                  <td class="text-muted">{{ cat.id }}</td>
-                  <td><span class="fw-semibold">{{ cat.intitule }}</span></td>
-                  <td>
-                    <span class="badge bg-label-secondary">
-                      {{ countArticlesByCategorie(cat.id) }}
-                    </span>
-                  </td>
-                  <td style="text-align:center;white-space:nowrap">
-                    <button class="btn btn-sm btn-icon btn-outline-primary me-1" title="Modifier"
-                      (click)="openEditCategorieModal(cat)" data-bs-toggle="modal" data-bs-target="#editCategorieModal">
+      <!-- État vide -->
+      @if (listCategorieActualite().length === 0) {
+        <div class="card shadow-none border">
+          <div class="card-body text-center py-5">
+            <i class="bi bi-tags d-block mb-3 text-muted" style="font-size:3rem;opacity:.3"></i>
+            <p class="fw-semibold mb-0">Aucune catégorie enregistrée</p>
+          </div>
+        </div>
+      }
+
+      <!-- Grille catégories -->
+      <div class="row g-3">
+        @for (cat of listCategorieActualite(); track cat.id) {
+          <div class="col-sm-6 col-md-4 col-xl-3">
+            <div class="card shadow-none border h-100 act-cat-card">
+              <div class="card-body d-flex flex-column gap-3 p-4">
+
+                <div class="d-flex align-items-start justify-content-between">
+                  <div class="act-cat-icon">
+                    <i class="bi bi-tag-fill" style="color:#696cff;font-size:1.1rem"></i>
+                  </div>
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-icon btn-outline-primary" title="Modifier"
+                      (click)="openEditCategorieModal(cat); openModal('editCategorieModal')">
                       <i class="bi bi-pencil"></i>
                     </button>
                     <button class="btn btn-sm btn-icon btn-outline-danger" title="Supprimer"
-                      (click)="openDeleteCategorieModal(cat.id)" data-bs-toggle="modal" data-bs-target="#deleteCategModal">
+                      (click)="openDeleteCategorieModal(cat.id); openModal('deleteCategModal')">
                       <i class="bi bi-trash3"></i>
                     </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+                  </div>
+                </div>
 
-  </div><!-- /.tab-content -->
+                <div>
+                  <p class="fw-bold mb-1">{{ cat.intitule }}</p>
+                  <span class="badge bg-label-secondary">
+                    {{ countArticlesByCategorie(cat.id) }} article(s)
+                  </span>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+    </div>
+    <!-- /pane-cat -->
+
+  </div>
+  <!-- /tab-content -->
+
+</div>
+<!-- /container-xxl -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════════════
+     MODAL — DÉTAIL ACTUALITÉ (lecture + vedette)
+════════════════════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="detailActualiteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+
+      @if (selectedActualite(); as act) {
+
+        <!-- En-tête -->
+        <div class="modal-header border-0 pb-0">
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="badge bg-label-primary">
+              <i class="bi bi-tag me-1"></i>{{ act.categorieActualite?.intitule ?? '—' }}
+            </span>
+            @if (act.vedette) {
+              <span class="badge bg-warning text-dark">
+                <i class="bi bi-star-fill me-1"></i> En vedette
+              </span>
+            }
+          </div>
+          <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"></button>
+        </div>
+
+        <!-- Corps -->
+        <div class="modal-body px-4 pt-3 pb-3">
+
+          <!-- Image -->
+          @if (act.url) {
+            <div class="act-detail-img-wrap mb-4">
+              <img [src]="act.url" [alt]="act.titre" class="act-detail-img" />
+            </div>
+          } @else {
+            <div class="act-detail-img-placeholder mb-4">
+              <i class="bi bi-image text-muted" style="font-size:4rem;opacity:.2"></i>
+              <p class="text-muted small mt-2 mb-0">Aucune image disponible</p>
+            </div>
+          }
+
+          <!-- Titre -->
+          <h4 class="fw-bold mb-2">{{ act.titre }}</h4>
+
+          <!-- Méta -->
+          <div class="d-flex align-items-center gap-3 flex-wrap text-muted small mb-4">
+            <span class="d-flex align-items-center gap-1">
+              <i class="bi bi-calendar3"></i>
+              {{ formatDate(act.datePublication) }}
+            </span>
+            <span class="d-flex align-items-center gap-1">
+              <i class="bi bi-tag"></i>
+              {{ act.categorieActualite?.intitule ?? 'Non catégorisé' }}
+            </span>
+            <span class="d-flex align-items-center gap-1">
+              <i class="bi bi-eye"></i>
+              @if (act.vedette) { En vedette } @else { Non mis en vedette }
+            </span>
+          </div>
+
+          <!-- Description -->
+          <div class="act-detail-desc">
+            <p class="mb-0" style="line-height:1.8;white-space:pre-line;">
+              {{ act.description }}
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Pied -->
+        <div class="modal-footer border-top gap-2 flex-wrap">
+
+          <!-- Bouton vedette (conditionnel) -->
+          @if (act.vedette) {
+            <button type="button" class="btn btn-outline-warning"
+              (click)="toggleVedette(act)">
+              <i class="bi bi-star me-1"></i> Retirer de la vedette
+            </button>
+          } @else {
+            <button type="button" class="btn btn-warning text-dark"
+              (click)="toggleVedette(act)">
+              <i class="bi bi-star-fill me-1"></i> Mettre en vedette
+            </button>
+          }
+
+          <div class="ms-auto d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              Fermer
+            </button>
+            <button type="button" class="btn btn-outline-primary"
+              data-bs-dismiss="modal"
+              (click)="openEditModal(act); openModal('editActualiteModal')">
+              <i class="bi bi-pencil me-1"></i> Modifier
+            </button>
+            <button type="button" class="btn btn-outline-danger"
+              data-bs-dismiss="modal"
+              (click)="openDeleteModal(act.id); openModal('deleteActualiteModal')">
+              <i class="bi bi-trash3 me-1"></i> Supprimer
+            </button>
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+  </div>
 </div>
 
 
-<!-- ═══════ MODAL : CRÉER ACTUALITÉ ═══════ -->
-<div class="modal fade" id="createActualiteModal" tabindex="-1" aria-labelledby="createActualiteLabel" aria-hidden="true">
+<!-- ════════════════════════════════════════════════════════════════════════════
+     MODAL — CRÉER ACTUALITÉ
+════════════════════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="createActualiteModal" tabindex="-1"
+  aria-labelledby="createActualiteLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
+
       <div class="modal-header">
-        <h5 class="modal-title" id="createActualiteLabel">
-          <i class="bi bi-pencil-square me-2" style="color:#696cff"></i>Nouvelle Actualité
-        </h5>
+        <div>
+          <h5 class="modal-title fw-bold mb-0" id="createActualiteLabel">
+            <i class="bi bi-pencil-square me-2" style="color:#696cff"></i>
+            Nouvelle Actualité
+          </h5>
+          <p class="text-muted small mb-0 mt-1">
+            Remplissez les informations pour publier un nouvel article
+          </p>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+
       <div class="modal-body">
         <form [formGroup]="actualiteFb" novalidate>
-
           <div class="row g-3">
+
             <div class="col-12">
-              <label class="form-label">Titre <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" formControlName="titre" placeholder="Titre de l'article…"
+              <label class="form-label fw-semibold">
+                Titre <span class="text-danger">*</span>
+              </label>
+              <input type="text" class="form-control" formControlName="titre"
+                placeholder="Ex : Cérémonie de remise de diplômes 2025…"
                 [class.is-invalid]="isInvalid('actualiteFb','titre')" />
               @if (isInvalid('actualiteFb','titre')) {
                 <div class="invalid-feedback">Le titre est obligatoire.</div>
@@ -208,10 +389,12 @@
             </div>
 
             <div class="col-md-6">
-              <label class="form-label">Catégorie <span class="text-danger">*</span></label>
+              <label class="form-label fw-semibold">
+                Catégorie <span class="text-danger">*</span>
+              </label>
               <select class="form-select" formControlName="categorieActualite"
                 [class.is-invalid]="isInvalid('actualiteFb','categorieActualite')">
-                <option [ngValue]="null" disabled>Sélectionner…</option>
+                <option [ngValue]="null" disabled>Sélectionner une catégorie…</option>
                 @for (cat of listCategorieActualite(); track cat.id) {
                   <option [ngValue]="cat.id">{{ cat.intitule }}</option>
                 }
@@ -222,7 +405,9 @@
             </div>
 
             <div class="col-md-6">
-              <label class="form-label">Date de publication <span class="text-danger">*</span></label>
+              <label class="form-label fw-semibold">
+                Date de publication <span class="text-danger">*</span>
+              </label>
               <input type="date" class="form-control" formControlName="datePublication"
                 [class.is-invalid]="isInvalid('actualiteFb','datePublication')" />
               @if (isInvalid('actualiteFb','datePublication')) {
@@ -231,29 +416,35 @@
             </div>
 
             <div class="col-12">
-              <label class="form-label">Description <span class="text-danger">*</span></label>
-              <textarea class="form-control" rows="4" formControlName="description"
-                placeholder="Contenu de l'article…"
+              <label class="form-label fw-semibold">
+                Description <span class="text-danger">*</span>
+              </label>
+              <textarea class="form-control" rows="5" formControlName="description"
+                placeholder="Contenu détaillé de l'article…"
                 [class.is-invalid]="isInvalid('actualiteFb','description')"></textarea>
               @if (isInvalid('actualiteFb','description')) {
-                <div class="invalid-feedback">La description est obligatoire (min. 10 caractères).</div>
+                <div class="invalid-feedback">
+                  La description est obligatoire (minimum 10 caractères).
+                </div>
               }
             </div>
 
-            <!-- Input file image -->
             <div class="col-12">
-              <label class="form-label">Image de l'article</label>
-              <div class="act-upload-zone" (click)="fileInputCreate.click()"
-                (dragover)="onDragOver($event)" (drop)="onDropCreate($event)">
+              <label class="form-label fw-semibold">Image de couverture</label>
+              <div class="act-upload-zone"
+                (click)="fileInputCreate.click()"
+                (dragover)="onDragOver($event)"
+                (drop)="onDropCreate($event)">
                 @if (previewUrlCreate()) {
                   <img [src]="previewUrlCreate()" class="act-upload-preview" alt="aperçu" />
-                  <button type="button" class="act-upload-remove" (click)="removeFileCreate($event)">
+                  <button type="button" class="act-upload-remove"
+                    (click)="removeFileCreate($event)" title="Retirer">
                     <i class="bi bi-x-lg"></i>
                   </button>
                 } @else {
                   <div class="act-upload-placeholder">
-                    <i class="bi bi-cloud-arrow-up-fill"></i>
-                    <p><strong>Cliquez</strong> ou glissez une image ici</p>
+                    <i class="bi bi-cloud-arrow-up-fill" style="font-size:2.5rem;color:#696cff;opacity:.55"></i>
+                    <p class="mb-0 mt-2 fw-semibold">Cliquez ou glissez une image ici</p>
                     <p class="act-upload-hint">JPG, PNG, WEBP — max 5 Mo</p>
                   </div>
                 }
@@ -261,43 +452,62 @@
               <input #fileInputCreate type="file" accept="image/*" style="display:none"
                 (change)="selectFileCreate($event)" />
             </div>
-          </div>
 
+          </div>
         </form>
       </div>
+
       <div class="modal-footer gap-2">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-outline-secondary"
+          data-bs-dismiss="modal">Annuler</button>
         <button type="button" class="btn btn-primary" (click)="createActualite()">
-          <i class="bi bi-send-fill me-1"></i> Publier
+          <i class="bi bi-send-fill me-1"></i> Publier l'article
         </button>
       </div>
+
     </div>
   </div>
 </div>
 
 
-<!-- ═══════ MODAL : MODIFIER ACTUALITÉ ═══════ -->
-<div class="modal fade" id="editActualiteModal" tabindex="-1" aria-labelledby="editActualiteLabel" aria-hidden="true">
+<!-- ════════════════════════════════════════════════════════════════════════════
+     MODAL — MODIFIER ACTUALITÉ
+════════════════════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="editActualiteModal" tabindex="-1"
+  aria-labelledby="editActualiteLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
+
       <div class="modal-header">
-        <h5 class="modal-title" id="editActualiteLabel">
-          <i class="bi bi-pencil me-2" style="color:#696cff"></i>Modifier l'Actualité
-        </h5>
+        <div>
+          <h5 class="modal-title fw-bold mb-0" id="editActualiteLabel">
+            <i class="bi bi-pencil me-2" style="color:#696cff"></i>
+            Modifier l'Actualité
+          </h5>
+          <p class="text-muted small mb-0 mt-1">
+            Modifiez les informations de l'article
+          </p>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+
       <div class="modal-body">
         <form [formGroup]="editActualiteFb" novalidate>
-
           <div class="row g-3">
+
             <div class="col-12">
-              <label class="form-label">Titre <span class="text-danger">*</span></label>
+              <label class="form-label fw-semibold">
+                Titre <span class="text-danger">*</span>
+              </label>
               <input type="text" class="form-control" formControlName="titre"
                 [class.is-invalid]="isInvalid('editActualiteFb','titre')" />
+              @if (isInvalid('editActualiteFb','titre')) {
+                <div class="invalid-feedback">Le titre est obligatoire.</div>
+              }
             </div>
 
             <div class="col-md-6">
-              <label class="form-label">Catégorie</label>
+              <label class="form-label fw-semibold">Catégorie</label>
               <select class="form-select" formControlName="categorieActualite">
                 <option [ngValue]="null" disabled>Sélectionner…</option>
                 @for (cat of listCategorieActualite(); track cat.id) {
@@ -307,28 +517,32 @@
             </div>
 
             <div class="col-md-6">
-              <label class="form-label">Date de publication</label>
+              <label class="form-label fw-semibold">Date de publication</label>
               <input type="date" class="form-control" formControlName="datePublication" />
             </div>
 
             <div class="col-12">
-              <label class="form-label">Description</label>
-              <textarea class="form-control" rows="4" formControlName="description"></textarea>
+              <label class="form-label fw-semibold">Description</label>
+              <textarea class="form-control" rows="5"
+                formControlName="description"></textarea>
             </div>
 
             <div class="col-12">
-              <label class="form-label">Image de l'article</label>
-              <div class="act-upload-zone" (click)="fileInputEdit.click()"
-                (dragover)="onDragOver($event)" (drop)="onDropEdit($event)">
+              <label class="form-label fw-semibold">Image de couverture</label>
+              <div class="act-upload-zone"
+                (click)="fileInputEdit.click()"
+                (dragover)="onDragOver($event)"
+                (drop)="onDropEdit($event)">
                 @if (previewUrlEdit()) {
                   <img [src]="previewUrlEdit()" class="act-upload-preview" alt="aperçu" />
-                  <button type="button" class="act-upload-remove" (click)="removeFileEdit($event)">
+                  <button type="button" class="act-upload-remove"
+                    (click)="removeFileEdit($event)" title="Retirer">
                     <i class="bi bi-x-lg"></i>
                   </button>
                 } @else {
                   <div class="act-upload-placeholder">
-                    <i class="bi bi-cloud-arrow-up-fill"></i>
-                    <p><strong>Cliquez</strong> ou glissez une image ici</p>
+                    <i class="bi bi-cloud-arrow-up-fill" style="font-size:2.5rem;color:#696cff;opacity:.55"></i>
+                    <p class="mb-0 mt-2 fw-semibold">Cliquez ou glissez une image ici</p>
                     <p class="act-upload-hint">JPG, PNG, WEBP — max 5 Mo</p>
                   </div>
                 }
@@ -336,134 +550,198 @@
               <input #fileInputEdit type="file" accept="image/*" style="display:none"
                 (change)="selectFileEdit($event)" />
             </div>
-          </div>
 
+          </div>
         </form>
       </div>
+
       <div class="modal-footer gap-2">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-outline-secondary"
+          data-bs-dismiss="modal">Annuler</button>
         <button type="button" class="btn btn-primary" (click)="updateActualite()">
-          <i class="bi bi-check-lg me-1"></i> Enregistrer
+          <i class="bi bi-check-lg me-1"></i> Enregistrer les modifications
         </button>
       </div>
+
     </div>
   </div>
 </div>
 
 
-<!-- ═══════ MODAL : SUPPRIMER ACTUALITÉ ═══════ -->
+<!-- ════════════════════════════════════════════════════════════════════════════
+     MODAL — SUPPRIMER ACTUALITÉ
+════════════════════════════════════════════════════════════════════════════ -->
 <div class="modal fade" id="deleteActualiteModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title"><i class="bi bi-trash3-fill me-2 text-danger"></i>Supprimer l'actualité</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+      <div class="modal-body text-center px-4 py-5">
+        <div class="act-confirm-icon act-confirm-icon--danger mb-3">
+          <i class="bi bi-trash3-fill text-danger" style="font-size:1.8rem"></i>
+        </div>
+        <h5 class="fw-bold mb-2">Supprimer l'actualité</h5>
+        <p class="text-muted mb-0">
+          Cette action est <strong>irréversible</strong>. L'article
+          <strong>#{{ deleteTargetId() }}</strong> sera définitivement supprimé.
+        </p>
       </div>
-      <div class="modal-body text-center py-4">
-        <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size:3rem"></i>
-        <h5 class="mt-3 mb-1">Êtes-vous sûr ?</h5>
-        <p class="text-muted mb-0">Cette action est irréversible. L'article #{{ deleteTargetId() }} sera supprimé.</p>
-      </div>
-      <div class="modal-footer justify-content-center gap-3">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button type="button" class="btn btn-danger" (click)="deleteActualite()">
+
+      <div class="modal-footer justify-content-center gap-3 border-0 pb-4 pt-0">
+        <button type="button" class="btn btn-outline-secondary px-4"
+          data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger px-4" (click)="deleteActualite()">
           <i class="bi bi-trash3 me-1"></i> Supprimer
         </button>
       </div>
+
     </div>
   </div>
 </div>
 
 
-<!-- ═══════ MODAL : CRÉER CATÉGORIE ═══════ -->
+<!-- ════════════════════════════════════════════════════════════════════════════
+     MODAL — CRÉER CATÉGORIE
+════════════════════════════════════════════════════════════════════════════ -->
 <div class="modal fade" id="createCategorieModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
     <div class="modal-content">
+
       <div class="modal-header">
-        <h5 class="modal-title"><i class="bi bi-tag-fill me-2" style="color:#696cff"></i>Nouvelle Catégorie</h5>
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-tag-fill me-2" style="color:#696cff"></i>
+          Nouvelle Catégorie
+        </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+
       <div class="modal-body">
         <form [formGroup]="categorieFb" novalidate>
-          <label class="form-label">Intitulé <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" formControlName="intitule" placeholder="Ex : Événements, Résultats…"
+          <label class="form-label fw-semibold">
+            Intitulé <span class="text-danger">*</span>
+          </label>
+          <input type="text" class="form-control" formControlName="intitule"
+            placeholder="Ex : Événements, Résultats, Annonces…"
             [class.is-invalid]="isInvalid('categorieFb','intitule')" />
           @if (isInvalid('categorieFb','intitule')) {
             <div class="invalid-feedback">L'intitulé est obligatoire.</div>
           }
         </form>
       </div>
+
       <div class="modal-footer gap-2">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button type="button" class="btn btn-primary" (click)="createCategorieActualite()">
-          <i class="bi bi-plus-lg me-1"></i> Créer
+        <button type="button" class="btn btn-outline-secondary"
+          data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary"
+          (click)="createCategorieActualite()">
+          <i class="bi bi-plus-lg me-1"></i> Créer la catégorie
         </button>
       </div>
+
     </div>
   </div>
 </div>
 
 
-<!-- ═══════ MODAL : MODIFIER CATÉGORIE ═══════ -->
+<!-- ════════════════════════════════════════════════════════════════════════════
+     MODAL — MODIFIER CATÉGORIE
+════════════════════════════════════════════════════════════════════════════ -->
 <div class="modal fade" id="editCategorieModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
     <div class="modal-content">
+
       <div class="modal-header">
-        <h5 class="modal-title"><i class="bi bi-pencil me-2" style="color:#696cff"></i>Modifier la Catégorie</h5>
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-pencil me-2" style="color:#696cff"></i>
+          Modifier la Catégorie
+        </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+
       <div class="modal-body">
         <form [formGroup]="editCategorieFb" novalidate>
-          <label class="form-label">Intitulé</label>
-          <input type="text" class="form-control" formControlName="intitule" />
+          <label class="form-label fw-semibold">Intitulé</label>
+          <input type="text" class="form-control" formControlName="intitule"
+            [class.is-invalid]="isInvalid('editCategorieFb','intitule')" />
+          @if (isInvalid('editCategorieFb','intitule')) {
+            <div class="invalid-feedback">L'intitulé est obligatoire.</div>
+          }
         </form>
       </div>
+
       <div class="modal-footer gap-2">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button type="button" class="btn btn-primary" (click)="updateCategorieActualite()">
+        <button type="button" class="btn btn-outline-secondary"
+          data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary"
+          (click)="updateCategorieActualite()">
           <i class="bi bi-check-lg me-1"></i> Enregistrer
         </button>
       </div>
+
     </div>
   </div>
 </div>
 
 
-<!-- ═══════ MODAL : SUPPRIMER CATÉGORIE ═══════ -->
+<!-- ════════════════════════════════════════════════════════════════════════════
+     MODAL — SUPPRIMER CATÉGORIE
+════════════════════════════════════════════════════════════════════════════ -->
 <div class="modal fade" id="deleteCategModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title"><i class="bi bi-trash3-fill me-2 text-danger"></i>Supprimer la catégorie</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+      <div class="modal-body text-center px-4 py-5">
+        <div class="act-confirm-icon act-confirm-icon--danger mb-3">
+          <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size:1.8rem"></i>
+        </div>
+        <h5 class="fw-bold mb-2">Supprimer la catégorie</h5>
+        <p class="text-muted mb-0">
+          Cette action est <strong>irréversible</strong>. Les articles liés
+          à cette catégorie pourraient être affectés.
+        </p>
       </div>
-      <div class="modal-body text-center py-4">
-        <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size:3rem"></i>
-        <h5 class="mt-3 mb-1">Êtes-vous sûr ?</h5>
-        <p class="text-muted mb-0">La suppression de cette catégorie est irréversible.</p>
-      </div>
-      <div class="modal-footer justify-content-center gap-3">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button type="button" class="btn btn-danger" (click)="deleteCategorieActualite()">
+
+      <div class="modal-footer justify-content-center gap-3 border-0 pb-4 pt-0">
+        <button type="button" class="btn btn-outline-secondary px-4"
+          data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger px-4"
+          (click)="deleteCategorieActualite()">
           <i class="bi bi-trash3 me-1"></i> Supprimer
         </button>
       </div>
+
     </div>
   </div>
 </div>
 
 
-<!-- Toast -->
 @if (toast(); as t) {
-  <div class="bs-toast toast toast-placement-ex show position-fixed bottom-0 end-0 m-4"
-    [class]="'bg-' + t.type" role="alert" style="z-index:9999">
-    <div class="toast-header">
-      <i class="bi me-2"
-        [class.bi-check-circle-fill]="t.type === 'success'"
-        [class.bi-x-circle-fill]="t.type === 'danger'"
-        [class.bi-info-circle-fill]="t.type === 'info'"></i>
-      <span class="me-auto fw-semibold text-white">Notification</span>
+  <div class="position-fixed bottom-0 end-0 m-4" style="z-index:9999;min-width:280px">
+    <div class="toast show border-0 shadow-lg overflow-hidden"
+      [class]="toastClass(t.type)"
+      role="alert" aria-live="assertive">
+
+      <div class="toast-header border-0"
+        [class]="toastClass(t.type)">
+        @if (t.type === 'success') {
+          <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+        }
+        @if (t.type === 'danger') {
+          <i class="bi bi-x-circle-fill me-2 fs-5"></i>
+        }
+        @if (t.type === 'info') {
+          <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+        }
+        <strong class="me-auto">Notification</strong>
+      </div>
+
+      <div class="toast-body pt-0 fw-semibold small">
+        {{ t.message }}
+      </div>
+
     </div>
-    <div class="toast-body text-white">{{ t.message }}</div>
   </div>
 }
+
+
+
+
