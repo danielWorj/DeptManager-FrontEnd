@@ -1,14 +1,4 @@
-/* ═══════════════════════════════════════════════════════════════════════════
-   ai-search.component.scss — CORRIGÉ
-   Corrections :
-   1. SVG icône loupe contrainte à 20×20px (neutralise l'héritage du thème Sneat)
-   2. .search-input-wrap passe de flex → position:relative + display:block
-   3. Input correctement positionné avec padding-left calculé
-   4. Bouton clear ancré en position:absolute à droite
-   5. Tous les SVG inline contraints avec !important contre le thème
-═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Variables ──────────────────────────────────────────────────────────── */
 :root {
   --primary:       #696cff;
   --primary-dk:    #4f52cc;
