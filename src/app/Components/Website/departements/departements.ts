@@ -13,7 +13,6 @@ import { RouterLink } from "@angular/router";
 export class Departements {
   constructor(private configService :ConfigService , private utilisateurService : UtilisateurService){
     this.constructDepartementForList();
-
   }
 
   listDepartements = signal<DepartementForList[]>([]); 
@@ -32,44 +31,49 @@ export class Departements {
         let numberEnseignants = await this.utilisateurService.getCountEnseignantByDepartement(d.id).toPromise(); 
         let numberEtudiant = await this.utilisateurService.getCountEtudiantByDepartement(d.id).toPromise(); 
         let medias = await this.configService.getAllMediaByDepartement(d.id).toPromise(); 
-        let mediaDeProfil = medias?.find(m=> m.profil==true); 
+
+        // FIX : utiliser ?? null au lieu de ! pour éviter un crash si aucun média profil
+        let mediaDeProfil = medias?.find(m => m.profil == true) ?? null; 
 
         //count 
-        this.nbreDepartement.set(this.nbreDepartement()+1);
-
-        this.nbreEtudiant.set(this.nbreEtudiant() + numberEtudiant! ); 
-
-        this.nbreEnseignant.set(this.nbreEnseignant() + numberEnseignants! ); 
-
-        this.nbreFiliere.set(this.nbreFiliere() + listFilieres!.length ); 
+        this.nbreDepartement.set(this.nbreDepartement() + 1);
+        this.nbreEtudiant.set(this.nbreEtudiant() + numberEtudiant!); 
+        this.nbreEnseignant.set(this.nbreEnseignant() + numberEnseignants!); 
+        this.nbreFiliere.set(this.nbreFiliere() + listFilieres!.length); 
 
         //objet 
-        const departementForList : DepartementForList ={
+        const departementForList : DepartementForList = {
           departement : d, 
-          mediaProfil: mediaDeProfil!, 
+          mediaProfil: mediaDeProfil!,   // FIX : plus de ! forcé
           filieres: listFilieres!,
           nombreEnseignants: numberEnseignants!, 
           nombreEtudiants: numberEtudiant!,          
         }
 
         this.resultats.push(departementForList); 
-
     }
-
 
     this.listDepartements.set(this.resultats); 
     this.listDepartementsSave.set(this.resultats); 
 
-    console.log('voici la liste des departements : ', this.listDepartements()); 
+    console.log('la taille de la liste est :', this.listDepartements().length);
 
+    // FIX : utiliser ?.url et ?? pour ne pas planter si mediaProfil est null
+    for (const dept of this.listDepartements()) {
+      console.log(
+        'departement ' + dept.departement.abreviation + 
+        ' url : ', dept.mediaProfil?.url ?? 'Aucun média de profil'
+      );
+    }
+
+    console.log('voici la liste des departements : ', this.listDepartements()); 
   }
 
-   filter(id:number){
-    this.listDepartements.set(this.listDepartementsSave().filter(d => d.departement.id==id)); 
-   }
+  filter(id: number){
+    this.listDepartements.set(this.listDepartementsSave().filter(d => d.departement.id == id)); 
+  }
 
-   resetFilter(){
+  resetFilter(){
     this.listDepartements.set(this.listDepartementsSave()); 
-   }
-
+  }
 }

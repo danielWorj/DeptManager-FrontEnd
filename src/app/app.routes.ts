@@ -107,7 +107,7 @@ export const routes: Routes = [
                     loadComponent: ()=>import('./Components/Website/page-filiere/page-filiere').then(f=>f.PageFiliere)
                 },
                 {
-                    path : 'recherche', 
+                    path : 'llm', 
                     loadComponent: ()=>import('./Components/Website/page-llm/page-llm').then(r=>r.PageLlm)
                 },
                 {

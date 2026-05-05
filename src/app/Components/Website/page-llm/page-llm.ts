@@ -25,6 +25,7 @@ export interface SuggestionCard {
   selector: 'app-ai-search',
   standalone: true,
   templateUrl: './page-llm.html',
+  styleUrls: ['./page-llm.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageLlm implements OnInit,AfterViewChecked {
@@ -224,4 +225,6 @@ export class PageLlm implements OnInit,AfterViewChecked {
       this.loadingInterval = undefined;
     }
   }
+
+  
 }
