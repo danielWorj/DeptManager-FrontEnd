@@ -303,44 +303,32 @@ export class DepartementC {
   getAllMedia(id: number): void {
     this.configService.getAllMediaByDepartement(id).subscribe({
       next: (data: Media[]) => {
-        // CORRECTIF BUG 3 : vider la map des URLs serveur (pas les ObjectURLs
-        // locaux qui sont déjà dans localObjectUrls). On reconstruit
-        // entièrement la map pour forcer de nouvelles SafeUrl avec cache-buster.
-        // On conserve les ObjectURLs locaux (id négatif temporaire) s'ils sont
-        // encore dans la liste (avant que le vrai id serveur arrive).
-        const localEntries = Array.from(this.mediaUrlMap.entries())
-          .filter(([k]) => k < 0);
-        this.mediaUrlMap.clear();
-        localEntries.forEach(([k, v]) => this.mediaUrlMap.set(k, v));
-
-        // Construire les SafeUrl pour tous les médias reçus du serveur,
-        // avec cache-buster unique par requête.
-        const ts = Date.now();
-        data.forEach(m => {
-          const safe = this.sanitizer.bypassSecurityTrustUrl(
-            `assets/file/${m.url}?t=${ts}`
-          );
-          this.mediaUrlMap.set(m.id, safe);
-        });
+        
 
         this.listMedia.set(data);
+        console.log('Médias chargés : ', data.length);
         this.mediaProfil.set(data.find(m => m.profil === true) ?? null);
 
-        // CORRECTIF BUG 1 : mettre à jour l'URL profil UNIQUEMENT si un média
-        // profil existe pour ce département. Sinon, conserver le placeholder.
-        const profil = data.find(m => m.profil === true);
-        if (profil) {
-          this.urlImage.set(this.mediaUrlMap.get(profil.id)!);
-        } else {
-          // Aucun profil → placeholder (évite d'afficher la photo du département précédent)
-          this.urlImage.set(this.PLACEHOLDER);
-        }
+        console.log('le media de profil est : ', this.mediaProfil());
+
+        // // CORRECTIF BUG 1 : mettre à jour l'URL profil UNIQUEMENT si un média
+        // // profil existe pour ce département. Sinon, conserver le placeholder.
+        // const profil = data.find(m => m.profil === true);
+        // if (profil) {
+        //   this.urlImage.set(this.mediaUrlMap.get(profil.id)!);
+        // } else {
+        //   // Aucun profil → placeholder (évite d'afficher la photo du département précédent)
+        //   this.urlImage.set(this.PLACEHOLDER);
+        // }
       },
       error: (err) => console.error('Erreur fetch médias', err),
     });
   }
 
   changerPhotoProfil(): void {
+    //alert("Changement de la photo de profil");
+
+    
     if (!this.selectedFile) return;
     this.mediaFb.patchValue({
       departement: this.idDept(),
@@ -363,6 +351,7 @@ export class DepartementC {
           this.getAllMedia(this.idDept());
           this.selectedFile = null;
           this.closeSubModal('photoProfilModal');
+          //alert("Photo de profil changée avec succès !");
         }
       },
       error: () => console.error('Erreur changement photo profil'),

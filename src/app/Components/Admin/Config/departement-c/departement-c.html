@@ -122,7 +122,7 @@
               <div class="col-md-3 d-flex align-items-stretch">
                 <div class="position-relative w-100" style="min-height: 240px;">
                   <img
-                    [src]="urlImage()"
+                    [src]="mediaProfil()?.url"
                     class="img-fluid rounded-start w-100 h-100"
                     style="object-fit: cover;"
                     [alt]="departementSelected()!.intitule"
@@ -246,7 +246,7 @@
                       <div class="col-6 col-md-3">
                         <div class="position-relative rounded overflow-hidden" style="height: 140px;">
                           <img
-                            [src]="getSafeMediaUrl(media)"
+                            [src]="media.url"
                             class="w-100 h-100"
                             style="object-fit: cover;"
                             [alt]="departementSelected()!.intitule"
