@@ -10,6 +10,7 @@ export const routes: Routes = [
         path : 'admin',
         loadComponent: ()=>import('./Components/LayoutAdmin/structure-layout-admin/structure-layout-admin').then(d=>d.StructureLayoutAdmin),
         canActivate : [AuthGuard],
+        data: { prerender: false },
         children : [
                 {
                     path: 'admin-dashboard', 
