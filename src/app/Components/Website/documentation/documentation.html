@@ -1,0 +1,495 @@
+<div class="doc-page">
+
+  <!-- ══════════════════════════════════════════════════
+       HERO
+  ══════════════════════════════════════════════════ -->
+  <section class="doc-hero">
+    <div class="doc-hero__pattern"></div>
+    <div class="doc-hero__glow"></div>
+    <div class="doc-hero__inner">
+      <div class="doc-hero__tag">
+        <span class="doc-hero__tag-line"></span>
+        Ressources Pédagogiques
+        <span class="doc-hero__tag-line"></span>
+      </div>
+      <h1 class="doc-hero__title">
+        Bibliothèque <em>Documentaire</em><br>de l'ENSET
+      </h1>
+      <p class="doc-hero__sub">
+        Accédez à l'ensemble des cours, TD, TP et examens classés<br>
+        par département, filière, niveau et année académique.
+      </p>
+      <!-- Compteur live -->
+      <div class="doc-hero__stats">
+        <div class="doc-hero__stat">
+          <span class="doc-hero__stat-num">{{ listDocument().length }}</span>
+          <span class="doc-hero__stat-lbl">Documents<br>disponibles</span>
+        </div>
+        <div class="doc-hero__stat">
+          <span class="doc-hero__stat-num">{{ listDepartement().length }}</span>
+          <span class="doc-hero__stat-lbl">Départements<br>couverts</span>
+        </div>
+        <div class="doc-hero__stat">
+          <span class="doc-hero__stat-num">{{ listTypeDocument().length }}</span>
+          <span class="doc-hero__stat-lbl">Types de<br>documents</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       FILTRES
+  ══════════════════════════════════════════════════ -->
+  <div class="doc-filters-shell">
+    <div class="doc-filters-card">
+
+      <!-- ── Badges type de document ── -->
+      <div class="doc-filters-card__types">
+        <span class="doc-filters-card__label">Type</span>
+        <div class="doc-type-badges">
+          <button
+            class="doc-type-badge"
+            [class.doc-type-badge--active]="activeType() === null"
+            (click)="filterByType(null)"
+            type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              width="12" height="12" style="flex-shrink:0">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            Tous
+          </button>
+          @for (type of listTypeDocument(); track type.id) {
+            <button
+              class="doc-type-badge"
+              [class.doc-type-badge--active]="activeType() === type.id"
+              (click)="filterByType(type.id)"
+              type="button">
+              {{ type.intitule }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- ── Barre de recherche + selects ── -->
+      <div class="doc-filters-card__body">
+
+        <!-- Recherche -->
+        <div class="doc-search-wrap">
+          <svg class="doc-search-wrap__icon" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.8" width="16" height="16">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            id="bkdoc-search-input"
+            class="doc-search-input"
+            type="text"
+            placeholder="Rechercher par matière, enseignant, type…"
+            (input)="onSearchInput($event)"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- Selects -->
+        <div class="doc-selects-grid">
+
+          <div class="doc-select-wrap">
+            <label class="doc-select-label" for="bkdoc-dep-select">Département</label>
+            <div class="doc-select-inner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                width="14" height="14" style="flex-shrink:0;color:#8896a8">
+                <rect x="2" y="7" width="20" height="14" rx="2"/>
+                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+              </svg>
+              <select id="bkdoc-dep-select" class="doc-select"
+                (change)="findDocumentationByDepartement($event)">
+                <option value="">Tous les départements</option>
+                @for (dep of listDepartement(); track dep.id) {
+                  <option [value]="dep.id">{{ dep.intitule }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="doc-select-wrap">
+            <label class="doc-select-label" for="bkdoc-fil-select">Filière</label>
+            <div class="doc-select-inner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                width="14" height="14" style="flex-shrink:0;color:#8896a8">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+              </svg>
+              <select id="bkdoc-fil-select" class="doc-select"
+                (change)="findDocumentByFiliere($event)">
+                <option value="">Toutes les filières</option>
+                @for (fil of listFiliereFiltered(); track fil.id) {
+                  <option [value]="fil.id">{{ fil.intitule }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="doc-select-wrap">
+            <label class="doc-select-label" for="bkdoc-niv-select">Niveau</label>
+            <div class="doc-select-inner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                width="14" height="14" style="flex-shrink:0;color:#8896a8">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+              <select id="bkdoc-niv-select" class="doc-select"
+                (change)="findDocumentByNiveau($event)">
+                <option value="">Tous les niveaux</option>
+                @for (niv of listNiveau(); track niv.id) {
+                  <option [value]="niv.id">{{ niv.intitule }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="doc-select-wrap">
+            <label class="doc-select-label" for="bkdoc-annee-select">Année académique</label>
+            <div class="doc-select-inner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                width="14" height="14" style="flex-shrink:0;color:#8896a8">
+                <rect x="3" y="4" width="18" height="18" rx="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              <select id="bkdoc-annee-select" class="doc-select"
+                (change)="findDocumentByAnnee($event)">
+                <option value="">Toutes les années</option>
+                @for (annee of listAnneeAcademique(); track annee.id) {
+                  <option [value]="annee.id">{{ annee.intitule }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="doc-select-wrap">
+            <label class="doc-select-label" for="bkdoc-ens-select">Enseignant</label>
+            <div class="doc-select-inner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                width="14" height="14" style="flex-shrink:0;color:#8896a8">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <select id="bkdoc-ens-select" class="doc-select"
+                (change)="findDocumentByEnseignant($event)">
+                <option value="">Tous les enseignants</option>
+                @for (ens of listEnseignant(); track ens.id) {
+                  <option [value]="ens.id">{{ ens.nom }} {{ ens.prenom }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <!-- Bouton reset -->
+          <div class="doc-select-wrap doc-select-wrap--reset">
+            <button class="doc-reset-btn" type="button" (click)="resetFilters()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" width="14" height="14" style="flex-shrink:0">
+                <polyline points="1 4 1 10 7 10"/>
+                <path d="M3.51 15a9 9 0 1 0 .49-3.14"/>
+              </svg>
+              Réinitialiser
+            </button>
+          </div>
+
+        </div>
+        <!-- /selects-grid -->
+
+      </div>
+      <!-- /body -->
+
+    </div>
+    <!-- /filters-card -->
+  </div>
+  <!-- /filters-shell -->
+
+
+  <!-- ══════════════════════════════════════════════════
+       CORPS — Liste des documents
+  ══════════════════════════════════════════════════ -->
+  <div class="doc-body">
+
+    <!-- Barre de résultats -->
+    <div class="doc-results-bar">
+      <p class="doc-results-bar__count">
+        <strong>{{ listDocument().length }}</strong>
+        document{{ listDocument().length > 1 ? 's' : '' }} trouvé{{ listDocument().length > 1 ? 's' : '' }}
+      </p>
+      @if (activeType() !== null) {
+        <div class="doc-active-filter">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            width="11" height="11" style="flex-shrink:0">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+          </svg>
+          {{ getActiveTypeLabel() }}
+          <button type="button" (click)="filterByType(null)" class="doc-active-filter__clear">✕</button>
+        </div>
+      }
+    </div>
+
+    <!-- ── État vide ── -->
+    @if (listDocument().length === 0) {
+      <div class="doc-empty">
+        <div class="doc-empty__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.2" width="32" height="32">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+        <h2 class="doc-empty__title">Aucun document trouvé</h2>
+        <p class="doc-empty__sub">Modifiez vos critères de recherche ou réinitialisez les filtres.</p>
+        <button class="doc-empty__btn enset-btn enset-btn--outline" type="button"
+          (click)="resetFilters()">
+          Réinitialiser les filtres
+        </button>
+      </div>
+    }
+
+    <!-- ── Grille de documents ── -->
+    @if (listDocument().length > 0) {
+      <div class="doc-grid">
+        @for (doc of listDocument(); track doc.id) {
+          <div class="doc-card" (click)="selectDocument(doc)">
+
+            <!-- Bandeau type -->
+            <div class="doc-card__type-band">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                width="13" height="13" style="flex-shrink:0">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+              {{ doc.typeDocument?.intitule ?? '—' }}
+            </div>
+
+            <!-- Corps -->
+            <div class="doc-card__body">
+              <h3 class="doc-card__matiere">{{ doc.matiere?.intitule ?? 'Matière non définie' }}</h3>
+
+              <div class="doc-card__meta">
+                <span class="doc-card__meta-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    width="11" height="11" style="flex-shrink:0">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                  {{ doc.enseignant?.nom ?? '' }} {{ doc.enseignant?.prenom ?? '—' }}
+                </span>
+                <span class="doc-card__meta-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    width="11" height="11" style="flex-shrink:0">
+                    <rect x="2" y="7" width="20" height="14" rx="2"/>
+                    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+                  </svg>
+                  {{ doc.departement?.intitule ?? '—' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="doc-card__footer">
+              <div class="doc-card__pills">
+                @if (doc.filiere?.intitule) {
+                  <span class="doc-pill doc-pill--filiere">{{ doc.filiere!.intitule }}</span>
+                }
+                @if (doc.niveau?.intitule) {
+                  <span class="doc-pill doc-pill--niveau">{{ doc.niveau!.intitule }}</span>
+                }
+                @if (doc.anneeAcademique?.intitule) {
+                  <span class="doc-pill doc-pill--annee">{{ doc.anneeAcademique!.intitule }}</span>
+                }
+              </div>
+              <span class="doc-card__date">{{ doc.dateC | date:'dd/MM/yyyy' }}</span>
+            </div>
+
+            <!-- Hover CTA -->
+            <div class="doc-card__hover-cta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                width="14" height="14" style="flex-shrink:0">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              Voir le détail
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+  <!-- /body -->
+
+
+  <!-- ══════════════════════════════════════════════════
+       PANNEAU DÉTAIL (drawer latéral)
+  ══════════════════════════════════════════════════ -->
+  @if (selectedDocument()) {
+    @let doc = selectedDocument()!;
+
+    <!-- Overlay -->
+    <div class="doc-overlay" (click)="closeDetail()"></div>
+
+    <!-- Drawer -->
+    <aside class="doc-drawer">
+
+      <!-- En-tête -->
+      <div class="doc-drawer__head">
+        <div>
+          <div class="doc-drawer__tag">
+            <span class="doc-drawer__tag-line"></span>
+            {{ doc.typeDocument?.intitule ?? 'Document' }}
+          </div>
+          <h2 class="doc-drawer__title">{{ doc.matiere?.intitule ?? 'Document' }}</h2>
+        </div>
+        <button class="doc-drawer__close" type="button" (click)="closeDetail()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            width="16" height="16">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Corps détail -->
+      <div class="doc-drawer__body">
+
+        <!-- Carte info principale -->
+        <div class="doc-drawer__info-card">
+          <div class="doc-info-row">
+            <div class="doc-info-row__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                width="15" height="15">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div>
+              <span class="doc-info-row__label">Enseignant</span>
+              <span class="doc-info-row__value">
+                {{ doc.enseignant?.nom ?? '' }} {{ doc.enseignant?.prenom ?? '—' }}
+              </span>
+            </div>
+          </div>
+          <div class="doc-info-row">
+            <div class="doc-info-row__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                width="15" height="15">
+                <rect x="2" y="7" width="20" height="14" rx="2"/>
+                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+              </svg>
+            </div>
+            <div>
+              <span class="doc-info-row__label">Département</span>
+              <span class="doc-info-row__value">{{ doc.departement?.intitule ?? '—' }}</span>
+            </div>
+          </div>
+          <div class="doc-info-row">
+            <div class="doc-info-row__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                width="15" height="15">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+              </svg>
+            </div>
+            <div>
+              <span class="doc-info-row__label">Filière</span>
+              <span class="doc-info-row__value">{{ doc.filiere?.intitule ?? '—' }}</span>
+            </div>
+          </div>
+          <div class="doc-info-row">
+            <div class="doc-info-row__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                width="15" height="15">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+            </div>
+            <div>
+              <span class="doc-info-row__label">Niveau</span>
+              <span class="doc-info-row__value">{{ doc.niveau?.intitule ?? '—' }}</span>
+            </div>
+          </div>
+          <div class="doc-info-row">
+            <div class="doc-info-row__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                width="15" height="15">
+                <rect x="3" y="4" width="18" height="18" rx="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <div>
+              <span class="doc-info-row__label">Année académique</span>
+              <span class="doc-info-row__value">{{ doc.anneeAcademique?.intitule ?? '—' }}</span>
+            </div>
+          </div>
+          <div class="doc-info-row">
+            <div class="doc-info-row__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                width="15" height="15">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div>
+              <span class="doc-info-row__label">Date d'ajout</span>
+              <span class="doc-info-row__value">{{ doc.dateC | date:'dd MMMM yyyy' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aperçu PDF (si URL disponible) -->
+        @if (doc.url) {
+          <div class="doc-drawer__preview">
+            <p class="doc-drawer__preview-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                width="13" height="13">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+              Aperçu du document
+            </p>
+            <div class="doc-drawer__pdf-wrap">
+              <iframe
+                [src]="getSafeUrl(doc.url)"
+                class="doc-drawer__iframe"
+                title="Aperçu PDF">
+              </iframe>
+            </div>
+          </div>
+        }
+
+      </div>
+      <!-- /drawer body -->
+
+      <!-- Footer actions -->
+      <div class="doc-drawer__footer">
+        <a [href]="doc.url" target="_blank" rel="noopener"
+          class="enset-btn enset-btn--primary doc-drawer__dl-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            width="15" height="15" style="flex-shrink:0">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Télécharger
+        </a>
+        <button class="enset-btn enset-btn--outline" type="button" (click)="closeDetail()">
+          Fermer
+        </button>
+      </div>
+
+    </aside>
+    <!-- /drawer -->
+  }
+
+</div>
+<!-- /doc-page -->

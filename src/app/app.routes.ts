@@ -114,6 +114,10 @@ export const routes: Routes = [
                     path : 'pole-formation', 
                     loadComponent: ()=>import('./Components/Website/pole-formation/pole-formation').then(r=>r.PoleFormation)
                 },
+                {
+                    path : 'documentation', 
+                    loadComponent: ()=>import('./Components/Website/documentation/documentation').then(r=>r.DocumentationC)
+                },
                 // {
                 //     path : 'departements/:id', 
                 //     loadComponent: ()=>import('./Components/Website/page-departement/page-departement').then(c=>c.PageDepartement)
