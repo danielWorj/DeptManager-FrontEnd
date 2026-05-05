@@ -1,0 +1,10 @@
+  .enset-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .enset-mobile-nav__body ul li a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }

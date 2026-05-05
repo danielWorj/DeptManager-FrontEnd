@@ -19,38 +19,84 @@
 
       <!-- Menu -->
       <ul class="enset-nav-menu">
+
         <li class="enset-nav-item">
-          <a routerLink="landing-page" routerLinkActive="active" class="enset-nav-link">À Propos <span class="enset-nav-caret">▼</span></a>
-          <div class="enset-dropdown">
-            <a href="https://enset-douala.cm/bienvenue/">Mot de bienvenue <span>→</span></a>
-            <a href="https://enset-douala.cm/a-propos/">Présentation <span>→</span></a>
-            <a href="https://enset-douala.cm/organigramme-enset/">Organigramme <span>→</span></a>
-          </div>
+          <a routerLink="landing-page" routerLinkActive="active" class="enset-nav-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              style="flex-shrink:0">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Accueil
+          </a>
         </li>
+
         <li class="enset-nav-item">
-          <a routerLink="departements" routerLinkActive="active" class="enset-nav-link">Départements <span class="enset-nav-caret">▼</span></a>
-          
+          <a routerLink="pole-formation" routerLinkActive="active" class="enset-nav-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              style="flex-shrink:0">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+            Pôles de Formation
+          </a>
         </li>
+
         <li class="enset-nav-item">
-          <a routerLink="pole-formation" routerLinkActive="active" class="enset-nav-link">Pôles de Formation</a>
+          <a routerLink="llm" routerLinkActive="active" class="enset-nav-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              style="flex-shrink:0">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            Recherche
+          </a>
         </li>
-        <!-- <li class="enset-nav-item">
-          <a routerLink="recherche" routerLinkActive="active" class="enset-nav-link">Recherche <span class="enset-nav-caret">▼</span></a>
-          <div class="enset-dropdown">
-            <a href="#">Laboratoires & Unités <span>→</span></a>
-            <a href="#">Publications scientifiques <span>→</span></a>
-            <a href="#">Projets en cours <span>→</span></a>
-          </div>
-        </li> -->
+
         <li class="enset-nav-item">
-          <a routerLink="llm" routerLinkActive="active" class="enset-nav-link">Recherche</a>
+          <a routerLink="blog" routerLinkActive="active" class="enset-nav-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              style="flex-shrink:0">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            Blog
+          </a>
         </li>
+
         <li class="enset-nav-item">
-          <a routerLink="blog" routerLinkActive="active" class="enset-nav-link">Blog</a>
+          <a routerLink="contact" routerLinkActive="active" class="enset-nav-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              style="flex-shrink:0">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            Contacts
+          </a>
         </li>
+
         <li class="enset-nav-item">
-          <a routerLink="contact" routerLinkActive="active" class="enset-nav-link">Contacts</a>
+          <a routerLink="departements" routerLinkActive="active" class="enset-nav-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              style="flex-shrink:0">
+              <rect x="2" y="7" width="20" height="14" rx="2"/>
+              <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+              <line x1="12" y1="12" x2="12" y2="16"/>
+              <line x1="10" y1="14" x2="14" y2="14"/>
+            </svg>
+            Départements
+          </a>
         </li>
+
       </ul>
 
       <!-- Actions -->
@@ -90,13 +136,82 @@
   </div>
   <div class="enset-mobile-nav__body">
     <ul>
-      <li><a href="https://enset-douala.cm/a-propos/">À Propos</a></li>
-      <li><a href="https://enset-douala.cm/enseignements-scientifiques-de-base-esb-2/">Départements</a></li>
-      <li><a href="https://enset-douala.cm/poles-de-formation/">Pôles de Formation</a></li>
-      <li><a href="#">Recherche</a></li>
-      <li><a href="https://enset-douala.cm/vie-etudiant/">Vie Étudiante</a></li>
-      <li><a href="https://enset-douala.cm/actualites-blog/">Blog & Actualités</a></li>
-      <li><a href="https://enset-douala.cm/contact/">Contacts</a></li>
+      <li>
+        <a href="https://enset-douala.cm/a-propos/">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+          À Propos
+        </a>
+      </li>
+      <li>
+        <a href="https://enset-douala.cm/enseignements-scientifiques-de-base-esb-2/">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2"/>
+            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+            <line x1="12" y1="12" x2="12" y2="16"/>
+            <line x1="10" y1="14" x2="14" y2="14"/>
+          </svg>
+          Départements
+        </a>
+      </li>
+      <li>
+        <a href="https://enset-douala.cm/poles-de-formation/">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+          Pôles de Formation
+        </a>
+      </li>
+      <li>
+        <a href="#">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Recherche
+        </a>
+      </li>
+      <li>
+        <a href="https://enset-douala.cm/vie-etudiant/">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          Vie Étudiante
+        </a>
+      </li>
+      <li>
+        <a href="https://enset-douala.cm/actualites-blog/">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          Blog & Actualités
+        </a>
+      </li>
+      <li>
+        <a href="https://enset-douala.cm/contact/">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          Contacts
+        </a>
+      </li>
     </ul>
   </div>
   <div class="enset-mobile-nav__footer">
@@ -107,3 +222,4 @@
     </a>
   </div>
 </div>
+
