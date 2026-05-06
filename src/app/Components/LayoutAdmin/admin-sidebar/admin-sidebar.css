@@ -1,0 +1,65 @@
+/* ═══════════════════════════════════════════════
+   MENU ITEM — État actif (clic ou route active)
+═══════════════════════════════════════════════ */
+.menu-link.active {
+  background-color: #696cff !important;
+  border-radius: 6px;
+  color: #ffffff !important;
+}
+
+/* Icône active */
+.menu-link.active .menu-icon {
+  color: #ffffff !important;
+}
+
+/* Texte actif */
+.menu-link.active div {
+  color: #ffffff !important;
+}
+
+/* ═══════════════════════════════════════════════
+   MENU ITEM — Survol (hover)
+═══════════════════════════════════════════════ */
+.menu-link:hover {
+  background-color: rgba(105, 108, 255, 0.12) !important;
+  border-radius: 6px;
+  color: #696cff !important;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.menu-link:hover .menu-icon {
+  color: #696cff !important;
+}
+
+.menu-link:hover div {
+  color: #696cff !important;
+}
+
+/* ═══════════════════════════════════════════════
+   Priorité : actif prend le dessus sur hover
+═══════════════════════════════════════════════ */
+.menu-link.active:hover {
+  background-color: #696cff !important;
+  color: #ffffff !important;
+}
+
+.menu-link.active:hover .menu-icon,
+.menu-link.active:hover div {
+  color: #ffffff !important;
+}
+
+/* ═══════════════════════════════════════════════
+   Transition douce sur tous les liens
+═══════════════════════════════════════════════ */
+.menu-link {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* ═══════════════════════════════════════════════
+   En-têtes de sections (non cliquables)
+═══════════════════════════════════════════════ */
+.menu-header-text {
+  font-size: 0.70rem;
+  letter-spacing: 0.08em;
+  color: #a1acb8;
+}

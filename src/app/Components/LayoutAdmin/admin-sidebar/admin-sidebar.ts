@@ -9,13 +9,17 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
 })
 export class AdminSidebar {
 
-  // ✅ Émet un événement vers le layout parent pour fermer le sidebar
   @Output() closeSidebar = new EventEmitter<void>();
 
   role = signal<number>(0);
+  activeItem = signal<string>('');
 
   constructor() {
     // this.role.set(parseInt(sessionStorage.getItem('role')!) ?? 0);
     this.role.set(0);
+  }
+
+  setActive(item: string) {
+    this.activeItem.set(item);
   }
 }
