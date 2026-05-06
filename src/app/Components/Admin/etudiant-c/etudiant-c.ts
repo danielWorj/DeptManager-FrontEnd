@@ -13,7 +13,6 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angul
 import { ResponseServer } from '../../../Core/Model/Server/ResponseServer';
 import { DatePipe } from '@angular/common';
 import { AnneeAcademique } from '../../../Core/Model/Scolarite/anneeacademique';
-//  Suppression de l'import inutilisé : "sign" from 'crypto'
 
 @Component({
   selector: 'app-etudiant-c',
@@ -25,7 +24,6 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
 
   etudiantForm!: FormGroup;
 
-  //  Instances Chart stockées pour éviter les duplications et fuites mémoire
   private chartInstance:    Chart | null = null;
   private doughnutInstance: Chart | null = null;
 
@@ -35,42 +33,44 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
     private utilisateurService: UtilisateurService
   ) {
     this.etudiantForm = this.fb.group({
-      id:          new FormControl(),
-      nom:         new FormControl(),
-      prenom:      new FormControl(),
+      id:           new FormControl(),
+      nom:          new FormControl(),
+      prenom:       new FormControl(),
       dateCreation: new FormControl(),
-      email:       new FormControl(),
-      telephone:   new FormControl(),
-      password:    new FormControl(),
-      role:        new FormControl(),
-      status:      new FormControl(),
-      photo:       new FormControl(),
-      matricule:   new FormControl(),
-      filiere:     new FormControl(),
-      niveau:      new FormControl(),
-      anneeAcademique : new FormControl(), 
+      email:        new FormControl(),
+      telephone:    new FormControl(),
+      password:     new FormControl(),
+      role:         new FormControl(),
+      status:       new FormControl(),
+      photo:        new FormControl(),
+      matricule:    new FormControl(),
+      filiere:      new FormControl(),
+      niveau:       new FormControl(),
+      anneeAcademique: new FormControl(),
     });
 
     this.loadPage();
   }
 
-  //  Destruction des charts quand le composant est détruit
   ngOnDestroy(): void {
     this.chartInstance?.destroy();
     this.doughnutInstance?.destroy();
   }
 
-  //  Les charts sont dessinés dès que la vue est prête
   ngAfterViewInit(): void {
-    // Petit délai pour laisser les données arriver avant de tracer les charts
     setTimeout(() => this.getStats(), 300);
   }
 
-  //  Signals 
+  // ─── États de chargement ─────────────────────────────────────────────────
+
+  /** Contrôle les cards KPI, le tableau et les graphiques */
+  loadingEtudiants = signal(true);
+
+  // ─── Signals ─────────────────────────────────────────────────────────────
+
   listEtudiant          = signal<Etudiant[]>([]);
   listEtudiantSave      = signal<Etudiant[]>([]);
   listDepartement       = signal<Departement[]>([]);
-  //  Signal séparé pour la liste filtrée des filières (par département)
   listFiliereFiltered   = signal<Filiere[]>([]);
   listFiliere           = signal<Filiere[]>([]);
   listNiveau            = signal<Niveau[]>([]);
@@ -80,7 +80,8 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
   labelNiveau               = signal<string[]>([]);
   numberEtudiantParNiveau   = signal<number[]>([]);
 
-  // ── Métriques pour les cards (status est un string côté API) ──
+  // ─── Métriques cards ─────────────────────────────────────────────────────
+
   get totalEtudiants(): number {
     return this.listEtudiantSave().length;
   }
@@ -91,7 +92,7 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
     return this.listEtudiantSave().filter(e => e.status !== 'true' && (e.status as unknown) !== true).length;
   }
 
-  //  Chargement 
+  // ─── Chargement ──────────────────────────────────────────────────────────
 
   loadPage(): void {
     this.getAllETudiant();
@@ -102,15 +103,18 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
   }
 
   getAllETudiant(): void {
+    this.loadingEtudiants.set(true);
     this.utilisateurService.getAllEtudiant().subscribe({
       next: (data: Etudiant[]) => {
         this.listEtudiant.set(data);
-        //  On alimente listEtudiantSave qui était vide — les filtres ne fonctionnaient pas sans ça
         this.listEtudiantSave.set(data);
-        //  Mise à jour des charts à chaque rechargement de la liste
+        this.loadingEtudiants.set(false);
         setTimeout(() => this.getStats(), 0);
       },
-      error: () => console.error('Fetch list etudiant : failed'),
+      error: () => {
+        console.error('Fetch list etudiant : failed');
+        this.loadingEtudiants.set(false);
+      },
     });
   }
 
@@ -139,7 +143,6 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
     this.configService.getAllFiliere().subscribe({
       next: (data: Filiere[]) => {
         this.listFiliere.set(data);
-        //  On initialise aussi la liste filtrée avec toutes les filières
         this.listFiliereFiltered.set(data);
       },
       error: () => console.error('Fetch list filiere : failed'),
@@ -153,37 +156,34 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
     });
   }
 
-  listAnnee = signal<AnneeAcademique[]>([]); 
-  getAllAneeAcademique() : void{
+  listAnnee = signal<AnneeAcademique[]>([]);
+  getAllAneeAcademique(): void {
     this.configService.getAllAnneeAcademique().subscribe({
       next: (data: AnneeAcademique[]) => {
-        this.listAnnee.set(data); 
-        this.getAnneeActive(); 
+        this.listAnnee.set(data);
+        this.getAnneeActive();
       },
-      error: () => console.error('Fetch list niveau : failed'),
+      error: () => console.error('Fetch list annee : failed'),
     });
   }
 
-  anneeActive = signal<AnneeAcademique | null >(null); 
-  getAnneeActive(){
-
+  anneeActive = signal<AnneeAcademique | null>(null);
+  getAnneeActive(): void {
     this.anneeActive.set(this.listAnnee().find(a => a.status) ?? null);
-    
   }
 
-  //  Filtres 
+  // ─── Filtres ─────────────────────────────────────────────────────────────
+
   findEtudiantByDepartement(event: Event): void {
     const idD = Number((event.target as HTMLSelectElement).value);
     if (!idD) {
       this.listEtudiant.set(this.listEtudiantSave());
-      //  Réinitialise aussi la liste des filières filtrées
       this.listFiliereFiltered.set(this.listFiliere());
       return;
     }
     this.listEtudiant.set(
       this.listEtudiantSave().filter(e => e.filiere?.departement?.id === idD)
     );
-    //  Filtre les filières selon le département sélectionné
     this.filterFiliereForDepartement(idD);
   }
 
@@ -209,11 +209,6 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
     );
   }
 
-  /**
-   *  Correction majeure : l'ancienne version filtrait listFiliere() sur f.id === idD
-   * ce qui comparait l'id de la filière avec l'id du département — toujours faux.
-   * On filtre maintenant sur f.departement?.id === idD
-   */
   filterFiliereForDepartement(idD: number): void {
     if (!idD) {
       this.listFiliereFiltered.set(this.listFiliere());
@@ -224,7 +219,7 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
     );
   }
 
-  //  Formulaire 
+  // ─── Formulaire ──────────────────────────────────────────────────────────
 
   refreshPage(): void {
     this.getAllETudiant();
@@ -253,8 +248,7 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
     });
   }
 
-
-  //  Détail étudiant 
+  // ─── Détail étudiant ─────────────────────────────────────────────────────
 
   selectedEtudiant = signal<Etudiant | null>(null);
 
@@ -266,20 +260,17 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
     this.selectedEtudiant.set(null);
   }
 
-  //  Stats 
+  // ─── Stats ───────────────────────────────────────────────────────────────
+
   getStats(): void {
     this.constructData();
     this.graphEvolutionEtudiantByFiliere();
-
     this.constructDataNiveau();
     this.graphEtudiantParNiveau();
   }
 
-  //  Chart Line : étudiants par filière 
-
   constructData(): void {
     const etudiants = this.listEtudiantSave();
-
     const unique = new Map<number, string>();
     etudiants.forEach(e => {
       if (e.filiere && !unique.has(e.filiere.id)) {
@@ -288,7 +279,6 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
     });
     this.labelFiliere.set(Array.from(unique.values()));
 
-    //  Correction : on indexait par abreviation mais on comptait par intitule — incohérence corrigée
     const compteur = new Map<string, number>();
     etudiants.forEach(e => {
       if (e.filiere) {
@@ -296,7 +286,6 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
         compteur.set(key, (compteur.get(key) ?? 0) + 1);
       }
     });
-
     this.numberEtudiant.set(
       this.labelFiliere().map(label => compteur.get(label) ?? 0)
     );
@@ -347,12 +336,8 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
     });
   }
 
-  //  Chart Doughnut : étudiants par niveau 
-
-  //  Renommée constructDataPoste → constructDataNiveau (nom cohérent avec le contexte étudiant)
   constructDataNiveau(): void {
     const etudiants = this.listEtudiantSave();
-
     const unique = new Map<number, string>();
     etudiants.forEach(e => {
       if (e.niveau && !unique.has(e.niveau.id)) {
@@ -368,13 +353,11 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
         compteur.set(intitule, (compteur.get(intitule) ?? 0) + 1);
       }
     });
-
     this.numberEtudiantParNiveau.set(
       this.labelNiveau().map(label => compteur.get(label) ?? 0)
     );
   }
 
-  //  Renommée graphEnseignantParPoste → graphEtudiantParNiveau (nom cohérent)
   graphEtudiantParNiveau(): void {
     const canvas = document.getElementById('doughnutChart') as HTMLCanvasElement | null;
     if (!canvas) { console.error('Canvas #doughnutChart introuvable'); return; }
@@ -396,7 +379,6 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
       data: {
         labels: this.labelNiveau(),
         datasets: [{
-          //  Label corrigé : "Enseignants par poste" → "Étudiants par niveau"
           label: "Étudiants par niveau",
           data: this.numberEtudiantParNiveau(),
           backgroundColor: colors.slice(0, this.labelNiveau().length),

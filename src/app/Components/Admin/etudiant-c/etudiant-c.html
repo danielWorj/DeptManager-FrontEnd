@@ -2,6 +2,7 @@
 
     <!-- ===== CARDS MÉTRIQUES ===== -->
     <div class="row mb-4">
+
         <!-- Card 1 : Total étudiants -->
         <div class="col-lg-4 col-md-6 col-12 mb-4">
             <div class="card h-100">
@@ -14,13 +15,21 @@
                         </div>
                         <span class="badge bg-label-primary rounded-pill">Total</span>
                     </div>
-                    <h2 class="card-title mb-1 fw-bold text-primary">
-                        {{ totalEtudiants }}
-                    </h2>
-                    <p class="mb-0 text-muted fw-semibold">Total Étudiants</p>
-                    <small class="text-body-secondary">
-                        <i class="bx bx-group me-1"></i>Tous les étudiants enregistrés
-                    </small>
+
+                    @if (loadingEtudiants()) {
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Chargement…</span>
+                            </div>
+                            <small class="text-muted">Chargement…</small>
+                        </div>
+                    } @else {
+                        <h2 class="card-title mb-1 fw-bold text-primary">{{ totalEtudiants }}</h2>
+                        <p class="mb-0 text-muted fw-semibold">Total Étudiants</p>
+                        <small class="text-body-secondary">
+                            <i class="bx bx-group me-1"></i>Tous les étudiants enregistrés
+                        </small>
+                    }
                 </div>
             </div>
         </div>
@@ -37,13 +46,21 @@
                         </div>
                         <span class="badge bg-label-success rounded-pill">Actifs</span>
                     </div>
-                    <h2 class="card-title mb-1 fw-bold text-success">
-                        {{ totalActifs }}
-                    </h2>
-                    <p class="mb-0 text-muted fw-semibold">Étudiants Actifs</p>
-                    <small class="text-body-secondary">
-                        <i class="bx bx-check-circle me-1"></i>Comptes actuellement actifs
-                    </small>
+
+                    @if (loadingEtudiants()) {
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <div class="spinner-border spinner-border-sm text-success" role="status">
+                                <span class="visually-hidden">Chargement…</span>
+                            </div>
+                            <small class="text-muted">Chargement…</small>
+                        </div>
+                    } @else {
+                        <h2 class="card-title mb-1 fw-bold text-success">{{ totalActifs }}</h2>
+                        <p class="mb-0 text-muted fw-semibold">Étudiants Actifs</p>
+                        <small class="text-body-secondary">
+                            <i class="bx bx-check-circle me-1"></i>Comptes actuellement actifs
+                        </small>
+                    }
                 </div>
             </div>
         </div>
@@ -60,19 +77,27 @@
                         </div>
                         <span class="badge bg-label-danger rounded-pill">Inactifs</span>
                     </div>
-                    <h2 class="card-title mb-1 fw-bold text-danger">
-                        {{ totalInactifs }}
-                    </h2>
-                    <p class="mb-0 text-muted fw-semibold">Étudiants Non Actifs</p>
-                    <small class="text-body-secondary">
-                        <i class="bx bx-x-circle me-1"></i>Comptes désactivés ou en attente
-                    </small>
+
+                    @if (loadingEtudiants()) {
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <div class="spinner-border spinner-border-sm text-danger" role="status">
+                                <span class="visually-hidden">Chargement…</span>
+                            </div>
+                            <small class="text-muted">Chargement…</small>
+                        </div>
+                    } @else {
+                        <h2 class="card-title mb-1 fw-bold text-danger">{{ totalInactifs }}</h2>
+                        <p class="mb-0 text-muted fw-semibold">Étudiants Non Actifs</p>
+                        <small class="text-body-secondary">
+                            <i class="bx bx-x-circle me-1"></i>Comptes désactivés ou en attente
+                        </small>
+                    }
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== CHARTS VISIBLES AU CHARGEMENT ===== -->
+    <!-- ===== CHARTS ===== -->
     <div class="card mb-4">
         <div class="card-header d-flex align-items-center">
             <i class="bx bx-bar-chart-alt-2 me-2 text-primary fs-5"></i>
@@ -80,18 +105,45 @@
         </div>
         <div class="card-body">
             <div class="row">
+
+                <!-- Chart ligne : par filière -->
                 <div class="col-md-8">
                     <p class="fw-semibold text-muted mb-2">
                         <i class="bx bx-line-chart me-1"></i>Répartition par filière
                     </p>
-                    <canvas id="myChart"></canvas>
+                    @if (loadingEtudiants()) {
+                        <div class="d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <div class="text-center text-muted">
+                                <div class="spinner-border text-primary mb-2" role="status">
+                                    <span class="visually-hidden">Chargement…</span>
+                                </div>
+                                <div style="font-size: .8rem;">Chargement du graphique…</div>
+                            </div>
+                        </div>
+                    } @else {
+                        <canvas id="myChart"></canvas>
+                    }
                 </div>
+
+                <!-- Chart doughnut : par niveau -->
                 <div class="col-md-4">
                     <p class="fw-semibold text-muted mb-2">
                         <i class="bx bx-doughnut-chart me-1"></i>Répartition par niveau
                     </p>
-                    <canvas id="doughnutChart"></canvas>
+                    @if (loadingEtudiants()) {
+                        <div class="d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <div class="text-center text-muted">
+                                <div class="spinner-border text-primary mb-2" role="status">
+                                    <span class="visually-hidden">Chargement…</span>
+                                </div>
+                                <div style="font-size: .8rem;">Chargement…</div>
+                            </div>
+                        </div>
+                    } @else {
+                        <canvas id="doughnutChart"></canvas>
+                    }
                 </div>
+
             </div>
         </div>
     </div>
@@ -113,7 +165,7 @@
 
                 <div class="row mb-3">
                     <div class="col-md-12">
-                       <div class="row">
+                        <div class="row">
                             <div class="col-md-3 mb-3">
                                 <div class="input-group">
                                     <label class="input-group-text" for="selectDepartement">Departement</label>
@@ -152,7 +204,7 @@
                                     <i class="bx bx-refresh"></i>
                                 </button>
                             </div>
-                       </div>
+                        </div>
                     </div>
                 </div>
 
@@ -175,36 +227,56 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @for (e of listEtudiant(); track e.matricule) {
+                            @if (loadingEtudiants()) {
                                 <tr>
-                                    <td>{{e.matricule}}</td>
-                                    <td>{{e.nom}} {{e.prenom}}</td>
-                                    <td>{{e.email}}</td>
-                                    <td>{{e.telephone}}</td>
-                                    <td>{{e.filiere?.abreviation}}</td>
-                                    <td>
-                                        @if (e.status) {
-                                            <span class="badge bg-label-success">Actif</span>
-                                        } @else {
-                                            <span class="badge bg-label-danger">Non Actif</span>
-                                        }
-                                    </td>
-                                    <td class="text-start">
-                                        <button class="btn btn-sm btn-icon btn-outline-info me-1"
-                                                (click)="selectEtudiant(e)"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#detailModal">
-                                            <i class="bx bx-user-pin"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-icon btn-outline-primary me-1"
-                                            (click)="etudiantForm.patchValue(e)" data-bs-toggle="modal" data-bs-target="#basicModal2">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-icon btn-outline-danger">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                                    <td colspan="7" class="text-center py-5">
+                                        <div class="spinner-border text-primary mb-2" role="status">
+                                            <span class="visually-hidden">Chargement…</span>
+                                        </div>
+                                        <div class="text-muted" style="font-size: .85rem;">
+                                            Chargement des étudiants…
+                                        </div>
                                     </td>
                                 </tr>
+                            } @else if (listEtudiant().length === 0) {
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">
+                                        <i class="bx bx-user-x fs-3 d-block mb-1"></i>
+                                        Aucun étudiant trouvé
+                                    </td>
+                                </tr>
+                            } @else {
+                                @for (e of listEtudiant(); track e.matricule) {
+                                    <tr>
+                                        <td>{{e.matricule}}</td>
+                                        <td>{{e.nom}} {{e.prenom}}</td>
+                                        <td>{{e.email}}</td>
+                                        <td>{{e.telephone}}</td>
+                                        <td>{{e.filiere?.abreviation}}</td>
+                                        <td>
+                                            @if (e.status) {
+                                                <span class="badge bg-label-success">Actif</span>
+                                            } @else {
+                                                <span class="badge bg-label-danger">Non Actif</span>
+                                            }
+                                        </td>
+                                        <td class="text-start">
+                                            <button class="btn btn-sm btn-icon btn-outline-info me-1"
+                                                    (click)="selectEtudiant(e)"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#detailModal">
+                                                <i class="bx bx-user-pin"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-icon btn-outline-primary me-1"
+                                                (click)="etudiantForm.patchValue(e)" data-bs-toggle="modal" data-bs-target="#basicModal2">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-icon btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
                             }
                         </tbody>
                     </table>
@@ -258,8 +330,8 @@
                         <div class="divider-text">Administration</div>
                     </div>
                     <div class="col-md-12 mb-3">
-                          <label for="anneeActive" class="form-label">Annee Academique (Active)</label>
-                          <input type="text" class="form-control text-primary" id="anneeActive" [value]="anneeActive()!.intitule" readonly/>
+                        <label for="anneeActive" class="form-label">Annee Academique (Active)</label>
+                        <input type="text" class="form-control text-primary" id="anneeActive" [value]="anneeActive()!.intitule" readonly/>
                     </div>
                     <div class="col-md-6 mb-3">
                         <div class="input-group">

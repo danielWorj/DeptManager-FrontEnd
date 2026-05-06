@@ -24,8 +24,7 @@ export class EnseignantsC implements OnDestroy {
 
   enseignantForm!: FormGroup;
 
-  //  Référence au chart pour éviter les duplications lors des re-renders
-  private chartInstance: Chart | null = null;
+  private chartInstance:    Chart | null = null;
   private doughnutInstance: Chart | null = null;
 
   constructor(
@@ -34,79 +33,84 @@ export class EnseignantsC implements OnDestroy {
     private utilisateurService: UtilisateurService
   ) {
     this.enseignantForm = this.fb.group({
-      id: new FormControl(),
-      nom: new FormControl(),
-      prenom: new FormControl(),
+      id:           new FormControl(),
+      nom:          new FormControl(),
+      prenom:       new FormControl(),
       dateCreation: new FormControl(),
-      email: new FormControl(),
-      password: new FormControl(),
-      telephone: new FormControl(),
-      role: new FormControl(),
-      status: new FormControl(),
-      poste: new FormControl(),
-      photo: new FormControl(),
-      departement: new FormControl(),
+      email:        new FormControl(),
+      password:     new FormControl(),
+      telephone:    new FormControl(),
+      role:         new FormControl(),
+      status:       new FormControl(),
+      poste:        new FormControl(),
+      photo:        new FormControl(),
+      departement:  new FormControl(),
     });
 
     this.loadPage();
   }
 
-  loadPage() {
+  loadPage(): void {
     this.getAllEnseignant();
     this.getAllDepartement();
     this.getAllPoste();
   }
 
-  //  Destruction du chart pour éviter les fuites mémoire
   ngOnDestroy(): void {
     this.chartInstance?.destroy();
     this.doughnutInstance?.destroy();
   }
 
-  // ─── Signals ───────────────────────────────────────────────────────────────
+  // ─── État de chargement ───────────────────────────────────────────────────
 
-  listEnseignant       = signal<Enseignant[]>([]);
-  listEnseignantSave   = signal<Enseignant[]>([]);
-  listNiveau           = signal<Niveau[]>([]);
-  listFiliere          = signal<Filiere[]>([]);
-  listDepartemet       = signal<Departement[]>([]);
-  listPoste            = signal<Poste[]>([]);
-  labelDepartement     = signal<string[]>([]);
-  numberEnseignant     = signal<number[]>([]);
-  labelPoste           = signal<string[]>([]);
+  /** Contrôle les cards KPI, le tableau et les graphiques */
+  loadingEnseignants = signal(true);
+
+  // ─── Signals ─────────────────────────────────────────────────────────────
+
+  listEnseignant           = signal<Enseignant[]>([]);
+  listEnseignantSave       = signal<Enseignant[]>([]);
+  listNiveau               = signal<Niveau[]>([]);
+  listFiliere              = signal<Filiere[]>([]);
+  listDepartemet           = signal<Departement[]>([]);
+  listPoste                = signal<Poste[]>([]);
+  labelDepartement         = signal<string[]>([]);
+  numberEnseignant         = signal<number[]>([]);
+  labelPoste               = signal<string[]>([]);
   numberEnseignantParPoste = signal<number[]>([]);
 
-  // ─── Métriques calculées ───────────────────────────────────────────────────
+  // ─── Métriques calculées ─────────────────────────────────────────────────
 
-  /** Nombre total d'enseignants */
   totalEnseignants = computed(() => this.listEnseignantSave().length);
 
-  /** Nombre d'enseignants dont le statut est actif */
   enseignantsActifs = computed(() =>
     this.listEnseignantSave().filter(
       e => e.status === 'ACTIF' || (e.status as unknown) === true
     ).length
   );
 
-  /** Nombre d'enseignants non actifs */
   enseignantsNonActifs = computed(() =>
     this.totalEnseignants() - this.enseignantsActifs()
   );
 
-  // ─── Chargement des données ────────────────────────────────────────────────
+  // ─── Chargement des données ───────────────────────────────────────────────
 
   getAllEnseignant(): void {
+    this.loadingEnseignants.set(true);
     this.listEnseignant.set([]);
     this.utilisateurService.getAllEnseignant().subscribe({
       next: (data: Enseignant[]) => {
         this.listEnseignant.set(data);
         this.listEnseignantSave.set(data);
-        // Mise à jour automatique des graphiques dès que les données arrivent
+        this.loadingEnseignants.set(false);
         this.constructData();
         this.constructDataPoste();
         this.renderCharts();
       },
-      error: () => console.error('Fetch list enseignant : failed'),
+      error: () => {
+        console.error('Fetch list enseignant : failed');
+        this.loadingEnseignants.set(false);
+      },
     });
   }
 
@@ -138,7 +142,7 @@ export class EnseignantsC implements OnDestroy {
     });
   }
 
-  // ─── Filtres ───────────────────────────────────────────────────────────────
+  // ─── Filtres ─────────────────────────────────────────────────────────────
 
   findEnseignantByDepartement(event: Event): void {
     const idD = Number((event.target as HTMLSelectElement).value);
@@ -162,7 +166,7 @@ export class EnseignantsC implements OnDestroy {
     );
   }
 
-  // ─── Formulaire ────────────────────────────────────────────────────────────
+  // ─── Formulaire ──────────────────────────────────────────────────────────
 
   resetForm(): void {
     this.enseignantForm.reset();
@@ -184,12 +188,8 @@ export class EnseignantsC implements OnDestroy {
     });
   }
 
-  // ─── Graphiques ────────────────────────────────────────────────────────────
+  // ─── Graphiques ──────────────────────────────────────────────────────────
 
-  /**
-   * Appelé après chaque rechargement des données pour raffraîchir les deux charts.
-   * Utilise setTimeout pour s'assurer que le DOM est stable.
-   */
   private renderCharts(): void {
     setTimeout(() => {
       this.graphEvolutionEnseignantByDepartement();
@@ -215,7 +215,6 @@ export class EnseignantsC implements OnDestroy {
         compteur.set(intitule, (compteur.get(intitule) ?? 0) + 1);
       }
     });
-
     this.numberEnseignant.set(
       this.labelDepartement().map(label => compteur.get(label) ?? 0)
     );
@@ -239,7 +238,6 @@ export class EnseignantsC implements OnDestroy {
         compteur.set(intitule, (compteur.get(intitule) ?? 0) + 1);
       }
     });
-
     this.numberEnseignantParPoste.set(
       this.labelPoste().map(label => compteur.get(label) ?? 0)
     );
@@ -247,21 +245,13 @@ export class EnseignantsC implements OnDestroy {
 
   graphEvolutionEnseignantByDepartement(): void {
     const canvas = document.getElementById('myChart') as HTMLCanvasElement | null;
-    if (!canvas) {
-      console.error('Canvas #myChart introuvable dans le DOM');
-      return;
-    }
+    if (!canvas) { console.error('Canvas #myChart introuvable dans le DOM'); return; }
 
-    if (this.chartInstance) {
-      this.chartInstance.destroy();
-      this.chartInstance = null;
-    }
+    this.chartInstance?.destroy();
+    this.chartInstance = null;
 
     const ctx2d = canvas.getContext('2d');
-    if (!ctx2d) {
-      console.error('Impossible d\'obtenir le contexte 2D du canvas');
-      return;
-    }
+    if (!ctx2d) { console.error('Impossible d\'obtenir le contexte 2D du canvas'); return; }
 
     const gradient = ctx2d.createLinearGradient(0, 0, 0, 400);
     gradient.addColorStop(0, 'rgba(105, 108, 255, 0.4)');
@@ -300,21 +290,13 @@ export class EnseignantsC implements OnDestroy {
 
   graphEnseignantParPoste(): void {
     const canvas = document.getElementById('doughnutChart') as HTMLCanvasElement | null;
-    if (!canvas) {
-      console.error('Canvas #doughnutChart introuvable dans le DOM');
-      return;
-    }
+    if (!canvas) { console.error('Canvas #doughnutChart introuvable dans le DOM'); return; }
 
-    if (this.doughnutInstance) {
-      this.doughnutInstance.destroy();
-      this.doughnutInstance = null;
-    }
+    this.doughnutInstance?.destroy();
+    this.doughnutInstance = null;
 
     const ctx2d = canvas.getContext('2d');
-    if (!ctx2d) {
-      console.error('Impossible d\'obtenir le contexte 2D du canvas');
-      return;
-    }
+    if (!ctx2d) { console.error('Impossible d\'obtenir le contexte 2D du canvas'); return; }
 
     const colors = [
       '#696cff', '#ff6b6b', '#ffd93d',
@@ -341,10 +323,7 @@ export class EnseignantsC implements OnDestroy {
         plugins: {
           legend: {
             position: 'bottom',
-            labels: {
-              padding: 16,
-              font: { size: 13 },
-            },
+            labels: { padding: 16, font: { size: 13 } },
           },
           tooltip: {
             callbacks: {

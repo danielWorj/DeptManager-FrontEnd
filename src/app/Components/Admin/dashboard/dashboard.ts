@@ -43,6 +43,20 @@ export class Dashboard implements OnDestroy, AfterViewInit {
     this.chartEnseignant?.destroy();
   }
 
+  // ─── États de chargement ─────────────────────────────────────────────────
+
+  loadingEtudiants   = signal(true);
+  loadingEnseignants = signal(true);
+  loadingRequetes    = signal(true);
+  loadingDocuments   = signal(true);
+  loadingRepartitions = signal(true);
+  loadingHoraires    = signal(true);
+
+  /** True tant qu'au moins l'une des deux sources des graphiques horaires charge */
+  loadingCouverture = computed(() =>
+    this.loadingRepartitions() || this.loadingHoraires()
+  );
+
   // ─── Données brutes ───────────────────────────────────────────────────────
 
   listEtudiant   = signal<Etudiant[]>([]);
@@ -101,8 +115,6 @@ export class Dashboard implements OnDestroy, AfterViewInit {
 
   // ─── Données horaires & répartitions (rangée 4) ──────────────────────────
 
-  // ⚠️ Ces deux listes nécessitent d'exposer getAllRepartition() dans ScolariteService
-  // et getAllHoraire() dans HoraireService côté backend (endpoints sans filtre).
   listRepartition = signal<Repartition[]>([]);
   listHoraire     = signal<Horaire[]>([]);
 
@@ -125,10 +137,6 @@ export class Dashboard implements OnDestroy, AfterViewInit {
     return Math.round((this.repartitionsProgrammees().length / total) * 100);
   });
 
-  /**
-   * Couverture par filière : pour chaque filière présente dans les répartitions,
-   * calcule combien ont un horaire vs combien n'en ont pas.
-   */
   couvertureParFiliere = computed(() => {
     const map = new Map<string, { total: number; programmees: number }>();
     const idsAvecHoraire = new Set(this.listHoraire().map(h => h.repartition?.id));
@@ -156,42 +164,72 @@ export class Dashboard implements OnDestroy, AfterViewInit {
     this.utilisateurService.getAllEtudiant().subscribe({
       next: (data: Etudiant[]) => {
         this.listEtudiant.set(data);
+        this.loadingEtudiants.set(false);
         setTimeout(() => this.renderCharts(), 0);
       },
-      error: () => console.error('Dashboard — fetch étudiants : failed'),
+      error: () => {
+        console.error('Dashboard — fetch étudiants : failed');
+        this.loadingEtudiants.set(false);
+      },
     });
 
     this.utilisateurService.getAllEnseignant().subscribe({
       next: (data: Enseignant[]) => {
         this.listEnseignant.set(data);
+        this.loadingEnseignants.set(false);
         setTimeout(() => this.renderCharts(), 0);
       },
-      error: () => console.error('Dashboard — fetch enseignants : failed'),
+      error: () => {
+        console.error('Dashboard — fetch enseignants : failed');
+        this.loadingEnseignants.set(false);
+      },
     });
 
     this.scolariteService.getAllRequete().subscribe({
-      next: (data: Requete[]) => this.listRequete.set(data),
-      error: () => console.error('Dashboard — fetch requêtes : failed'),
+      next: (data: Requete[]) => {
+        this.listRequete.set(data);
+        this.loadingRequetes.set(false);
+      },
+      error: () => {
+        console.error('Dashboard — fetch requêtes : failed');
+        this.loadingRequetes.set(false);
+      },
     });
 
     this.scolariteService.getAllDocument().subscribe({
-      next: (data: Documentation[]) => this.listDocument.set(data),
-      error: () => console.error('Dashboard — fetch documents : failed'),
+      next: (data: Documentation[]) => {
+        this.listDocument.set(data);
+        this.loadingDocuments.set(false);
+      },
+      error: () => {
+        console.error('Dashboard — fetch documents : failed');
+        this.loadingDocuments.set(false);
+      },
     });
 
     // ⚠️ Requiert getAllRepartition() dans ScolariteService
     this.scolariteService.getAllRepartition().subscribe({
-      next: (data: Repartition[]) => this.listRepartition.set(data),
-      error: () => console.error('Dashboard — fetch répartitions : failed'),
+      next: (data: Repartition[]) => {
+        this.listRepartition.set(data);
+        this.loadingRepartitions.set(false);
+      },
+      error: () => {
+        console.error('Dashboard — fetch répartitions : failed');
+        this.loadingRepartitions.set(false);
+      },
     });
 
     // ⚠️ Requiert getAllHoraire() dans HoraireService
     this.horaireService.getAllHoraire().subscribe({
       next: (data: Horaire[]) => {
         this.listHoraire.set(data);
+        this.loadingHoraires.set(false);
         setTimeout(() => this.renderCharts(), 0);
       },
-      error: () => console.error('Dashboard — fetch horaires : failed'),
+      error: () => {
+        console.error('Dashboard — fetch horaires : failed');
+        this.loadingHoraires.set(false);
+      },
     });
   }
 
