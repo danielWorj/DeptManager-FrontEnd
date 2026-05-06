@@ -27,9 +27,13 @@ export class HoraireService {
     return this.http.get<Horaire>(DeptManager.Horaire.allByRepartition+id);
   }
 
-   getHoraireBySalleJourAndPeriode(idS:number, idJ:number , idP:number):Observable<Horaire>{
+  getHoraireBySalleJourAndPeriode(idS:number, idJ:number , idP:number):Observable<Horaire>{
     //console.log(DeptManager.Horaire.allBySalleJourAndPeriode+idS+'/'+idJ+'/'+idP)
     return this.http.get<Horaire>(DeptManager.Horaire.allBySalleJourAndPeriode+idS+'/'+idJ+'/'+idP);
+  }
+
+  getAllHoraire():Observable<Horaire[]>{
+    return this.http.get<Horaire[]>(DeptManager.Horaire.all);
   }
   createHoraire(request:any):Observable<ResponseServer>{
     return this.http.post<ResponseServer>(DeptManager.Horaire.create,request);

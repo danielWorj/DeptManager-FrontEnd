@@ -135,6 +135,10 @@ export class ScolariteService {
 
     //Repartition 
 
+    getAllRepartition():Observable<Repartition[]>{
+      return this.http.get<Repartition[]>(DeptManager.Scolarite.Repartition.all);
+    }
+
     getAllRepartitionByEnseignant(id:number):Observable<Repartition[]>{   
       return this.http.get<Repartition[]>(DeptManager.Scolarite.Repartition.allByEnseignant+id);
     }
