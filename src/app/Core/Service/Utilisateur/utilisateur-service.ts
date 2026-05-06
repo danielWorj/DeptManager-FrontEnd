@@ -41,6 +41,11 @@ export class UtilisateurService {
       return this.http.post<ResponseServer>(DeptManager.Utilisateur.Enseignant.update, request);
     }
 
+    deleteEnseignant(id:number):Observable<ResponseServer>{
+      return this.http.delete<ResponseServer>(DeptManager.Utilisateur.Etudiant.delete+id);
+    }
+
+
     //Etudiant
     getAllEtudiant():Observable<Etudiant[]>{
       return this.http.get<Etudiant[]>(DeptManager.Utilisateur.Etudiant.all); 
@@ -83,6 +88,10 @@ export class UtilisateurService {
 
     getEtudiantByID(id:number):Observable<Etudiant>{
       return this.http.get<Etudiant>(DeptManager.Utilisateur.Etudiant.byId+id); 
+    }
+
+    deleteEtudiant(id:number):Observable<ResponseServer>{
+      return this.http.delete<ResponseServer>(DeptManager.Utilisateur.Etudiant.delete+id);
     }
 
 

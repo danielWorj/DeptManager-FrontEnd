@@ -1,0 +1,420 @@
+<div class="pr-page">
+
+  <!-- ══ HERO HEADER ══ -->
+  <div class="pr-hero">
+    <div class="pr-hero__pattern"></div>
+    <div class="pr-hero__inner">
+      <div class="pr-hero__top">
+        <div>
+          <span class="pr-tag">Espace étudiant</span>
+          <h1 class="pr-hero__title">Mes <em>Requêtes</em></h1>
+          <p class="pr-hero__sub">Soumettez et suivez vos demandes auprès de la scolarité de l'ENSET Douala.</p>
+        </div>
+        <button class="pr-new-btn" (click)="openNewModal()">
+          <i class="bi bi-plus-lg"></i> Nouvelle requête
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="pr-stats">
+        <div class="pr-stat">
+          <div class="pr-stat__n">{{ listRequeteSave().length }}</div>
+          <div class="pr-stat__l"><span class="pr-stat__dot dot-all"></span>Total</div>
+        </div>
+        <div class="pr-stat">
+          <div class="pr-stat__n">{{ requetesEnAttente().length }}</div>
+          <div class="pr-stat__l"><span class="pr-stat__dot dot-att"></span>En attente</div>
+        </div>
+        <div class="pr-stat">
+          <div class="pr-stat__n">{{ requetesTraitees().length }}</div>
+          <div class="pr-stat__l"><span class="pr-stat__dot dot-ok"></span>Traitées</div>
+        </div>
+        <div class="pr-stat">
+          <div class="pr-stat__n">{{ requetesRejetees().length }}</div>
+          <div class="pr-stat__l"><span class="pr-stat__dot dot-rej"></span>Rejetées</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CONTENU PRINCIPAL ══ -->
+  <div class="pr-content">
+
+    <!-- Onglets -->
+    <div class="pr-tabs">
+      <button class="pr-tab" [class.active]="activeTab() === 'toutes'" (click)="setTab('toutes')">
+        Toutes <span class="pr-tab-count">{{ listRequeteSave().length }}</span>
+      </button>
+      <button class="pr-tab" [class.active]="activeTab() === 'attente'" (click)="setTab('attente')">
+        En attente <span class="pr-tab-count">{{ requetesEnAttente().length }}</span>
+      </button>
+      <button class="pr-tab" [class.active]="activeTab() === 'traitees'" (click)="setTab('traitees')">
+        Traitées <span class="pr-tab-count">{{ requetesTraitees().length }}</span>
+      </button>
+      <button class="pr-tab" [class.active]="activeTab() === 'rejetees'" (click)="setTab('rejetees')">
+        Rejetées <span class="pr-tab-count">{{ requetesRejetees().length }}</span>
+      </button>
+    </div>
+
+    <!-- Chargement -->
+    @if (loadingRequetes()) {
+      <div class="pr-loading">
+        <div class="pr-spinner"></div>
+        <span>Chargement des requêtes…</span>
+      </div>
+    }
+
+    <!-- Liste des cartes -->
+    @if (!loadingRequetes()) {
+
+      @if (listRequeteFiltered().length === 0) {
+        <div class="pr-empty">
+          <i class="bi bi-inbox pr-empty__icon"></i>
+          <p class="pr-empty__title">Aucune requête trouvée</p>
+          <p class="pr-empty__sub">Soumettez une nouvelle requête ou changez d'onglet.</p>
+        </div>
+      }
+
+      <div class="pr-grid">
+        @for (r of listRequeteFiltered(); track r.id) {
+          <div class="pr-card">
+            <div class="pr-card__inner">
+
+              <!-- Avatar -->
+              <div class="pr-avatar">
+                {{ getInitials(r.etudiant?.nom, r.etudiant?.prenom) }}
+              </div>
+
+              <div class="pr-card__body">
+                <div class="pr-card__head">
+                  <div>
+                    <div class="pr-card__name">
+                      {{ r.etudiant?.prenom }} {{ r.etudiant?.nom }}
+                    </div>
+                    <div class="pr-card__meta">
+                      {{ r.etudiant?.matricule }} —
+                      <span>{{ r.etudiant?.filiere?.intitule ?? '—' }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="pr-card__actions">
+                    <button class="pr-action-btn" title="Voir le détail" (click)="openDetail(r)">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    @if (r.statutRequete?.id === 1) {
+                      <button class="pr-action-btn danger" title="Annuler la requête"
+                        (click)="openDeleteModal(r.id)">
+                        <i class="bi bi-trash3"></i>
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <!-- Description résumée -->
+                <p class="pr-card__desc">{{ r.description }}</p>
+
+                <!-- Footer badges -->
+                <div class="pr-card__footer">
+                  <span class="pr-badge pr-badge--motif">
+                    <i class="bi bi-tag-fill"></i>
+                    {{ r.motifRequete?.intitule ?? '—' }}
+                  </span>
+                  <span class="pr-badge" [ngClass]="statutClass(r.statutRequete?.id)">
+                    {{ statutLabel(r.statutRequete?.id) }}
+                  </span>
+                  <span class="pr-card__date">
+                    <i class="bi bi-calendar3"></i>
+                    {{ formatDate(r.dateCreation) }}
+                  </span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Pied de liste -->
+      @if (listRequeteFiltered().length > 0) {
+        <div class="pr-list-footer">
+          {{ listRequeteFiltered().length }} résultat(s) sur {{ listRequeteSave().length }} au total
+        </div>
+      }
+
+    }
+
+  </div><!-- /.pr-content -->
+
+</div><!-- /.pr-page -->
+
+
+<!-- ══ MODAL : NOUVELLE REQUÊTE ══ -->
+<div class="modal fade pr-modal-wrap" id="newRequeteModal" tabindex="-1"
+  aria-labelledby="newRequeteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content pr-modal-content">
+
+      <div class="modal-header pr-modal-header">
+        <h5 class="modal-title pr-modal-title" id="newRequeteLabel">
+          <i class="bi bi-pencil-square me-2"></i>Nouvelle <em>Requête</em>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+
+      <div class="modal-body pr-modal-body">
+        <form [formGroup]="requeteFb" novalidate>
+
+          <!-- Étudiant -->
+          <div class="pr-form-group">
+            <label class="pr-label" for="nEtudiant">
+              Étudiant <span class="pr-required">*</span>
+            </label>
+            <select class="pr-select" id="nEtudiant" formControlName="etudiant"
+              [class.pr-invalid]="isFieldInvalid('etudiant')">
+              <option [ngValue]="null" disabled>Sélectionner un étudiant…</option>
+              @for (etu of listEtudiant(); track etu.id) {
+                <option [value]="etu.id">{{ etu.prenom }} {{ etu.nom }}</option>
+              }
+            </select>
+            @if (isFieldInvalid('etudiant')) {
+              <div class="pr-error-msg">Veuillez sélectionner un étudiant.</div>
+            }
+          </div>
+
+          <!-- Motif -->
+          <div class="pr-form-group">
+            <label class="pr-label" for="nMotif">
+              Motif de la requête <span class="pr-required">*</span>
+            </label>
+            <select class="pr-select" id="nMotif" formControlName="motifRequete"
+              [class.pr-invalid]="isFieldInvalid('motifRequete')">
+              <option [ngValue]="null" disabled>Sélectionner un motif…</option>
+              @for (motif of listMotifRequete(); track motif.id) {
+                <option [value]="motif.id">{{ motif.intitule }}</option>
+              }
+            </select>
+            @if (isFieldInvalid('motifRequete')) {
+              <div class="pr-error-msg">Veuillez sélectionner un motif.</div>
+            }
+          </div>
+
+          <!-- Description -->
+          <div class="pr-form-group">
+            <label class="pr-label" for="nDesc">
+              Description <span class="pr-required">*</span>
+            </label>
+            <textarea class="pr-textarea" id="nDesc" rows="4" formControlName="description"
+              [class.pr-invalid]="isFieldInvalid('description')"
+              placeholder="Décrivez précisément votre demande (minimum 10 caractères)…"></textarea>
+            @if (isFieldInvalid('description')) {
+              <div class="pr-error-msg">La description est obligatoire (minimum 10 caractères).</div>
+            }
+          </div>
+
+          <!-- Pièces jointes -->
+          <div class="pr-form-group">
+            <label class="pr-label">
+              Pièces jointes
+              <span class="pr-label-opt">(optionnel)</span>
+            </label>
+            <div class="pr-dropzone"
+              (click)="fileInput.click()"
+              (dragover)="onDragOver($event)"
+              (drop)="onDrop($event)">
+              <div class="pr-dz-icon"><i class="bi bi-cloud-arrow-up-fill"></i></div>
+              <p class="pr-dz-text"><strong>Cliquez pour parcourir</strong> ou déposez vos fichiers ici</p>
+              <p class="pr-dz-hint">PDF, JPG, PNG, DOCX — max 10 Mo par fichier</p>
+            </div>
+            <input #fileInput type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.docx"
+              style="display:none" (change)="onFileSelect($event)" />
+            @if (selectedFiles().length > 0) {
+              <div class="pr-file-list">
+                @for (file of selectedFiles(); track file.name) {
+                  <div class="pr-file-item">
+                    <i class="bi bi-paperclip"></i>
+                    <span>{{ file.name }}</span>
+                    <button type="button" class="pr-file-remove" (click)="removeFile(file.name)">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+        </form>
+      </div>
+
+      <div class="modal-footer pr-modal-footer">
+        <button type="button" class="pr-btn pr-btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="pr-btn pr-btn-primary" (click)="createRequete()">
+          <i class="bi bi-send-fill"></i> Soumettre la requête
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ MODAL : DÉTAIL REQUÊTE ══ -->
+<div class="modal fade pr-modal-wrap" id="detailModal" tabindex="-1"
+  aria-labelledby="detailLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content pr-modal-content">
+
+      <div class="modal-header pr-modal-header">
+        <h5 class="modal-title pr-modal-title" id="detailLabel">
+          <i class="bi bi-eye-fill me-2"></i>Détail de la <em>Requête</em>
+          @if (requeteSelected(); as r) {
+            <span class="pr-modal-id">#{{ r.id }}</span>
+          }
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+
+      @if (requeteSelected(); as r) {
+        <div class="modal-body pr-modal-body">
+
+          <!-- Étudiant -->
+          <div class="pr-detail-section">
+            <div class="pr-detail-label">Étudiant</div>
+            <div class="pr-student-card">
+              <div class="pr-avatar">
+                {{ getInitials(r.etudiant?.nom, r.etudiant?.prenom) }}
+              </div>
+              <div>
+                <div class="pr-student-name">{{ r.etudiant?.prenom }} {{ r.etudiant?.nom }}</div>
+                <div class="pr-student-meta">
+                  {{ r.etudiant?.matricule }} — {{ r.etudiant?.filiere?.intitule }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="pr-divider" />
+
+          <!-- Département / Filière / Date -->
+          <div class="pr-detail-row">
+            <div class="pr-detail-section">
+              <div class="pr-detail-label">Département</div>
+              <div class="pr-detail-value">
+                {{ r.etudiant?.filiere?.departement?.intitule ?? '—' }}
+              </div>
+            </div>
+            <div class="pr-detail-section">
+              <div class="pr-detail-label">Filière</div>
+              <div class="pr-detail-value">{{ r.etudiant?.filiere?.intitule ?? '—' }}</div>
+            </div>
+            <div class="pr-detail-section">
+              <div class="pr-detail-label">Date de soumission</div>
+              <div class="pr-detail-value">{{ formatDate(r.dateCreation) }}</div>
+            </div>
+          </div>
+
+          <hr class="pr-divider" />
+
+          <!-- Motif -->
+          <div class="pr-detail-section">
+            <div class="pr-detail-label">Motif</div>
+            <div class="pr-detail-value">
+              <span class="pr-badge pr-badge--motif">
+                <i class="bi bi-tag-fill"></i>
+                {{ r.motifRequete?.intitule ?? '—' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Statut -->
+          <div class="pr-detail-section">
+            <div class="pr-detail-label">Statut</div>
+            <div class="pr-detail-value">
+              <span class="pr-badge" [ngClass]="statutClass(r.statutRequete?.id)">
+                {{ statutLabel(r.statutRequete?.id) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="pr-detail-section">
+            <div class="pr-detail-label">Description</div>
+            <div class="pr-detail-value pr-detail-desc">{{ r.description }}</div>
+          </div>
+
+          <!-- Pièces jointes -->
+          @if (listPieceJointe().length > 0) {
+            <div class="pr-detail-section">
+              <div class="pr-detail-label">Pièces jointes</div>
+              <div class="pr-attachments">
+                @for (pj of listPieceJointe(); track pj) {
+                  <span class="pr-attachment-chip">
+                    <i class="bi bi-paperclip"></i>{{ pj }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+
+        <div class="modal-footer pr-modal-footer">
+          <button type="button" class="pr-btn pr-btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        </div>
+      }
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ MODAL : CONFIRMER LA SUPPRESSION ══ -->
+<div class="modal fade pr-modal-wrap" id="deleteModal" tabindex="-1"
+  aria-labelledby="deleteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content pr-modal-content">
+
+      <div class="modal-header pr-modal-header pr-modal-header--danger">
+        <h5 class="modal-title pr-modal-title" id="deleteLabel">
+          <i class="bi bi-trash3-fill me-2"></i>Annuler la requête
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+
+      <div class="modal-body pr-modal-body text-center py-4">
+        <i class="bi bi-exclamation-triangle-fill pr-delete-icon"></i>
+        <h5 class="pr-delete-title">Êtes-vous sûr ?</h5>
+        <p class="pr-delete-sub">
+          Vous êtes sur le point d'annuler la requête
+          <strong>#{{ deleteTargetId() }}</strong>.<br />
+          Cette action est irréversible.
+        </p>
+      </div>
+
+      <div class="modal-footer pr-modal-footer justify-content-center">
+        <button type="button" class="pr-btn pr-btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="pr-btn pr-btn-danger" (click)="deleteRequete()">
+          <i class="bi bi-trash3"></i> Oui, supprimer
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ TOAST ══ -->
+@if (toast(); as t) {
+  <div class="pr-toast" [ngClass]="'pr-toast--' + t.type">
+    <i class="bi"
+      [class.bi-check-circle-fill]="t.type === 'success'"
+      [class.bi-x-circle-fill]="t.type === 'danger'"
+      [class.bi-info-circle-fill]="t.type === 'info'"
+      [class.bi-exclamation-triangle-fill]="t.type === 'warning'">
+    </i>
+    <span>{{ t.message }}</span>
+    <button class="pr-toast__close" (click)="closeToast()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+}

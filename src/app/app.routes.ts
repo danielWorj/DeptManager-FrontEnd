@@ -118,6 +118,10 @@ export const routes: Routes = [
                     path : 'documentation', 
                     loadComponent: ()=>import('./Components/Website/documentation/documentation').then(r=>r.DocumentationC)
                 },
+                {
+                    path : 'portail-requete', 
+                    loadComponent: ()=>import('./Components/Website/portail-requete/portail-requete').then(r=>r.PortailRequete)
+                },
                 // {
                 //     path : 'departements/:id', 
                 //     loadComponent: ()=>import('./Components/Website/page-departement/page-departement').then(c=>c.PageDepartement)

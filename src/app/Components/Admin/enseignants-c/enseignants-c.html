@@ -1,5 +1,31 @@
 <div class="container-xxl flex-grow-1 container-p-y">
 
+  <!-- ══════════════════════════════════════════
+       TOAST — notification opérations CRUD
+  ═══════════════════════════════════════════ -->
+  @if (toast(); as t) {
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+      <div class="toast show align-items-center border-0 text-white"
+           [class.bg-success]="t.type === 'success'"
+           [class.bg-danger]="t.type === 'danger'"
+           [class.bg-warning]="t.type === 'warning'"
+           [class.bg-info]="t.type === 'info'"
+           role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body d-flex align-items-center gap-2">
+            <i class="{{ toastIcon(t.type) }} fs-5"></i>
+            <div>
+              <div class="fw-semibold" style="font-size:.8rem; opacity:.85;">{{ toastTitle(t.type) }}</div>
+              <div style="font-size:.875rem;">{{ t.message }}</div>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                  (click)="closeToast()" aria-label="Fermer"></button>
+        </div>
+      </div>
+    </div>
+  }
+
   <!-- ═══════════════════════════════════════════
        CARTES MÉTRIQUES
   ════════════════════════════════════════════ -->
@@ -112,8 +138,6 @@
     </div>
     <div class="card-body">
       <div class="row">
-
-        <!-- Chart ligne : par département -->
         <div class="col-md-8">
           @if (loadingEnseignants()) {
             <div class="d-flex align-items-center justify-content-center" style="height: 200px;">
@@ -128,8 +152,6 @@
             <canvas id="myChart"></canvas>
           }
         </div>
-
-        <!-- Chart doughnut : par poste -->
         <div class="col-md-4">
           @if (loadingEnseignants()) {
             <div class="d-flex align-items-center justify-content-center" style="height: 200px;">
@@ -144,7 +166,6 @@
             <canvas id="doughnutChart"></canvas>
           }
         </div>
-
       </div>
     </div>
   </div>
@@ -159,10 +180,9 @@
         <!-- Actions -->
         <div class="row">
           <div class="col-md-12 text-end mb-3">
-            <button class="btn btn-primary m-1"
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#basicModal2">
+            <button class="btn btn-primary m-1" type="button"
+                    data-bs-toggle="modal" data-bs-target="#basicModal2"
+                    (click)="resetForm()">
               <i class="fas fa-plus me-2"></i>Ajouter un Enseignant
             </button>
             <button class="btn btn-secondary m-1" type="button">
@@ -257,10 +277,16 @@
                       }
                     </td>
                     <td class="text-end">
-                      <button class="btn btn-sm btn-icon btn-outline-primary me-1">
+                      <!-- Édition -->
+                      <button class="btn btn-sm btn-icon btn-outline-primary me-1"
+                              (click)="enseignantForm.patchValue(e)"
+                              data-bs-toggle="modal" data-bs-target="#basicModal2">
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="btn btn-sm btn-icon btn-outline-danger">
+                      <!-- Suppression -->
+                      <button class="btn btn-sm btn-icon btn-outline-danger"
+                              (click)="confirmDelete(e)"
+                              data-bs-toggle="modal" data-bs-target="#deleteModal">
                         <i class="fas fa-trash"></i>
                       </button>
                     </td>
@@ -285,7 +311,13 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="addDFiliereModal">Édition d'un enseignant</h5>
+        <h5 class="modal-title">
+          @if (enseignantForm.get('id')?.value) {
+            <i class="fas fa-edit me-2 text-primary"></i>Modifier l'enseignant
+          } @else {
+            <i class="fas fa-user-plus me-2 text-success"></i>Ajouter un enseignant
+          }
+        </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -354,6 +386,49 @@
             </div>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL : Confirmation de suppression
+════════════════════════════════════════════ -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="Close" (click)="cancelDelete()"></button>
+      </div>
+      <div class="modal-body text-center px-4 pb-2">
+        <div class="mb-3">
+          <span class="d-inline-flex align-items-center justify-content-center rounded-circle"
+                style="width:64px; height:64px; background:rgba(255,62,29,.12);">
+            <i class="bx bx-trash" style="font-size:2rem; color:#ff3e1d;"></i>
+          </span>
+        </div>
+        <h5 class="mb-1">Confirmer la suppression</h5>
+        @if (enseignantToDelete(); as ens) {
+          <p class="text-muted mb-0">
+            Voulez-vous vraiment supprimer l'enseignant
+            <strong>{{ ens.nom }} {{ ens.prenom }}</strong> ?
+          </p>
+          <small class="text-muted">({{ ens.poste?.intitule }})</small>
+        }
+        <p class="text-danger mt-2" style="font-size:.8rem;">
+          <i class="bx bx-error-circle me-1"></i>Cette action est irréversible.
+        </p>
+      </div>
+      <div class="modal-footer border-0 justify-content-center gap-2">
+        <button type="button" class="btn btn-outline-secondary"
+                data-bs-dismiss="modal" (click)="cancelDelete()">
+          <i class="fas fa-times me-1"></i>Annuler
+        </button>
+        <button type="button" class="btn btn-danger"
+                data-bs-dismiss="modal" (click)="deleteEnseignant()">
+          <i class="fas fa-trash me-1"></i>Supprimer
+        </button>
       </div>
     </div>
   </div>

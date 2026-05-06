@@ -1,5 +1,31 @@
 <div class="container-xxl flex-grow-1 container-p-y">
 
+    <!-- ══════════════════════════════════════════
+         TOAST — notification opérations CRUD
+    ═══════════════════════════════════════════ -->
+    @if (toast(); as t) {
+      <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+        <div class="toast show align-items-center border-0 text-white"
+             [class.bg-success]="t.type === 'success'"
+             [class.bg-danger]="t.type === 'danger'"
+             [class.bg-warning]="t.type === 'warning'"
+             [class.bg-info]="t.type === 'info'"
+             role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body d-flex align-items-center gap-2">
+              <i class="{{ toastIcon(t.type) }} fs-5"></i>
+              <div>
+                <div class="fw-semibold" style="font-size:.8rem; opacity:.85;">{{ toastTitle(t.type) }}</div>
+                <div style="font-size:.875rem;">{{ t.message }}</div>
+              </div>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                    (click)="closeToast()" aria-label="Fermer"></button>
+          </div>
+        </div>
+      </div>
+    }
+
     <!-- ===== CARDS MÉTRIQUES ===== -->
     <div class="row mb-4">
 
@@ -15,7 +41,6 @@
                         </div>
                         <span class="badge bg-label-primary rounded-pill">Total</span>
                     </div>
-
                     @if (loadingEtudiants()) {
                         <div class="d-flex align-items-center gap-2 mt-2">
                             <div class="spinner-border spinner-border-sm text-primary" role="status">
@@ -46,7 +71,6 @@
                         </div>
                         <span class="badge bg-label-success rounded-pill">Actifs</span>
                     </div>
-
                     @if (loadingEtudiants()) {
                         <div class="d-flex align-items-center gap-2 mt-2">
                             <div class="spinner-border spinner-border-sm text-success" role="status">
@@ -77,7 +101,6 @@
                         </div>
                         <span class="badge bg-label-danger rounded-pill">Inactifs</span>
                     </div>
-
                     @if (loadingEtudiants()) {
                         <div class="d-flex align-items-center gap-2 mt-2">
                             <div class="spinner-border spinner-border-sm text-danger" role="status">
@@ -105,8 +128,6 @@
         </div>
         <div class="card-body">
             <div class="row">
-
-                <!-- Chart ligne : par filière -->
                 <div class="col-md-8">
                     <p class="fw-semibold text-muted mb-2">
                         <i class="bx bx-line-chart me-1"></i>Répartition par filière
@@ -124,8 +145,6 @@
                         <canvas id="myChart"></canvas>
                     }
                 </div>
-
-                <!-- Chart doughnut : par niveau -->
                 <div class="col-md-4">
                     <p class="fw-semibold text-muted mb-2">
                         <i class="bx bx-doughnut-chart me-1"></i>Répartition par niveau
@@ -143,7 +162,6 @@
                         <canvas id="doughnutChart"></canvas>
                     }
                 </div>
-
             </div>
         </div>
     </div>
@@ -154,7 +172,8 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-12 text-end mb-3">
-                        <button class="btn btn-primary m-1" type="button" data-bs-toggle="modal" data-bs-target="#basicModal2">
+                        <button class="btn btn-primary m-1" type="button" data-bs-toggle="modal" data-bs-target="#basicModal2"
+                                (click)="resetForm()">
                             <i class="fas fa-plus me-2"></i>Ajouter un Etudiant
                         </button>
                         <button class="btn btn-secondary m-1" type="button">
@@ -209,11 +228,6 @@
                 </div>
 
                 <div class="table-responsive">
-                    <div class="d-flex justify-content-between">
-                        <p class="mb-3">Filiere : <span class="fw-bold"></span></p>
-                        <p class="mb-3">Niveau : <span class="fw-bold"></span></p>
-                    </div>
-
                     <table class="table table-hover align-middle">
                         <thead>
                             <tr>
@@ -261,17 +275,25 @@
                                             }
                                         </td>
                                         <td class="text-start">
+                                            <!-- Détail -->
                                             <button class="btn btn-sm btn-icon btn-outline-info me-1"
                                                     (click)="selectEtudiant(e)"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#detailModal">
                                                 <i class="bx bx-user-pin"></i>
                                             </button>
+                                            <!-- Édition -->
                                             <button class="btn btn-sm btn-icon btn-outline-primary me-1"
-                                                (click)="etudiantForm.patchValue(e)" data-bs-toggle="modal" data-bs-target="#basicModal2">
+                                                    (click)="etudiantForm.patchValue(e)"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#basicModal2">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-icon btn-outline-danger">
+                                            <!-- Suppression -->
+                                            <button class="btn btn-sm btn-icon btn-outline-danger"
+                                                    (click)="confirmDelete(e)"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </td>
@@ -287,12 +309,18 @@
 </div>
 
 
-<!-- Modal Ajout / Edition -->
+<!-- ===== Modal Ajout / Edition ===== -->
 <div class="modal fade" id="basicModal2" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog" role="document">
     <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title" id="addDFiliereModal">Edition de l'étudiant</h5>
+            <h5 class="modal-title">
+                @if (etudiantForm.get('id')?.value) {
+                    <i class="fas fa-edit me-2 text-primary"></i>Modifier l'étudiant
+                } @else {
+                    <i class="fas fa-user-plus me-2 text-success"></i>Ajouter un étudiant
+                }
+            </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -375,7 +403,48 @@
     </div>
 </div>
 
-<!-- Modal Détail Étudiant -->
+<!-- ===== Modal Confirmation Suppression ===== -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close" (click)="cancelDelete()"></button>
+        </div>
+        <div class="modal-body text-center px-4 pb-2">
+            <div class="mb-3">
+                <span class="d-inline-flex align-items-center justify-content-center rounded-circle"
+                      style="width:64px; height:64px; background:rgba(255,62,29,.12);">
+                    <i class="bx bx-trash" style="font-size:2rem; color:#ff3e1d;"></i>
+                </span>
+            </div>
+            <h5 class="mb-1">Confirmer la suppression</h5>
+            @if (etudiantToDelete(); as etd) {
+                <p class="text-muted mb-0">
+                    Voulez-vous vraiment supprimer l'étudiant
+                    <strong>{{ etd.nom }} {{ etd.prenom }}</strong> ?
+                </p>
+                <small class="text-muted">({{ etd.matricule }})</small>
+            }
+            <p class="text-danger mt-2" style="font-size:.8rem;">
+                <i class="bx bx-error-circle me-1"></i>Cette action est irréversible.
+            </p>
+        </div>
+        <div class="modal-footer border-0 justify-content-center gap-2">
+            <button type="button" class="btn btn-outline-secondary"
+                    data-bs-dismiss="modal" (click)="cancelDelete()">
+                <i class="fas fa-times me-1"></i>Annuler
+            </button>
+            <button type="button" class="btn btn-danger"
+                    data-bs-dismiss="modal" (click)="deleteEtudiant()">
+                <i class="fas fa-trash me-1"></i>Supprimer
+            </button>
+        </div>
+    </div>
+    </div>
+</div>
+
+<!-- ===== Modal Détail Étudiant ===== -->
 <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
@@ -389,19 +458,13 @@
 
         <div class="modal-body">
             @if (selectedEtudiant(); as etudiant) {
-
                 <div class="card mb-3">
                     <div class="row g-0">
-
-                        <!-- Photo de profil -->
                         <div class="col-md-4 d-flex align-items-center justify-content-center p-3">
                             @if (etudiant.photo) {
-                                <img
-                                    [src]="etudiant.photo"
-                                    class="img-fluid rounded-start"
-                                    style="max-height: 220px; object-fit: cover; border-radius: 12px;"
-                                    alt="Photo de {{ etudiant.nom }} {{ etudiant.prenom }}"
-                                />
+                                <img [src]="etudiant.photo" class="img-fluid rounded-start"
+                                     style="max-height: 220px; object-fit: cover; border-radius: 12px;"
+                                     alt="Photo de {{ etudiant.nom }} {{ etudiant.prenom }}"/>
                             } @else {
                                 <div class="d-flex align-items-center justify-content-center bg-label-secondary rounded"
                                      style="width: 140px; height: 140px;">
@@ -409,18 +472,13 @@
                                 </div>
                             }
                         </div>
-
-                        <!-- Informations -->
                         <div class="col-md-8">
                             <div class="card-body">
-
                                 <h5 class="card-title text-primary mb-1">
                                     {{ etudiant.nom }} {{ etudiant.prenom }}
                                 </h5>
                                 <p class="text-muted mb-3">
-                                    <span class="badge bg-label-primary">
-                                        {{ etudiant.matricule }}
-                                    </span>
+                                    <span class="badge bg-label-primary">{{ etudiant.matricule }}</span>
                                     &nbsp;
                                     @if (etudiant.status) {
                                         <span class="badge bg-label-success">Actif</span>
@@ -428,9 +486,7 @@
                                         <span class="badge bg-label-danger">Non Actif</span>
                                     }
                                 </p>
-
                                 <hr/>
-
                                 <div class="mb-3">
                                     <p class="mb-1">
                                         <i class="fas fa-envelope me-2 text-primary"></i>
@@ -441,31 +497,24 @@
                                         <strong>Téléphone :</strong> {{ etudiant.telephone }}
                                     </p>
                                 </div>
-
                                 <hr/>
                                 <div class="mb-3">
                                     <p class="mb-1">
                                         <i class="fas fa-graduation-cap me-2 text-primary"></i>
-                                        <strong>Filière :</strong>
-                                        {{ etudiant.filiere?.intitule ?? '—' }}
+                                        <strong>Filière :</strong> {{ etudiant.filiere?.intitule ?? '—' }}
                                         @if (etudiant.filiere?.abreviation) {
-                                            <span class="badge bg-label-info ms-1">
-                                                {{ etudiant.filiere?.abreviation }}
-                                            </span>
+                                            <span class="badge bg-label-info ms-1">{{ etudiant.filiere?.abreviation }}</span>
                                         }
                                     </p>
                                     <p class="mb-1">
                                         <i class="fas fa-layer-group me-2 text-primary"></i>
-                                        <strong>Niveau :</strong>
-                                        {{ etudiant.niveau?.intitule ?? '—' }}
+                                        <strong>Niveau :</strong> {{ etudiant.niveau?.intitule ?? '—' }}
                                     </p>
                                     <p class="mb-1">
                                         <i class="fas fa-building me-2 text-primary"></i>
-                                        <strong>Département :</strong>
-                                        {{ etudiant.filiere?.departement?.intitule ?? '—' }}
+                                        <strong>Département :</strong> {{ etudiant.filiere?.departement?.intitule ?? '—' }}
                                     </p>
                                 </div>
-
                                 <hr/>
                                 <p class="card-text">
                                     <small class="text-body-secondary">
@@ -473,12 +522,10 @@
                                         Inscrit le : {{ etudiant.dateCreation | date:'dd/MM/yyyy' }}
                                     </small>
                                 </p>
-
                             </div>
                         </div>
                     </div>
                 </div>
-
             } @else {
                 <div class="text-center text-muted py-4">
                     <i class="fas fa-user-slash" style="font-size: 48px;"></i>
