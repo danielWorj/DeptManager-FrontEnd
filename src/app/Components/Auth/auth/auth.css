@@ -1,9 +1,51 @@
 /* ═══════════════════════════════════════════════════════
-   AUTH CARD — position relative pour l'overlay
+   PAGE WRAPPER — fond gris clair, pleine hauteur
+═══════════════════════════════════════════════════════ */
+.auth-page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f4f5fb;
+  padding: 1rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CARD CONTAINER — responsive : pleine largeur mobile,
+   limitée sur desktop
+═══════════════════════════════════════════════════════ */
+.auth-card-container {
+  width: 100%;
+  max-width: 460px;   /* Desktop : max 460px         */
+}
+
+/* Sur très petits écrans (< 400px) : marge latérale minimale */
+@media (max-width: 400px) {
+  .auth-page-wrapper {
+    padding: 0.5rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   AUTH CARD
 ═══════════════════════════════════════════════════════ */
 .auth-card {
   position: relative;
   overflow: hidden;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(105, 108, 255, 0.10),
+              0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.auth-card .card-body {
+  padding: 2rem 2rem;
+}
+
+@media (max-width: 480px) {
+  .auth-card .card-body {
+    padding: 1.5rem 1.25rem;
+  }
 }
 
 /* Flou du contenu pendant le chargement */
@@ -15,7 +57,42 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   OVERLAY
+   INPUTS — taille confortable sur mobile
+═══════════════════════════════════════════════════════ */
+.form-control-lg {
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+}
+
+.form-control-lg:focus {
+  border-color: #696cff;
+  box-shadow: 0 0 0 3px rgba(105, 108, 255, 0.15);
+}
+
+/* ═══════════════════════════════════════════════════════
+   BOUTON
+═══════════════════════════════════════════════════════ */
+.login-btn {
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.75rem;
+  letter-spacing: 0.02em;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-btn:not(:disabled):hover {
+  box-shadow: 0 4px 12px rgba(105, 108, 255, 0.35);
+}
+
+.login-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════════════════
+   OVERLAY SPINNER
 ═══════════════════════════════════════════════════════ */
 .spinner-overlay {
   position: absolute;
@@ -32,7 +109,6 @@
   to   { opacity: 1; }
 }
 
-/* Fond semi-transparent */
 .spinner-backdrop {
   position: absolute;
   inset: 0;
@@ -41,7 +117,6 @@
   -webkit-backdrop-filter: blur(6px);
 }
 
-/* Contenu centré par-dessus le fond */
 .spinner-content {
   position: relative;
   z-index: 2;
@@ -58,7 +133,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   ANNEAU TOURNANT
+   ANNEAU SPINNER
 ═══════════════════════════════════════════════════════ */
 .spinner-ring {
   position: relative;
@@ -66,7 +141,6 @@
   height: 64px;
 }
 
-/* Arc de base */
 .spinner-ring__arc {
   position: absolute;
   inset: 0;
@@ -74,33 +148,27 @@
   border: 3px solid transparent;
 }
 
-/* Arc 1 — principal (violet #696cff) */
 .spinner-ring__arc--1 {
   border-top-color: #696cff;
   animation: spin 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-/* Arc 2 — décalé, plus petit, opacité réduite */
 .spinner-ring__arc--2 {
   inset: 8px;
   border-right-color: rgba(105, 108, 255, 0.45);
   animation: spinReverse 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-/* Arc 3 — encore plus petit, très subtil */
 .spinner-ring__arc--3 {
   inset: 16px;
   border-bottom-color: rgba(105, 108, 255, 0.2);
   animation: spin 2s linear infinite;
 }
 
-/* Point central pulsant */
 .spinner-ring__dot {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 8px;
-  height: 8px;
+  top: 50%; left: 50%;
+  width: 8px; height: 8px;
   margin: -4px 0 0 -4px;
   border-radius: 50%;
   background: #696cff;
@@ -108,9 +176,6 @@
   box-shadow: 0 0 0 0 rgba(105, 108, 255, 0.4);
 }
 
-/* ═══════════════════════════════════════════════════════
-   LABEL "Connexion en cours..."
-═══════════════════════════════════════════════════════ */
 .spinner-label {
   font-size: 0.875rem;
   font-weight: 500;
@@ -119,7 +184,6 @@
   margin: 0;
 }
 
-/* Points animés "..." */
 .spinner-dots::after {
   content: '';
   display: inline-block;
@@ -132,14 +196,6 @@
   50%  { content: '..'; }
   75%  { content: '...'; }
   100% { content: ''; }
-}
-
-/* ═══════════════════════════════════════════════════════
-   BOUTON — état désactivé
-═══════════════════════════════════════════════════════ */
-.login-btn:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
 }
 
 /* ═══════════════════════════════════════════════════════
