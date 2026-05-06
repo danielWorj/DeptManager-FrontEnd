@@ -36,6 +36,7 @@ export class Auth {
     const formData: FormData = new FormData();
     formData.append('auth', JSON.stringify(this.authForm.value));
 
+
     this.authService.basicLogin(formData).subscribe({
       next: (data: BasicAuthData) => {
         this.isLoading = false;
