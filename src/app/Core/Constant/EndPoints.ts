@@ -175,7 +175,7 @@ export const DeptManager ={
             count : `${utilisateurapi}/etudiant/count`,
             create : `${utilisateurapi}/etudiant/create`, 
             update : `${utilisateurapi}/etudiant/update`,  
-            delete : `${utilisateurapi}/etudiant/delete`,  
+            delete : `${utilisateurapi}/etudiant/delete/`,  
             byId : `${utilisateurapi}/etudiant/byid/`,  
             allbydepartement : `${utilisateurapi}/etudiant/bydepartement/`, 
             countByDepaterment : `${utilisateurapi}/etudiant/countbydept/`, 
