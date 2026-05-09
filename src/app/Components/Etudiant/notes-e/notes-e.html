@@ -1,0 +1,289 @@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <!-- ══ EN-TÊTE ══ -->
+  <div class="nm-page-header">
+    <div>
+      <h4 class="fw-bold mb-1">
+        <i class="bi bi-journal-richtext text-primary me-2"></i>
+        Mes Notes
+      </h4>
+      <p class="text-muted mb-0">
+        Consultez vos résultats par semestre pour l'année académique en cours
+      </p>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="nm-btn nm-btn-outline" (click)="telecharger()">
+        <i class="fas fa-print text-primary"></i> Télécharger PDF
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ══ BANNIÈRE ÉTUDIANT CONNECTÉ ══ -->
+  @if (etudiantConnected(); as etud) {
+    <div class="nm-repartition-banner">
+      <div class="nm-rep-icon">
+        <i class="bi bi-person-circle"></i>
+      </div>
+      <div class="nm-rep-info">
+        <h4>{{ etud.nom }} {{ etud.prenom }}</h4>
+        <div class="nm-rep-tags">
+          <span class="nm-rep-tag">
+            <i class="bi bi-card-text me-1"></i>
+            {{ etud.matricule }}
+          </span>
+          <span class="nm-rep-tag">
+            <i class="bi bi-envelope me-1"></i>
+            {{ etud.email }}
+          </span>
+          <span class="nm-rep-tag accent">
+            <i class="bi bi-diagram-3 me-1"></i>
+            {{ etud.filiere?.intitule }}
+          </span>
+          <span class="nm-rep-tag">
+            <i class="bi bi-layers me-1"></i>
+            {{ etud.niveau?.intitule }}
+          </span>
+        </div>
+      </div>
+    </div>
+  }
+
+
+  <!-- ══ FILTRE SEMESTRE ══ -->
+  <div class="nm-filter-card">
+    <div class="nm-filter-title">
+      <i class="bi bi-funnel-fill"></i> Sélectionner un semestre
+    </div>
+    <div class="nm-filter-grid">
+
+      <div style="grid-column: span 3;">
+        <div class="nm-filter-label">
+          Semestre <span class="nm-required">*</span>
+        </div>
+        <select class="form-select form-select-sm" (change)="onSemestreChange($event)">
+          <option value="0" disabled [selected]="idSemestreSelected === 0">
+            -- Choisir un semestre --
+          </option>
+          @for (sem of listSemestre(); track sem.id) {
+            <option value="{{ sem.id }}">
+              {{ sem.intitule }}
+              — {{ sem.anneeAcademique?.intitule }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div style="display:flex; align-items:flex-end;">
+        <button class="nm-btn nm-btn-outline" style="width:100%;" (click)="resetSelection()">
+          <i class="bi bi-x-circle"></i> Réinitialiser
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ STAT CARDS ══ -->
+  @if (idSemestreSelected !== 0) {
+    <div class="nm-stats-row">
+      <div class="nm-stat-card">
+        <div class="nm-stat-icon blue"><i class="bi bi-clipboard2-data-fill"></i></div>
+        <div>
+          <div class="nm-stat-value">{{ listNote().length }}</div>
+          <div class="nm-stat-label">Notes enregistrées</div>
+        </div>
+      </div>
+      <div class="nm-stat-card">
+        <div class="nm-stat-icon green"><i class="bi bi-check2-circle"></i></div>
+        <div>
+          <div class="nm-stat-value">{{ getNotesByMention('ADMIS') }}</div>
+          <div class="nm-stat-label">Matières admises (≥10)</div>
+        </div>
+      </div>
+      <div class="nm-stat-card">
+        <div class="nm-stat-icon orange"><i class="bi bi-exclamation-circle"></i></div>
+        <div>
+          <div class="nm-stat-value">{{ getNotesByMention('REFUSE') }}</div>
+          <div class="nm-stat-label">Matières refusées (&lt;10)</div>
+        </div>
+      </div>
+      <div class="nm-stat-card">
+        <div class="nm-stat-icon purple"><i class="bi bi-bar-chart-fill"></i></div>
+        <div>
+          <div class="nm-stat-value">{{ getMoyenneGenerale() }}</div>
+          <div class="nm-stat-label">Moyenne générale</div>
+        </div>
+      </div>
+    </div>
+  }
+
+
+  <!-- ══ ACCORDÉON STATISTIQUES ══ -->
+  <div id="accordionIcon" class="accordion mt-3 mb-3 accordion-without-arrow">
+    <div class="accordion-item card">
+      <h2 class="accordion-header text-body d-flex justify-content-between" id="accordionIconOne">
+        <button
+          type="button"
+          class="accordion-button collapsed"
+          data-bs-toggle="collapse"
+          data-bs-target="#accordionIcon-1"
+          aria-controls="accordionIcon-1"
+          [disabled]="idSemestreSelected === 0"
+          (click)="getStats()">
+          <i class="bi bi-bar-chart-fill me-2"></i>
+          Statistiques — Distribution de mes notes
+          @if (idSemestreSelected === 0) {
+            <span class="ms-2 text-muted" style="font-size:.8rem; font-weight:400;">
+              (sélectionner un semestre d'abord)
+            </span>
+          }
+        </button>
+      </h2>
+      <div id="accordionIcon-1" class="accordion-collapse collapse" data-bs-parent="#accordionIcon">
+        <div class="accordion-body">
+
+          <!-- Légende seuil -->
+          <div class="d-flex gap-3 mb-3 ms-1" style="font-size:.82rem;">
+            <span>
+              <span style="display:inline-block;width:12px;height:12px;border-radius:3px;
+                           background:#ea5455;margin-right:5px;"></span>
+              Échec (note &lt; 10)
+            </span>
+            <span>
+              <span style="display:inline-block;width:12px;height:12px;border-radius:3px;
+                           background:#28c76f;margin-right:5px;"></span>
+              Réussite (note ≥ 10)
+            </span>
+            <span class="ms-auto text-muted">
+              Moyenne générale :
+              <strong class="text-primary">{{ getMoyenneGenerale() }} / 20</strong>
+            </span>
+          </div>
+
+          <!-- Canvas bar chart -->
+          <canvas id="barChartNotes" style="max-height:320px;"></canvas>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ TABLEAU DES NOTES ══ -->
+  <div class="nm-table-card">
+    <div class="nm-table-header">
+      <h3>
+        Mes résultats
+        <span style="font-size:.75rem; color:var(--text-muted); font-weight:400; margin-left:6px;">
+          {{ listNote().length }} entrée(s)
+        </span>
+      </h3>
+      <div class="nm-table-actions">
+        <div class="nm-search-box">
+          <i class="bi bi-search"></i>
+          <input type="text" placeholder="Rechercher une matière..." (input)="onSearch($event)" />
+        </div>
+        <button class="nm-btn nm-btn-outline nm-btn-sm" (click)="telecharger()">
+          <i class="bi bi-download"></i> Exporter
+        </button>
+      </div>
+    </div>
+
+    <div class="nm-table-wrapper">
+      <table class="nm-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Matière</th>
+            <th>Enseignant</th>
+            <th>Note / 20</th>
+            <th>Mention</th>
+            <th>Type d'évaluation</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          @if (idSemestreSelected === 0) {
+            <tr>
+              <td colspan="6">
+                <div class="nm-empty-state">
+                  <i class="bi bi-funnel"></i>
+                  <p>Veuillez sélectionner un semestre pour afficher vos notes.</p>
+                </div>
+              </td>
+            </tr>
+
+          } @else if (listNote().length === 0) {
+            <tr>
+              <td colspan="6">
+                <div class="nm-empty-state">
+                  <i class="bi bi-clipboard2-x"></i>
+                  <p>Aucune note enregistrée pour ce semestre.</p>
+                </div>
+              </td>
+            </tr>
+
+          } @else {
+            @for (note of listNote(); track note.id; let i = $index) {
+              <tr>
+                <td style="color:var(--text-muted); font-size:.75rem;">{{ i + 1 }}</td>
+
+                <td>
+                  <div class="nm-avatar-cell">
+                    <div class="nm-avatar" [class]="getAvatarColor(i)">
+                      <i class="bi bi-book-fill" style="font-size:.85rem;"></i>
+                    </div>
+                    <div>
+                      <div class="nm-name">{{ note.repartition?.matiere?.intitule }}</div>
+                      <div class="nm-sub">
+                        {{ note.repartition?.filiere?.abreviation }}
+                        · {{ note.repartition?.niveau?.intitule }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+                <td>
+                  <div style="font-size:.85rem;">
+                    {{ note.repartition?.enseignant?.nom }}
+                    {{ note.repartition?.enseignant?.prenom }}
+                  </div>
+                </td>
+
+                <td>
+                  <div class="nm-note-badge" [ngClass]="getNoteBadgeClass(note.note)">
+                    {{ note.note }}
+                  </div>
+                </td>
+
+                <td>
+                  <span style="font-weight:600; font-size:.82rem;" [style.color]="getMentionColor(note.note)">
+                    {{ getMentionLabel(note.note) }}
+                  </span>
+                </td>
+
+                <td>
+                  <span class="nm-eval-pill" [ngClass]="getEvalPillClass(note.typeEvaluation?.intitule)">
+                    {{ note.typeEvaluation?.intitule }}
+                  </span>
+                </td>
+              </tr>
+            }
+          }
+
+        </tbody>
+      </table>
+    </div>
+
+    <div class="nm-pagination">
+      <span>Total : <b>{{ listNote().length }}</b> résultat(s)</span>
+      <div class="nm-page-btns">
+        <div class="nm-page-btn"><i class="bi bi-chevron-left"></i></div>
+        <div class="nm-page-btn active">1</div>
+        <div class="nm-page-btn"><i class="bi bi-chevron-right"></i></div>
+      </div>
+    </div>
+  </div>
+
+</div>

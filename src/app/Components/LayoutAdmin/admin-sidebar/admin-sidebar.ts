@@ -3,7 +3,7 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
 
 @Component({
   selector: 'app-admin-sidebar',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink],
   templateUrl: './admin-sidebar.html',
   styleUrl: './admin-sidebar.css',
 })
@@ -15,8 +15,9 @@ export class AdminSidebar {
   activeItem = signal<string>('');
 
   constructor() {
-    // this.role.set(parseInt(sessionStorage.getItem('role')!) ?? 0);
-    this.role.set(0);
+    this.role.set(parseInt(localStorage.getItem('role')!) ?? 0);
+    console.log('Le role recu est :', this.role()); 
+    //this.role.set(0);
   }
 
   setActive(item: string) {

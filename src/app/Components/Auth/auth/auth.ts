@@ -30,6 +30,13 @@ export class Auth {
     });
   }
 
+  roleRoutes: Record<number, string> = {
+    1: '/admin/home',
+    2: '/admin/admin-etudiant'
+  };
+
+
+
   login(): void {
     this.isLoading = true;
 
@@ -46,10 +53,19 @@ export class Auth {
           localStorage.setItem('id', `${data.id}`);
           localStorage.setItem('role', `${data.role}`);
 
+          console.log(data);
+
           // ← Lecture du returnUrl + sécurité Open Redirect
+          // const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+          // console.log('Return URL:', returnUrl);
+          // const safeUrl = returnUrl?.startsWith('/') ? returnUrl : '/admin/admin-dashboard';
+          // this.router.navigateByUrl(safeUrl);
+
+
           const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
           console.log('Return URL:', returnUrl);
-          const safeUrl = returnUrl?.startsWith('/') ? returnUrl : '/admin/admin-dashboard';
+          const defaultRoute = this.roleRoutes[data.role] ?? '/landing-page';
+          const safeUrl = returnUrl?.startsWith('/') ? returnUrl : defaultRoute;
           this.router.navigateByUrl(safeUrl);
         }
       },

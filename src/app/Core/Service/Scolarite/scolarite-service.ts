@@ -104,6 +104,10 @@ export class ScolariteService {
       return this.http.get<Requete[]>(DeptManager.Scolarite.Revendication.Requete.all);
     } 
 
+    getAllRequeteByEtudiant(id:number):Observable<Requete[]>{  
+      return this.http.get<Requete[]>(DeptManager.Scolarite.Revendication.Requete.allbyetudiant+id);
+    } 
+
     createRequete(request:any):Observable<ResponseServer>{
       return this.http.post<ResponseServer>(DeptManager.Scolarite.Revendication.Requete.create,request);
     } 

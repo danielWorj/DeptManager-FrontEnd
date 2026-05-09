@@ -54,7 +54,10 @@ export const routes: Routes = [
                     loadComponent : ()=>import('./Components/Admin/repartition/repartition').then(n => n.RepartitionC)
                 }, 
                  //ETUDIANT 
-
+                {
+                    path : 'admin-etudiant', 
+                    loadComponent: ()=>import('./Components/Etudiant/dashboard/dashboard').then(n=>n.Dashboard)
+                },
                 {
                     path : 'etudiant-note', 
                     loadComponent: ()=>import('./Components/Etudiant/notes-e/notes-e').then(n=>n.NotesE)

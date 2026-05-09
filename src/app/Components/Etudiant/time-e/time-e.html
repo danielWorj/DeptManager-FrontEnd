@@ -1,1 +1,219 @@
-<p>time-e works!</p>
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <!-- ══ EN-TÊTE ══ -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-1">
+        <i class="fas fa-calendar-alt text-primary me-2"></i>
+        Mon Emploi du Temps
+      </h4>
+      <p class="text-muted mb-0">
+        Consultez vos créneaux horaires par semestre
+      </p>
+    </div>
+    <div class="d-flex gap-2 align-items-center">
+      @if (erreur()) {
+        <span class="text-danger small">
+          <i class="fas fa-exclamation-circle me-1"></i>{{ erreur() }}
+        </span>
+      }
+      <button class="btn btn-primary" (click)="telecharger()" [disabled]="chargement()">
+        @if (chargement()) {
+          <span class="spinner-border spinner-border-sm me-1"></span> Génération…
+        } @else {
+          <i class="fas fa-file-pdf me-1"></i> Télécharger PDF
+        }
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ══ BANNIÈRE ÉTUDIANT ══ -->
+  @if (etudiantConnected(); as etud) {
+    <div class="card mb-4 tdt-filter-card">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <div class="tde-avatar">
+            {{ etud.nom?.charAt(0) }}{{ etud.prenom?.charAt(0) }}
+          </div>
+          <div>
+            <div class="fw-bold fs-6">{{ etud.nom }} {{ etud.prenom }}</div>
+            <div class="text-muted small">{{ etud.matricule }} · {{ etud.email }}</div>
+          </div>
+          <div class="ms-auto d-flex gap-2 flex-wrap">
+            <span class="badge bg-label-primary">
+              <i class="fas fa-graduation-cap me-1"></i>
+              {{ etud.filiere?.intitule }} ({{ etud.filiere?.abreviation }})
+            </span>
+            <span class="badge bg-label-info">
+              <i class="fas fa-layer-group me-1"></i>{{ etud.niveau?.intitule }}
+            </span>
+            <span class="badge bg-label-secondary">
+              <i class="fas fa-clock me-1"></i>
+              {{ listHoraireDisplay().length }} créneau(x)
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+
+  <!-- ══ FILTRE PAR SEMESTRE ══ -->
+  @if (listSemestre().length > 0) {
+    <div class="card mb-4 tdt-filter-card">
+      <div class="card-header tdt-filter-header">
+        <i class="fas fa-filter text-primary me-2"></i>
+        <strong>Filtrer par semestre</strong>
+      </div>
+      <div class="card-body py-3">
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+
+          <!-- Bouton « Tous » -->
+          <button
+            class="btn btn-sm"
+            [ngClass]="idSemestreSelected() === 0 ? 'btn-primary' : 'btn-outline-secondary'"
+            (click)="onSemestreChange(0)">
+            <i class="fas fa-th me-1"></i> Tous les semestres
+          </button>
+
+          <!-- Un bouton par année académique + ses semestres -->
+          @for (annee of listAnnne(); track annee.id) {
+            <span class="text-muted small ms-2 me-1">{{ annee.intitule }} :</span>
+            @for (sem of listSemestre(); track sem.id) {
+              @if (sem.anneeAcademique.id === annee.id) {
+                <button
+                  class="btn btn-sm"
+                  [ngClass]="idSemestreSelected() === sem.id ? 'btn-primary' : 'btn-outline-secondary'"
+                  (click)="onSemestreChange(sem.id)">
+                  {{ sem.intitule }}
+                </button>
+              }
+            }
+          }
+
+        </div>
+      </div>
+    </div>
+  }
+
+
+  <!-- ══ GRILLE EMPLOI DU TEMPS ══ -->
+  <div class="card">
+    <div class="card-header tdt-filter-header d-flex justify-content-between align-items-center">
+      <div>
+        <i class="fas fa-table text-primary me-2"></i>
+        <strong>Grille horaire</strong>
+      </div>
+      @if (idSemestreSelected() !== 0) {
+        <span class="badge bg-label-primary">
+          @for (sem of listSemestre(); track sem.id) {
+            @if (sem.id === idSemestreSelected()) {
+              {{ sem.intitule }} — {{ sem.anneeAcademique?.intitule }}
+            }
+          }
+        </span>
+      }
+    </div>
+
+    <div class="card-body p-0">
+
+      <!-- Aucun horaire -->
+      @if (listHoraireDisplay().length === 0) {
+        <div class="tdt-empty-state p-5">
+          <i class="fas fa-calendar-times fa-2x text-muted mb-3 d-block text-center"></i>
+          <p class="fw-semibold text-center mb-1">Aucun cours programmé</p>
+          <p class="small text-muted text-center mb-0">
+            @if (idSemestreSelected() !== 0) {
+              Aucun horaire trouvé pour ce semestre.
+              <button class="btn btn-link btn-sm p-0 ms-1" (click)="onSemestreChange(0)">
+                Voir tous les semestres
+              </button>
+            } @else {
+              Votre emploi du temps n'est pas encore disponible.
+            }
+          </p>
+        </div>
+
+      } @else {
+
+        <div class="table-responsive">
+          <table class="table table-bordered tdt-edt-table mb-0">
+            <thead>
+              <tr>
+                <!-- Coin supérieur gauche -->
+                <th class="tdt-edt-corner">
+                  <span class="text-muted small">Horaire \ Jour</span>
+                </th>
+                <!-- Une colonne par jour -->
+                @for (jour of listJour(); track jour.id) {
+                  <th class="tdt-edt-day-header text-center">
+                    {{ jour.intitule }}
+                  </th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Une ligne par période -->
+              @for (row of getEmploiDuTempsGrid(); track row.periode.id) {
+
+                <!-- On masque les lignes entièrement vides -->
+                @if (rowHasHoraire(row)) {
+                  <tr>
+                    <!-- Colonne heure -->
+                    <td class="tdt-edt-time-col">
+                      <div class="fw-semibold text-primary">{{ row.periode.debut }}</div>
+                      <div class="text-muted small">{{ row.periode.fin }}</div>
+                    </td>
+                    <!-- Cellules par jour -->
+                    @for (cell of row.cells; track cell.jour.id) {
+                      <td class="tdt-edt-cell"
+                          [ngClass]="cell.horaire ? 'tdt-edt-cell-filled' : ''">
+                        @if (cell.horaire) {
+                          <div class="tde-slot" [ngClass]="getSlotColor(cell.horaire.repartition.matiere.id)">
+                            <div class="tde-slot-matiere">
+                              {{ cell.horaire.repartition.matiere.intitule }}
+                            </div>
+                            <div class="tde-slot-detail">
+                              <i class="fas fa-user me-1"></i>
+                              {{ cell.horaire.repartition.enseignant.nom }}
+                              {{ cell.horaire.repartition.enseignant.prenom }}
+                            </div>
+                            <div class="tde-slot-detail">
+                              <i class="fas fa-door-open me-1"></i>
+                              {{ cell.horaire.salle.intitule }}
+                            </div>
+                            @if (cell.horaire.repartition.semestre) {
+                              <div class="tde-slot-sem">
+                                {{ cell.horaire.repartition.semestre.intitule }}
+                              </div>
+                            }
+                          </div>
+                        } @else {
+                          <span class="tdt-edt-empty">—</span>
+                        }
+                      </td>
+                    }
+                  </tr>
+                }
+
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Légende couleurs matières -->
+        <div class="d-flex gap-3 flex-wrap px-3 py-2 border-top" style="font-size:.78rem;">
+          @for (h of listHoraireDisplay(); track h.id) {
+            <span class="d-flex align-items-center gap-1">
+              <span class="tde-legend-dot" [ngClass]="getSlotColor(h.repartition.matiere.id)"></span>
+              {{ h.repartition.matiere.intitule }}
+            </span>
+          }
+        </div>
+
+      }
+    </div><!-- /card-body -->
+  </div><!-- /card grille -->
+
+</div>

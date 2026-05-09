@@ -1,6 +1,6 @@
-const api = "https://deptmanager-backend.onrender.com/deptmanager/api"; 
+//const api = "https://deptmanager-backend.onrender.com/deptmanager/api"; 
 
-//const api = "http://localhost:8080/deptmanager/api";
+const api = "http://localhost:8080/deptmanager/api";
 
 const authapi = `${api}/auth`; 
 const actualiteapi = `${api}/actualite`; 
@@ -95,6 +95,7 @@ export const DeptManager ={
         Revendication :{
             Requete :{
                 all : `${structureapi}/requete/all`, 
+                allbyetudiant : `${structureapi}/requete/all/byetudiant/`, 
                 create : `${structureapi}/requete/creation`, 
                 update : `${structureapi}/requete/update`, 
                 change : `${structureapi}/requete/change/`, 
