@@ -164,6 +164,8 @@ export class EnseignantsC implements OnDestroy {
     });
   }
 
+
+
   // ─── Filtres ─────────────────────────────────────────────────────────────
 
   findEnseignantByDepartement(event: Event): void {
@@ -239,6 +241,21 @@ export class EnseignantsC implements OnDestroy {
       error: () => {
         this.enseignantToDelete.set(null);
         this.showToast("Échec de la suppression de l'enseignant.", 'danger');
+      },
+    });
+  }
+
+  changeStatus(enseignant:Enseignant){
+    this.utilisateurService.changeStatus(enseignant.id).subscribe({
+      next: () => {
+        this.getAllEnseignant();
+        this.showToast(
+          `Le status de M/Mmme ${enseignant.nom} ${enseignant.prenom} a été mis a jour avec succès.`,
+          'success'
+        );
+      },
+      error: () => {
+        this.showToast("Échec de la mis a jour du statut de l'enseignant.", 'danger');
       },
     });
   }

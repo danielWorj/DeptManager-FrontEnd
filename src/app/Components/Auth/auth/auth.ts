@@ -31,7 +31,7 @@ export class Auth {
   }
 
   roleRoutes: Record<number, string> = {
-    1: '/admin/home',
+    1: '/admin/admin-dashboard',
     2: '/admin/admin-etudiant'
   };
 

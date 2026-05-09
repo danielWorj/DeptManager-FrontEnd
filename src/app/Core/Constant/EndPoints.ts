@@ -160,6 +160,8 @@ export const DeptManager ={
         
     },
     Utilisateur :{
+        change : `${utilisateurapi}/status/`, 
+
         Enseignant :{
             all : `${utilisateurapi}/enseignant/all`, 
             count : `${utilisateurapi}/enseignant/count`, 

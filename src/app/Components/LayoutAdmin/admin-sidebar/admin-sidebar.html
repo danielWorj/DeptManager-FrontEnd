@@ -154,6 +154,7 @@
   @if (role() == 1) {
     <ul class="menu-inner py-1">
 
+      <!-- Dashboard -->
       <li class="menu-item">
         <a routerLink="admin-dashboard"
            class="menu-link"
@@ -164,25 +165,114 @@
         </a>
       </li>
 
-      <li class="menu-header small text-uppercase"><span class="menu-header-text">MON ESPACE</span></li>
+      <!-- ── RH ── -->
+      <li class="menu-header small text-uppercase"><span class="menu-header-text">RH</span></li>
 
       <li class="menu-item">
-        <a routerLink="admin-et-time"
+        <a routerLink="admin-etudiants"
            class="menu-link"
-           [class.active]="activeItem() === 'et-time'"
-           (click)="setActive('et-time')">
-          <i class="menu-icon bx bx-time-five"></i>
-          <div>Emploi de temps</div>
+           [class.active]="activeItem() === 'etudiants'"
+           (click)="setActive('etudiants')">
+          <i class="menu-icon bx bx-group"></i>
+          <div>Etudiants</div>
         </a>
       </li>
 
       <li class="menu-item">
-        <a routerLink="admin-et-note"
+        <a routerLink="admin-enseignants"
            class="menu-link"
-           [class.active]="activeItem() === 'et-note'"
-           (click)="setActive('et-note')">
+           [class.active]="activeItem() === 'enseignants'"
+           (click)="setActive('enseignants')">
+          <i class="menu-icon bx bx-chalkboard"></i>
+          <div>Enseignants</div>
+        </a>
+      </li>
+
+      <!-- ── ACADÉMIE ── -->
+      <li class="menu-header small text-uppercase"><span class="menu-header-text">ACADÉMIE</span></li>
+
+      <li class="menu-item">
+        <a routerLink="admin-documentation"
+           class="menu-link"
+           [class.active]="activeItem() === 'documentation'"
+           (click)="setActive('documentation')">
+          <i class="menu-icon bx bx-book-open"></i>
+          <div>Documentation</div>
+        </a>
+      </li>
+
+      <!-- ── NOTES ── -->
+      <li class="menu-header small text-uppercase"><span class="menu-header-text">Notes</span></li>
+
+      <li class="menu-item">
+        <a routerLink="admin-note"
+           class="menu-link"
+           [class.active]="activeItem() === 'notes'"
+           (click)="setActive('notes')">
           <i class="menu-icon bx bx-notepad"></i>
           <div>Notes</div>
+        </a>
+      </li>
+
+      <!-- ── REQUÊTES ── -->
+      <li class="menu-header small text-uppercase"><span class="menu-header-text">Requêtes</span></li>
+
+      <li class="menu-item">
+        <a routerLink="admin-requete"
+           class="menu-link"
+           [class.active]="activeItem() === 'requetes'"
+           (click)="setActive('requetes')">
+          <i class="menu-icon bx bx-inbox"></i>
+          <div>Requêtes</div>
+        </a>
+      </li>
+
+      <!-- ── ENSEIGNEMENT ── -->
+      <li class="menu-header small text-uppercase"><span class="menu-header-text">Enseignement</span></li>
+
+      <li class="menu-item">
+        <a routerLink="admin-time"
+           class="menu-link"
+           [class.active]="activeItem() === 'emplois'"
+           (click)="setActive('emplois')">
+          <i class="menu-icon bx bx-time-five"></i>
+          <div>Emplois de temps</div>
+        </a>
+      </li>
+
+      <li class="menu-item">
+        <a routerLink="admin-repartition"
+           class="menu-link"
+           [class.active]="activeItem() === 'repartitions'"
+           (click)="setActive('repartitions')">
+          <i class="menu-icon bx bx-grid-alt"></i>
+          <div>Répartitions</div>
+        </a>
+      </li>
+
+      <!-- ── ACTUALITÉ ── -->
+      <li class="menu-header small text-uppercase"><span class="menu-header-text">ACTUALITÉ</span></li>
+
+      <li class="menu-item">
+        <a routerLink="admin-actualite"
+           class="menu-link"
+           [class.active]="activeItem() === 'actualites'"
+           (click)="setActive('actualites')">
+          <i class="menu-icon bx bx-news"></i>
+          <div>Actualités</div>
+        </a>
+      </li>
+
+      <!-- ── SETTINGS ── -->
+      <li class="menu-header small text-uppercase"><span class="menu-header-text">Settings</span></li>
+
+      <li class="menu-item">
+        <a routerLink="config"
+           class="menu-link"
+           [class.active]="activeItem() === 'config'"
+           (click)="setActive('config')">
+          <i class="menu-icon bx bx-cog"></i>
+          <div>Configuration</div>
         </a>
       </li>
 
@@ -193,7 +283,7 @@
        ÉTUDIANT (role = 2)
   ══════════════════════════════════════════ -->
   @if (role() == 2) {
-    <ul class="menu-inner py-1">
+    <!-- <ul class="menu-inner py-1">
 
       <li class="menu-item">
         <a routerLink="admin-etudiant"
@@ -241,7 +331,7 @@
         </a>
       </li>
 
-    </ul>
+    </ul> -->
   }
 
 </aside>

@@ -109,4 +109,9 @@ export class UtilisateurService {
     }
 
 
+    //CHANGEMENT STATUS 
+    changeStatus(id:number):Observable<ResponseServer>{
+      return this.http.get<ResponseServer>(DeptManager.Utilisateur.change+id); 
+    }
+
 }

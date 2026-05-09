@@ -271,9 +271,9 @@
                     <td>{{ e.poste.intitule }}</td>
                     <td>
                       @if (e.status) {
-                        <span class="badge bg-label-success">Actif</span>
+                        <span class="badge bg-label-success" (click)="changeStatus(e)">Actif</span>
                       } @else {
-                        <span class="badge bg-label-danger">Non Actif</span>
+                        <span class="badge bg-label-danger" (click)="changeStatus(e)">Non Actif</span>
                       }
                     </td>
                     <td class="text-end">

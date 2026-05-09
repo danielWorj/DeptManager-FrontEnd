@@ -264,6 +264,21 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
     });
   }
 
+   changeStatus(etudiant:Etudiant){
+      this.utilisateurService.changeStatus(etudiant.id).subscribe({
+        next: () => {
+          this.getAllETudiant();
+          this.showToast(
+            `Le status de M/Mmme ${etudiant.nom} ${etudiant.prenom} a été mis a jour avec succès.`,
+            'success'
+          );
+        },
+        error: () => {
+          this.showToast("Échec de la mis a jour du statut de l'enseignant.", 'danger');
+        },
+      });
+    }
+
   // ─── Suppression ─────────────────────────────────────────────────────────
 
   etudiantToDelete = signal<Etudiant | null>(null);
