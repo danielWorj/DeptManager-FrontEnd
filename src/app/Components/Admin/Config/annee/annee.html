@@ -1,0 +1,183 @@
+<div class="card">
+  <div class="card-body">
+
+    <!-- Alertes -->
+    @if (successMessage()) {
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>{{ successMessage() }}
+        <button type="button" class="btn-close" (click)="successMessage.set(null)"></button>
+      </div>
+    }
+    @if (errorMessage()) {
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>{{ errorMessage() }}
+        <button type="button" class="btn-close" (click)="errorMessage.set(null)"></button>
+      </div>
+    }
+
+    <!-- Barre d'outils -->
+    <div class="row mb-3 align-items-center">
+      <div class="col-md-6">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" class="form-control" placeholder="Rechercher une année académique..." />
+        </div>
+      </div>
+      <div class="col-md-6 text-end">
+        <button
+          class="btn btn-primary"
+          type="button"
+          data-bs-toggle="modal"
+          data-bs-target="#anneeModal"
+          (click)="openCreateModal()"
+        >
+          <i class="fas fa-plus me-2"></i>Nouvelle Année
+        </button>
+      </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Intitulé</th>
+            <th>Statut</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (isLoading()) {
+            <tr>
+              <td colspan="4" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Chargement...</span>
+                </div>
+              </td>
+            </tr>
+          } @else if (listAnnee().length === 0) {
+            <tr>
+              <td colspan="4" class="text-center text-muted py-4">
+                <i class="fas fa-calendar-times fa-2x mb-2 d-block"></i>
+                Aucune année académique enregistrée.
+              </td>
+            </tr>
+          } @else {
+            @for (annee of listAnnee(); track annee.id; let i = $index) {
+              <tr>
+                <td class="text-muted">{{ i + 1 }}</td>
+                <td class="fw-semibold">{{ annee.intitule }}</td>
+                <td>
+                  @if (annee.status) {
+                    <span class="badge bg-success">
+                      <i class="fas fa-check-circle me-1"></i>Active
+                    </span>
+                  } @else {
+                    <span class="badge bg-secondary">
+                      <i class="fas fa-clock me-1"></i>Inactive
+                    </span>
+                  }
+                </td>
+                <td class="text-end">
+                  <!-- Bouton Activer -->
+                  @if (!annee.status) {
+                    <button
+                      class="btn btn-sm btn-outline-success me-1"
+                      title="Activer cette année"
+                      (click)="activeAnneeAcademique(annee.id)"
+                    >
+                      <i class="fas fa-power-off"></i>
+                    </button>
+                  }
+                  <!-- Bouton Éditer -->
+                  <button
+                    class="btn btn-sm btn-icon btn-outline-primary me-1"
+                    title="Modifier"
+                    data-bs-toggle="modal"
+                    data-bs-target="#anneeModal"
+                    (click)="openEditModal(annee)"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <!-- Bouton Supprimer -->
+                  <button
+                    class="btn btn-sm btn-icon btn-outline-danger"
+                    title="Supprimer"
+                    (click)="deleteAnneeAcademique(annee.id)"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Création / Édition -->
+<div class="modal fade" id="anneeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          @if (isEditMode()) {
+            <i class="fas fa-edit me-2 text-primary"></i>Modifier l'année académique
+          } @else {
+            <i class="fas fa-plus-circle me-2 text-primary"></i>Nouvelle année académique
+          }
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="anneeForm" (ngSubmit)="saveAnnee()">
+          <div class="mb-3">
+            <label for="intituleAnnee" class="form-label fw-semibold">
+              Intitulé <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              id="intituleAnnee"
+              class="form-control"
+              formControlName="intitule"
+              placeholder="Ex: 2024 - 2025"
+            />
+          </div>
+
+          <div class="mb-3 form-check">
+            <input
+              type="checkbox"
+              id="statusAnnee"
+              class="form-check-input"
+              formControlName="status"
+            />
+            <label class="form-check-label" for="statusAnnee">
+              Marquer comme année active
+            </label>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              Annuler
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+            >
+              @if (isEditMode()) {
+                <i class="fas fa-save me-1"></i>Mettre à jour
+              } @else {
+                <i class="fas fa-plus me-1"></i>Enregistrer
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

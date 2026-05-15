@@ -188,7 +188,21 @@ export class ScolariteService {
 
     // //Get All Annee Academique
 
-    // getAllAnneeAcademique():Observable<AnneeAcademique[]>{  
-    //   return this.http.get<AnneeAcademique[]>(DeptManager.Scolarite.AnneeAcademique.all);
-    // }
+    getAllAnneeAcademique():Observable<AnneeAcademique[]>{  
+      return this.http.get<AnneeAcademique[]>(DeptManager.Scolarite.AnneeAcademique.all);
+    }
+    activeAnneeAcademique(id:number):Observable<ResponseServer>{  
+      return this.http.get<ResponseServer>(DeptManager.Scolarite.AnneeAcademique.active+id);
+    }
+    createAnneeAcademique(request:any):Observable<ResponseServer>{  
+      return this.http.post<ResponseServer>(DeptManager.Scolarite.AnneeAcademique.create,request);
+    }
+
+    updateAnneeAcademique(request:any):Observable<ResponseServer>{  
+      return this.http.post<ResponseServer>(DeptManager.Scolarite.AnneeAcademique.update,request);
+    }
+
+    deleteAnneeAcademique(id:number):Observable<ResponseServer>{  
+      return this.http.get<ResponseServer>(DeptManager.Scolarite.AnneeAcademique.delete+id);
+    }
 }

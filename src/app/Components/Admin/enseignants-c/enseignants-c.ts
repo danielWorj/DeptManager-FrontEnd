@@ -164,8 +164,6 @@ export class EnseignantsC implements OnDestroy {
     });
   }
 
-
-
   // ─── Filtres ─────────────────────────────────────────────────────────────
 
   findEnseignantByDepartement(event: Event): void {
@@ -186,14 +184,37 @@ export class EnseignantsC implements OnDestroy {
     this.enseignantForm.reset();
   }
 
-  createEnseignant(): void {
+  // ✅ CORRECTION : la méthode s'appelait createEnseignant() et appelait
+  //    TOUJOURS this.utilisateurService.createEnseignant(), même en mode édition.
+  //    Elle est renommée saveEnseignant() et route désormais vers
+  //    updateEnseignant() si un id est présent dans le formulaire.
+  //    Pensez à mettre à jour l'appel dans le template HTML :
+  //    (click)="saveEnseignant()" au lieu de (click)="createEnseignant()"
+  saveEnseignant(): void {
     if (this.enseignantForm.invalid) return;
 
     const isEdit = !!this.enseignantForm.get('id')?.value;
     const formData = new FormData();
-    formData.append('enseignant', JSON.stringify(this.enseignantForm.value));
 
-    this.utilisateurService.createEnseignant(formData).subscribe({
+    const rawValue = this.enseignantForm.value;
+
+    // Pour l'édition, on envoie l'id du département et l'id du poste au lieu des objets complets
+    const payload = isEdit
+      ? {
+          ...rawValue,
+          departement: rawValue.departement?.id ?? rawValue.departement,
+          poste:       rawValue.poste?.id       ?? rawValue.poste,
+        }
+      : rawValue;
+
+    formData.append('enseignant', JSON.stringify(payload));
+
+    // ✅ Choix du bon endpoint selon le mode création / édition
+    const request$ = isEdit
+      ? this.utilisateurService.updateEnseignant(formData)
+      : this.utilisateurService.createEnseignant(formData);
+
+    request$.subscribe({
       next: (response: ResponseServer) => {
         console.log(response.message);
         this.getAllEnseignant();
@@ -204,7 +225,7 @@ export class EnseignantsC implements OnDestroy {
         );
       },
       error: () => {
-        console.error('Erreur lors de la création d\'un enseignant');
+        console.error('Erreur lors de la sauvegarde d\'un enseignant');
         this.showToast(
           isEdit ? 'Échec de la modification de l\'enseignant.' : 'Échec de la création de l\'enseignant.',
           'danger'
@@ -245,17 +266,17 @@ export class EnseignantsC implements OnDestroy {
     });
   }
 
-  changeStatus(enseignant:Enseignant){
+  changeStatus(enseignant: Enseignant): void {
     this.utilisateurService.changeStatus(enseignant.id).subscribe({
       next: () => {
         this.getAllEnseignant();
         this.showToast(
-          `Le status de M/Mmme ${enseignant.nom} ${enseignant.prenom} a été mis a jour avec succès.`,
+          `Le statut de M/Mme ${enseignant.nom} ${enseignant.prenom} a été mis à jour avec succès.`,
           'success'
         );
       },
       error: () => {
-        this.showToast("Échec de la mis a jour du statut de l'enseignant.", 'danger');
+        this.showToast("Échec de la mise à jour du statut de l'enseignant.", 'danger');
       },
     });
   }

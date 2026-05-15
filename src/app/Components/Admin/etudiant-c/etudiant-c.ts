@@ -237,14 +237,36 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
     this.etudiantForm.reset();
   }
 
-  createEtudiant(): void {
+
+  saveEtudiant(): void {
     if (this.etudiantForm.invalid) return;
 
     const isEdit = !!this.etudiantForm.get('id')?.value;
     const formData = new FormData();
-    formData.append('etudiant', JSON.stringify(this.etudiantForm.value));
 
-    this.utilisateurService.createEtudiant(formData).subscribe({
+    const rawValue = this.etudiantForm.value;
+
+    // Pour l'édition, on envoie l'id de la filière et l'id du niveau au lieu des objets complets
+    const payload = isEdit
+      ? {
+          ...rawValue,
+          
+          filiere: rawValue.filiere?.id ?? rawValue.filiere,
+          niveau:  rawValue.niveau?.id  ?? rawValue.niveau,
+          anneeAcademique:  rawValue.anneeAcademique?.id  ?? rawValue.anneeAcademique,
+        }
+      : rawValue;
+
+    formData.append('etudiant', JSON.stringify(payload));
+
+    console.log('objet :', payload); 
+
+    // ✅ Choix du bon endpoint selon le mode création / édition
+    const request$ = isEdit
+      ? this.utilisateurService.updateEtudiant(formData)
+      : this.utilisateurService.createEtudiant(formData);
+
+    request$.subscribe({
       next: (response: ResponseServer) => {
         console.log(response.message);
         this.getAllETudiant();
@@ -255,7 +277,7 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
         );
       },
       error: () => {
-        console.error("Erreur lors de la création d'un étudiant");
+        console.error("Erreur lors de la sauvegarde d'un étudiant");
         this.showToast(
           isEdit ? "Échec de la modification de l'étudiant." : "Échec de la création de l'étudiant.",
           'danger'
@@ -264,20 +286,21 @@ export class EtudiantC implements OnDestroy, AfterViewInit {
     });
   }
 
-   changeStatus(etudiant:Etudiant){
-      this.utilisateurService.changeStatus(etudiant.id).subscribe({
-        next: () => {
-          this.getAllETudiant();
-          this.showToast(
-            `Le status de M/Mmme ${etudiant.nom} ${etudiant.prenom} a été mis a jour avec succès.`,
-            'success'
-          );
-        },
-        error: () => {
-          this.showToast("Échec de la mis a jour du statut de l'enseignant.", 'danger');
-        },
-      });
-    }
+  changeStatus(etudiant: Etudiant): void {
+    this.utilisateurService.changeStatus(etudiant.id).subscribe({
+      next: () => {
+        this.getAllETudiant();
+        this.showToast(
+          `Le statut de M/Mme ${etudiant.nom} ${etudiant.prenom} a été mis à jour avec succès.`,
+          'success'
+        );
+      },
+      error: () => {
+        // ✅ CORRECTION : message corrigé — il s'agit d'un étudiant, pas d'un enseignant
+        this.showToast("Échec de la mise à jour du statut de l'étudiant.", 'danger');
+      },
+    });
+  }
 
   // ─── Suppression ─────────────────────────────────────────────────────────
 

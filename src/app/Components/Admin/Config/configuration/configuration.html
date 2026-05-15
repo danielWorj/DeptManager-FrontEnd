@@ -10,8 +10,13 @@
 
          <!-- Navigation par onglets -->
             <ul class="nav nav-pills mb-4" id="configTabs" role="tablist">
+                <li class="nav-item ms-1" role="presentation">
+                    <button class="nav-link active" id="annees-tab" data-bs-toggle="tab" data-bs-target="#annees" type="button" role="tab">
+                        <i class="fas fa-school me-2"></i>Annee
+                    </button>
+                </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="departements-tab" data-bs-toggle="tab" data-bs-target="#departements" type="button" role="tab">
+                    <button class="nav-link " id="departements-tab" data-bs-toggle="tab" data-bs-target="#departements" type="button" role="tab">
                         <i class="fas fa-building me-2"></i>Départements
                     </button>
                 </li>
@@ -36,9 +41,12 @@
 
             <!-- Contenu des onglets -->
             <div class="tab-content" id="configTabContent">
+                <div class="tab-pane fade active show" id="annees" role="tabpanel">
+                   <app-annee></app-annee>
+                </div>
                             
                 <!-- Onglet Départements -->
-                <div class="tab-pane fade active show" id="departements" role="tabpanel">
+                <div class="tab-pane fade " id="departements" role="tabpanel">
                    <app-departement-c></app-departement-c>
                 </div>
 

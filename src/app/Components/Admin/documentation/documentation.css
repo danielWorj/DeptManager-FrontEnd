@@ -1,0 +1,381 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   SPINNER — anneau rotatif réutilisable
+   Usage : <span class="bkdoc-spinner"></span>
+           <span class="bkdoc-spinner bkdoc-spinner--sm"></span>
+══════════════════════════════════════════════════════════════════════════════ */
+
+.bkdoc-spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(var(--bkdoc-primary-rgb, 67,97,238), 0.2);
+  border-top-color: var(--bkdoc-primary, #4361ee);
+  border-radius: 50%;
+  animation: bkdoc-spin 0.7s linear infinite;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.bkdoc-spinner--sm {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+}
+
+@keyframes bkdoc-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Overlay de chargement de la liste */
+.bkdoc-list-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  color: var(--bkdoc-text-muted, #6c757d);
+}
+
+.bkdoc-list-loading .bkdoc-spinner {
+  width: 36px;
+  height: 36px;
+  border-width: 4px;
+}
+
+.bkdoc-list-loading__text {
+  font-size: .85rem;
+  letter-spacing: .02em;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   TOASTS
+══════════════════════════════════════════════════════════════════════════════ */
+
+.bkdoc-toast-container {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.bkdoc-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 280px;
+  max-width: 400px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(0,0,0,.14), 0 1px 4px rgba(0,0,0,.08);
+  pointer-events: all;
+  overflow: hidden;
+  position: relative;
+
+  /* Entrée/sortie */
+  opacity: 0;
+  transform: translateX(32px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+
+.bkdoc-toast--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Barre de progression en bas */
+.bkdoc-toast__bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  border-radius: 0 0 10px 10px;
+  animation: bkdoc-toast-bar 4s linear forwards;
+  transform-origin: left;
+}
+
+@keyframes bkdoc-toast-bar {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+
+/* Icônes et couleurs par type */
+.bkdoc-toast__icon {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.bkdoc-toast--success .bkdoc-toast__icon,
+.bkdoc-toast--success .bkdoc-toast__bar { color: #2ecc71; background: #2ecc71; }
+
+.bkdoc-toast--error .bkdoc-toast__icon,
+.bkdoc-toast--error .bkdoc-toast__bar   { color: #e74c3c; background: #e74c3c; }
+
+.bkdoc-toast--info .bkdoc-toast__icon,
+.bkdoc-toast--info .bkdoc-toast__bar    { color: #3498db; background: #3498db; }
+
+.bkdoc-toast--warning .bkdoc-toast__icon,
+.bkdoc-toast--warning .bkdoc-toast__bar { color: #f39c12; background: #f39c12; }
+
+.bkdoc-toast__msg {
+  flex: 1;
+  font-size: .875rem;
+  line-height: 1.4;
+  color: #2d3748;
+}
+
+.bkdoc-toast__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #a0aec0;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 2px;
+  transition: color .15s;
+}
+.bkdoc-toast__close:hover { color: #4a5568; }
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   ICÔNES DOCUMENT — couleur selon type
+══════════════════════════════════════════════════════════════════════════════ */
+
+.bkdoc-icon-pdf {
+  background: #ffeaea !important;
+  color: #e63946 !important;
+}
+.bkdoc-icon-img {
+  background: #e8f8f5 !important;
+  color: #2a9d8f !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   PRÉVISUALISATION INLINE — PDF
+══════════════════════════════════════════════════════════════════════════════ */
+
+.bkdoc-preview-pdf__badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: .75rem;
+  color: #5f6368;
+  background: #f1f3f4;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  padding: 3px 8px;
+  align-self: flex-start;
+}
+
+.bkdoc-preview-pdf {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bkdoc-preview-pdf__notice {
+  font-size: .78rem;
+  color: var(--bkdoc-text-muted, #6c757d);
+  text-align: center;
+  padding: 4px 0;
+}
+.bkdoc-preview-pdf__notice a {
+  color: var(--bkdoc-primary, #4361ee);
+  text-decoration: underline;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   PRÉVISUALISATION INLINE — IMAGE
+══════════════════════════════════════════════════════════════════════════════ */
+
+.bkdoc-preview-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border-radius: .375rem;
+  overflow: hidden;
+  min-height: 200px;
+}
+
+.bkdoc-preview-image__img {
+  max-width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: .25rem;
+  display: block;
+}
+
+.bkdoc-preview-image--fullscreen {
+  min-height: 0;
+  height: 100%;
+  background: #1a1a2e;
+}
+
+.bkdoc-preview-image__img--fullscreen {
+  max-height: 100%;
+  width: auto;
+  height: 100%;
+  object-fit: contain;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   PRÉVISUALISATION — FALLBACK (format non supporté / pas d'URL)
+══════════════════════════════════════════════════════════════════════════════ */
+
+.bkdoc-preview-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 36px 24px;
+  text-align: center;
+  color: var(--bkdoc-text-muted, #6c757d);
+  background: #f8f9fa;
+  border-radius: .375rem;
+}
+
+.bkdoc-preview-fallback__icon {
+  font-size: 2.5rem;
+  opacity: .45;
+}
+
+.bkdoc-preview-fallback p {
+  margin: 0;
+  font-size: .875rem;
+  line-height: 1.5;
+}
+
+.bkdoc-preview-fallback__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   MODAL PLEIN ÉCRAN — PRÉVISUALISATION
+══════════════════════════════════════════════════════════════════════════════ */
+
+.bkdoc-preview-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .72);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: bkdoc-fade-in .2s ease;
+}
+
+@keyframes bkdoc-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.bkdoc-preview-modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 1000px;
+  max-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,.35);
+  animation: bkdoc-slide-up .25s ease;
+}
+
+@keyframes bkdoc-slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* En-tête du modal preview */
+.bkdoc-preview-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid #e9ecef;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.bkdoc-preview-modal__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: .95rem;
+  color: #2d3748;
+  min-width: 0;
+}
+
+.bkdoc-preview-modal__title span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bkdoc-preview-modal__title i {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.bkdoc-preview-modal__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Corps du modal preview */
+.bkdoc-preview-modal__body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* L'iframe dans le modal occupe tout l'espace */
+.bkdoc-preview-modal__body iframe {
+  flex: 1;
+  min-height: 480px;
+}
+
+/* Bouton secondaire (utilisé dans le fallback) */
+.bkdoc-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--bkdoc-primary, #4361ee);
+  color: var(--bkdoc-primary, #4361ee);
+  background: transparent;
+  font-size: .85rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+.bkdoc-btn-secondary:hover {
+  background: var(--bkdoc-primary, #4361ee);
+  color: #fff;
+}

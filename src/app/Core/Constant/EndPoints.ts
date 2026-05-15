@@ -132,7 +132,15 @@ export const DeptManager ={
             update : `${scolariteapi}/semestre/update`,
             delete : `${scolariteapi}/semestre/delete`,
 
-        } 
+        }, 
+        AnneeAcademique :{
+            all : `${scolariteapi}/anneeacademique/all`,
+            active : `${scolariteapi}/anneeacademique/active/`,
+            create : `${scolariteapi}/anneeacademique/create`,
+            update : `${scolariteapi}/anneeacademique/update`,
+            delete : `${scolariteapi}/anneeacademique/delete/`,
+
+        }
         
     }, 
     Horaire:{
