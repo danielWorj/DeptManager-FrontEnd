@@ -72,4 +72,19 @@ export class FiliereC {
       }
     })
   }
+
+  deleteFiliere(f:Filiere){
+    console.log('Lancement de la suppression des filieres......'); 
+    this.configService.deleteFiliere(f.id).subscribe({
+      next:(data:ResponseServer)=>{
+        if (data) {
+          console.log('Suppression de la filiere'); 
+          this.getAllFiliere(); 
+        }
+      }, 
+      error:()=>{
+        console.log('delete console : failed'); 
+      }
+    })
+  }
 }

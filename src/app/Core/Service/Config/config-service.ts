@@ -291,4 +291,10 @@ export class ConfigService {
 
 
 
+  //DATABASE 
+  resetDatabase():Observable<ResponseServer>{
+    return this.http.get<ResponseServer>(DeptManager.DB.reset); 
+  }
+
+
 }

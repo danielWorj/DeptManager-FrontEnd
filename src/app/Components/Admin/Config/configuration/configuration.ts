@@ -4,10 +4,11 @@ import { MatiereC } from "../matiere-c/matiere-c";
 import { FiliereC } from "../filiere-c/filiere-c";
 import { SalleC } from "../salle-c/salle-c";
 import { Annee } from "../annee/annee";
+import { DataBase } from "../../DB/data-base/data-base";
 
 @Component({
   selector: 'app-configuration',
-  imports: [DepartementC, MatiereC, FiliereC, SalleC, Annee],
+  imports: [DepartementC, MatiereC, FiliereC, SalleC, Annee, DataBase],
   templateUrl: './configuration.html',
   styleUrl: './configuration.css',
 })

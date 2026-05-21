@@ -1,6 +1,6 @@
-const api = "https://deptmanager-backend.onrender.com/deptmanager/api"; 
+//const api = "https://deptmanager-backend.onrender.com/deptmanager/api"; 
 
-//const api = "http://localhost:8080/deptmanager/api";
+const api = "http://localhost:8080/deptmanager/api";
 
 const authapi = `${api}/auth`; 
 const actualiteapi = `${api}/actualite`; 
@@ -9,6 +9,7 @@ const scolariteapi = `${api}/scolarite`;
 const horaireapi = `${api}/horaire`; 
 const utilisateurapi = `${api}/utilisateur`; 
 const evaluationapi = `${api}/note`; 
+const databaseapi = `${api}/database`; 
 
 const ai = "http://localhost:5000/api/";
 
@@ -29,7 +30,7 @@ export const DeptManager ={
             byId: `${structureapi}/filiere/byId/`,
             create : `${structureapi}/filiere/create`,
             update : `${structureapi}/filiere/update`,
-            delete : `${structureapi}/filiere/delete`,
+            delete : `${structureapi}/filiere/delete/`,
         }, 
         Niveau:{
             all : `${structureapi}/niveau/all`,
@@ -217,6 +218,7 @@ export const DeptManager ={
     }, 
     Auth:{
         baslogin : `${authapi}/login`, 
+        pwdlogin : `${authapi}/pwd/login`, 
     }, 
     Media :{
         create : `${structureapi}/media/create`, 
@@ -251,5 +253,8 @@ export const DeptManager ={
         status : `${ai}status`,
         indexDocument : `${ai}index`,
         query : `${ai}query`,
+    }, 
+    DB :{
+        reset : `${databaseapi}/reset`
     }
 }

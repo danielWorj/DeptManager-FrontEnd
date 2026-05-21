@@ -35,6 +35,11 @@
                         <i class="fas fa-school me-2"></i>Salles
                     </button>
                 </li>
+                <li class="nav-item ms-1" role="database">
+                    <button class="nav-link" id="database-tab" data-bs-toggle="tab" data-bs-target="#database" type="button" role="tab">
+                        <i class="menu-icon bx bx-data me-2"></i>Database
+                    </button>
+                </li>
                 
                
             </ul>
@@ -63,6 +68,10 @@
                 <!-- Onglet Salles -->
                 <div class="tab-pane fade" id="salles" role="tabpanel">
                    <app-salle-c></app-salle-c>
+                </div>
+                <!-- Onglet base de donnee -->
+                 <div class="tab-pane fade" id="database" role="tabpanel">
+                   <app-data-base></app-data-base>
                 </div>
 
             </div>

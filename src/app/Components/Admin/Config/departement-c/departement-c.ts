@@ -410,4 +410,19 @@ export class DepartementC {
       error: () => console.error('Erreur upload média'),
     });
   }
+
+
+  deleteDepartement(d:Departement){
+     this.configService.deleteDepartement(d.id).subscribe({
+      next: (data: ResponseServer) => {
+        if (data) {
+          this.getAllDepartement();
+          this.departementForm.reset();
+          // Fermer le modal filière → détail reste ouvert
+          //this.closeSubModal('filiereModal');
+        }
+      },
+      error: () => console.error('Erreur création departement'),
+    });
+  }
 }

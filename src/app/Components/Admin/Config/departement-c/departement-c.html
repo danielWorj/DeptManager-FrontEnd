@@ -36,14 +36,17 @@
               <td><span class="badge bg-label-primary">{{ d.abreviation }}</span></td>
               <td class="fw-semibold">{{ d.intitule }}</td>
               <td class="text-end">
-                <button
-                  class="btn btn-sm btn-icon btn-outline-primary"
-                  title="Voir les détails"
+               
+                <button class="btn btn-sm btn-icon btn-outline-primary m-1"
+                title="Voir les détails"
                   data-bs-toggle="modal"
                   data-bs-target="#detailDepartementModal"
-                  (click)="selectDepartement(d)"
-                >
-                  <i class="bx bx-show"></i>
+                (click)="selectDepartement(d)">
+                    <i class="fas fa-edit"></i>
+                </button>
+
+                 <button class="btn btn-sm btn-icon btn-outline-danger m-1" (click)="deleteDepartement(d)">
+                    <i class="fas fa-trash"></i>
                 </button>
               </td>
             </tr>
@@ -379,7 +382,7 @@
     </div>
   </div>
 </div>
-ù
+
 <!-- ── Filière ── -->
 <div class="modal fade" id="filiereModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">

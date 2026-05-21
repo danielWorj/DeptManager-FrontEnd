@@ -37,6 +37,10 @@ export const routes: Routes = [
                     loadComponent : ()=>import('./Components/Admin/Config/configuration/configuration').then(d => d.Configuration)
                 },
                 {
+                    path: 'db', 
+                    loadComponent : ()=>import('./Components/Admin/DB/data-base/data-base').then(d => d.DataBase)
+                },
+                {
                     path: 'admin-requete', 
                     loadComponent : ()=>import('./Components/Admin/requete/requete').then(r => r.RequeteC)
                 },

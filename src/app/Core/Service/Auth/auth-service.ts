@@ -14,8 +14,12 @@ export class AuthService {
     return !!localStorage.getItem('id');
   }
 
-  
   basicLogin(request :any):Observable<BasicAuthData>{
     return this.http.post<BasicAuthData>(DeptManager.Auth.baslogin, request)
   }
+
+  basicLoginWithPwd(request:any):Observable<BasicAuthData>{
+    return this.http.post<BasicAuthData>(DeptManager.Auth.pwdlogin, request)
+  }
+
 }
